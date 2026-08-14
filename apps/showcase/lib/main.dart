@@ -179,6 +179,7 @@ class _FoundationCatalog extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.routexColors;
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _ShowcaseSection(
           title: 'Semantic colors',
@@ -268,29 +269,32 @@ class _ShowcaseSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surfaceRaised,
-        borderRadius: RoutexRadii.card,
-        border: Border.all(color: colors.borderSubtle),
-        boxShadow: RoutexLayer.shadow(RoutexLayerRole.chrome, colors),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(RoutexSpacing.componentPadding),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: RoutexTypography.title),
-            const SizedBox(height: RoutexSpacing.controlGap),
-            Text(
-              description,
-              style: RoutexTypography.body.copyWith(
-                color: colors.contentSecondary,
+    return SizedBox(
+      width: double.infinity,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.surfaceRaised,
+          borderRadius: RoutexRadii.card,
+          border: Border.all(color: colors.borderSubtle),
+          boxShadow: RoutexLayer.shadow(RoutexLayerRole.chrome, colors),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(RoutexSpacing.componentPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: RoutexTypography.title),
+              const SizedBox(height: RoutexSpacing.controlGap),
+              Text(
+                description,
+                style: RoutexTypography.body.copyWith(
+                  color: colors.contentSecondary,
+                ),
               ),
-            ),
-            const SizedBox(height: RoutexSpacing.contentGap),
-            child,
-          ],
+              const SizedBox(height: RoutexSpacing.contentGap),
+              child,
+            ],
+          ),
         ),
       ),
     );
