@@ -7,5 +7,8 @@ export 'src/foundations/routex_motion.dart';
 export 'src/foundations/routex_radii.dart';
 export 'src/foundations/routex_spacing.dart';
 export 'src/foundations/routex_typography.dart';
+export 'src/layout/routex_cluster.dart';
+export 'src/layout/routex_inset.dart';
+export 'src/layout/routex_stack.dart';
 export 'src/theme/routex_color_tokens.dart';
 export 'src/theme/routex_theme.dart';

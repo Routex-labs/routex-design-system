@@ -97,6 +97,131 @@ void main() {
     );
   });
 
+  group('layout primitive', () {
+    testWidgets('Inset은 모든 역할의 방향성 여백을 정확히 고정한다', (tester) async {
+      final cases = <(RoutexInsetRole, EdgeInsetsGeometry)>[
+        (
+          RoutexInsetRole.screen,
+          const EdgeInsetsDirectional.fromSTEB(
+            RoutexSpacing.screenGutter,
+            RoutexSpacing.sectionGap,
+            RoutexSpacing.screenGutter,
+            RoutexSpacing.sectionGap,
+          ),
+        ),
+        (
+          RoutexInsetRole.component,
+          const EdgeInsetsDirectional.all(RoutexSpacing.componentPadding),
+        ),
+      ];
+
+      for (final (role, expectedPadding) in cases) {
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.rtl,
+            child: RoutexInset(
+              role: role,
+              child: const SizedBox(width: 100, height: 100),
+            ),
+          ),
+        );
+
+        expect(
+          tester.widget<Padding>(find.byType(Padding)).padding,
+          expectedPadding,
+          reason: role.name,
+        );
+      }
+    });
+
+    testWidgets('Stack은 모든 역할에서 자식 사이에만 gap을 둔다', (tester) async {
+      final cases = <(RoutexStackGap, double)>[
+        (RoutexStackGap.inline, RoutexSpacing.inlineGap),
+        (RoutexStackGap.control, RoutexSpacing.controlGap),
+        (RoutexStackGap.content, RoutexSpacing.contentGap),
+        (RoutexStackGap.section, RoutexSpacing.sectionGap),
+      ];
+
+      for (final (gap, expectedGap) in cases) {
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 100,
+                child: RoutexStack(
+                  gap: gap,
+                  children: const [
+                    SizedBox(key: ValueKey('first'), height: 10),
+                    SizedBox(key: ValueKey('second'), height: 10),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        expect(
+          tester.getSize(find.byType(RoutexStack)).height,
+          20 + expectedGap,
+          reason: gap.name,
+        );
+        expect(
+          tester.getSize(find.byKey(const ValueKey('first'))).width,
+          tester.getSize(find.byType(RoutexStack)).width,
+          reason: '${gap.name} stretch',
+        );
+        expect(
+          tester.getTopLeft(find.byKey(const ValueKey('second'))).dy -
+              tester.getTopLeft(find.byKey(const ValueKey('first'))).dy,
+          10 + expectedGap,
+          reason: gap.name,
+        );
+      }
+    });
+
+    testWidgets('Cluster는 모든 역할에서 같은 축 간격으로 줄바꿈한다', (tester) async {
+      final cases = <(RoutexClusterGap, double)>[
+        (RoutexClusterGap.control, RoutexSpacing.controlGap),
+        (RoutexClusterGap.content, RoutexSpacing.contentGap),
+      ];
+
+      for (final (gap, expectedGap) in cases) {
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 100,
+                child: RoutexCluster(
+                  gap: gap,
+                  children: const [
+                    SizedBox(key: ValueKey('first'), width: 60, height: 20),
+                    SizedBox(key: ValueKey('second'), width: 60, height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final wrap = tester.widget<Wrap>(find.byType(Wrap));
+        expect(wrap.spacing, expectedGap, reason: gap.name);
+        expect(wrap.runSpacing, expectedGap, reason: gap.name);
+        expect(wrap.alignment, WrapAlignment.start, reason: gap.name);
+        expect(
+          tester.getTopLeft(find.byKey(const ValueKey('second'))).dy -
+              tester.getTopLeft(find.byKey(const ValueKey('first'))).dy,
+          20 + expectedGap,
+          reason: gap.name,
+        );
+        expect(tester.takeException(), isNull);
+      }
+    });
+  });
+
   testWidgets('loading 상태는 동작을 비활성화하고 진행 상태를 표시한다', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
