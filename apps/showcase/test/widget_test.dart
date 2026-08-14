@@ -18,6 +18,44 @@ void main() {
 
   for (final width in [360.0, 390.0]) {
     for (final textScale in [1.0, 1.3, 2.0]) {
+      testWidgets('Showcase ${width.toInt()}px · $textScale×에서 섹션 경계가 일치한다', (
+        tester,
+      ) async {
+        tester.view.devicePixelRatio = 1;
+        tester.view.physicalSize = Size(width, 5000);
+        tester.platformDispatcher.textScaleFactorTestValue = textScale;
+        addTearDown(tester.view.resetDevicePixelRatio);
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+        await tester.pumpWidget(const RoutexShowcaseApp());
+        await tester.pump();
+
+        final sectionTitles = [
+          'Alignment & Rhythm',
+          'Button · beta',
+          'Semantic colors',
+          'Typography',
+          'Spacing · Radius · Metrics',
+          'Layer · Motion',
+          'Motion boundary',
+        ];
+        final rects = [
+          for (final title in sectionTitles)
+            tester.getRect(find.byKey(ValueKey('showcase-section-$title'))),
+        ];
+
+        for (final rect in rects.skip(1)) {
+          expect(rect.left, rects.first.left, reason: 'left edge');
+          expect(rect.right, rects.first.right, reason: 'right edge');
+        }
+        expect(tester.takeException(), isNull);
+      });
+    }
+  }
+
+  for (final width in [360.0, 390.0]) {
+    for (final textScale in [1.0, 1.3, 2.0]) {
       testWidgets('${width.toInt()}px · $textScale×에서 overflow가 없다', (
         tester,
       ) async {
