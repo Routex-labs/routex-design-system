@@ -12,6 +12,7 @@ void main() {
     expect(find.text('Semantic colors'), findsOneWidget);
     expect(find.text('Alignment & Rhythm'), findsOneWidget);
     expect(find.text('Button · beta'), findsOneWidget);
+    expect(find.text('ListCell · beta'), findsOneWidget);
     expect(find.text('Motion boundary'), findsOneWidget);
     expect(find.text(RoutexColorRole.actionPrimary.name), findsOneWidget);
   });
@@ -34,6 +35,7 @@ void main() {
         final sectionTitles = [
           'Alignment & Rhythm',
           'Button · beta',
+          'ListCell · beta',
           'Semantic colors',
           'Typography',
           'Spacing · Radius · Metrics',

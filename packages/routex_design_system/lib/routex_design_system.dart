@@ -1,6 +1,7 @@
 library;
 
 export 'src/components/routex_button.dart';
+export 'src/components/routex_list_cell.dart';
 export 'src/foundations/routex_layer.dart';
 export 'src/foundations/routex_metrics.dart';
 export 'src/foundations/routex_motion.dart';

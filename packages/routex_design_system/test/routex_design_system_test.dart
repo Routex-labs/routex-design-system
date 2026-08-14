@@ -97,6 +97,173 @@ void main() {
     );
   });
 
+  group('RoutexListCell beta', () {
+    testWidgets('leading 유무와 LTR·RTL에 관계없이 텍스트 열을 고정한다', (tester) async {
+      for (final direction in TextDirection.values) {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: RoutexTheme.light,
+            home: Directionality(
+              textDirection: direction,
+              child: const Scaffold(
+                body: SizedBox(
+                  width: 360,
+                  child: Column(
+                    children: [
+                      RoutexListCell(
+                        title: '아이콘 있음',
+                        subtitle: '같은 텍스트 열',
+                        leadingIcon: Icons.storefront_outlined,
+                      ),
+                      RoutexListCell(title: '아이콘 없음', subtitle: '같은 텍스트 열'),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+
+        final withIcon = tester.getRect(find.text('아이콘 있음'));
+        final withoutIcon = tester.getRect(find.text('아이콘 없음'));
+        if (direction == TextDirection.ltr) {
+          expect(withIcon.left, withoutIcon.left);
+        } else {
+          expect(withIcon.right, withoutIcon.right);
+        }
+        expect(withIcon.top, lessThan(withoutIcon.top));
+        expect(tester.takeException(), isNull);
+      }
+    });
+
+    testWidgets('빈 subtitle은 gap을 남기지 않고 48dp 터치 영역을 유지한다', (tester) async {
+      var pressed = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexListCell(
+              title: '저장한 장소',
+              onPressed: () => pressed = true,
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSize(find.byType(RoutexListCell)).height,
+        greaterThanOrEqualTo(RoutexMetrics.minimumTouchTarget),
+      );
+      expect(find.byType(RoutexStack), findsNothing);
+      await tester.tap(find.byType(RoutexListCell));
+      expect(pressed, isTrue);
+    });
+
+    testWidgets('selected·disabled 상태를 의미와 동작에 함께 반영한다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexListCell(
+              title: '선택한 장소',
+              subtitle: 'B2 · 카페',
+              selected: true,
+              enabled: false,
+              onPressed: _unexpectedPress,
+            ),
+          ),
+        ),
+      );
+
+      final semantics = tester.getSemantics(find.byType(RoutexListCell));
+      expect(
+        semantics,
+        matchesSemantics(
+          label: '선택한 장소, B2 · 카페',
+          isButton: true,
+          hasSelectedState: true,
+          isSelected: true,
+          hasEnabledState: true,
+          isEnabled: false,
+        ),
+      );
+      expect(tester.widget<InkWell>(find.byType(InkWell)).onTap, isNull);
+      expect(
+        tester
+            .widget<Material>(
+              find.descendant(
+                of: find.byType(RoutexListCell),
+                matching: find.byType(Material),
+              ),
+            )
+            .color,
+        RoutexColorTokens.light.actionPrimarySubtle,
+      );
+    });
+
+    testWidgets('pressed는 selected와 조합해도 별도 시각 상태를 유지한다', (tester) async {
+      for (final selected in [false, true]) {
+        await tester.pumpWidget(
+          MaterialApp(
+            theme: RoutexTheme.light,
+            home: Scaffold(
+              body: RoutexListCell(
+                title: '상태 조합',
+                selected: selected,
+                onPressed: _unexpectedPress,
+              ),
+            ),
+          ),
+        );
+
+        final pressedColor = tester
+            .widget<InkWell>(find.byType(InkWell))
+            .overlayColor
+            ?.resolve({WidgetState.pressed});
+        expect(
+          pressedColor,
+          selected
+              ? RoutexColorTokens.light.surfaceCanvas
+              : RoutexColorTokens.light.actionPrimarySubtle,
+          reason: 'selected: $selected',
+        );
+      }
+    });
+
+    for (final width in [360.0, 390.0]) {
+      for (final textScale in [1.0, 1.3, 2.0]) {
+        testWidgets('${width.toInt()}px · $textScale× 긴 한글에서 overflow가 없다', (
+          tester,
+        ) async {
+          tester.view.devicePixelRatio = 1;
+          tester.view.physicalSize = Size(width, 600);
+          tester.platformDispatcher.textScaleFactorTestValue = textScale;
+          addTearDown(tester.view.resetDevicePixelRatio);
+          addTearDown(tester.view.resetPhysicalSize);
+          addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+          await tester.pumpWidget(
+            MaterialApp(
+              theme: RoutexTheme.light,
+              home: const Scaffold(
+                body: RoutexListCell(
+                  title: '더현대 서울에서 저장한 아주 긴 장소 이름',
+                  subtitle: '지하 2층에서 찾을 수 있는 카페와 베이커리 상세 정보',
+                  leadingIcon: Icons.storefront_outlined,
+                  trailingIcon: Icons.chevron_right,
+                ),
+              ),
+            ),
+          );
+          await tester.pump();
+
+          expect(find.textContaining('더현대 서울'), findsOneWidget);
+          expect(tester.takeException(), isNull);
+        });
+      }
+    }
+  });
+
   group('layout primitive', () {
     testWidgets('Inset은 모든 역할의 방향성 여백을 정확히 고정한다', (tester) async {
       final cases = <(RoutexInsetRole, EdgeInsetsGeometry)>[
@@ -259,6 +426,9 @@ void main() {
     expect(() => tokenContext.routexColors, throwsFlutterError);
   });
 }
+
+void _unexpectedPress() =>
+    throw StateError('disabled cell must not be pressed');
 
 double _contrastRatio(Color foreground, Color background) {
   final lighter = foreground.computeLuminance() > background.computeLuminance()
