@@ -21,7 +21,7 @@
 | 프로모션 코드 이동 | 완료 | `apps/promo_studio/`에서 독립 실행 |
 | 프로모션 정적 분석·웹 빌드 | 완료 | `flutter analyze`, `flutter build web` 통과 |
 | 디자인 시스템 계획 이동 | 완료 | 이 문서가 단일 출처 |
-| Runtime Kit package | bootstrap 완료 | semantic foundation과 `RoutexButton` beta |
+| Runtime Kit package | 기반 구축 중 | semantic foundation, layout primitive, `RoutexButton`·`RoutexListCell` beta |
 | Showcase & Lab | 최소 Showcase 완료 | Runtime Kit을 path dependency로 직접 import |
 | 검증 workflow | 완료 | Runtime Kit analyze/test, Showcase analyze/test/web build, Promo analyze/web build |
 | Git 저장소·GitHub 원격 | 완료 | 공개 `Routex-labs/routex-design-system` |
@@ -31,7 +31,8 @@
 Runtime Kit가 생기면 package import로 교체하고 이 사본을 제거한다.
 
 현재 package의 `0.0.1`은 monorepo 공급과 Showcase import를 확인하는 bootstrap 버전이다.
-토큰 수치와 `RoutexButton` API는 inventory 전이므로 beta이며, Navigation은 이를 소비하지 않는다.
+토큰 수치와 `RoutexButton`·`RoutexListCell` API는 pilot 전이므로 beta이며, Navigation은 이를
+소비하지 않는다.
 
 ### 3인 팀의 v0.1 범위 제한
 
@@ -571,7 +572,7 @@ v0.1의 상한은 공통 컴포넌트 6~10개다. 아래 8개를 후보로 두�
 | IconButton | standard/onMap/inverse, selected/disabled | 상단 바, 재중앙, 닫기 |
 | Chip | filter/choice/status, selected/disabled | `filter_pill`, 카테고리, 이동수단 |
 | Surface | flat/outlined/raised/overlay | 카드와 지도 overlay container |
-| ListCell | 1~3행, leading/trailing/action, selected | 검색·즐겨찾기·카테고리 매장 |
+| ListCell · beta | 1~2행, leading/trailing, selected/disabled | 검색·즐겨찾기·카테고리 매장 |
 | SearchField | idle/focused/typing/loading/error | 상단 검색과 길찾기 두 칸 |
 | Sheet | peek/medium/expanded, drag/close | 모든 bottom sheet frame/header |
 | Status/Empty | info/success/warning/error/loading/empty | 검색 없음, 위치 오류, 도착 |
@@ -636,7 +637,8 @@ Navigation 제품 화면은 공급 경로만 검증한 빈 package나 `main` bra
 
 ### 2단계 — 공통 컴포넌트
 
-- Button → IconButton → Chip → Surface/ListCell → SearchField → Sheet → Status 순서로 만든다.
+- Button과 ListCell vertical slice 이후 SearchField → Sheet를 우선하고, 실제 pilot 요구에 따라
+  IconButton → Chip → Surface → Status를 추가한다.
 - 각 컴포넌트 PR에 상태표, 접근성 semantics, 1.0/2.0 text scale 테스트를 포함한다.
 - Navigation inventory에서 확인된 실제 사용 사례로 API를 정하되, 이 단계에서는 Showcase의
   고정 fixture로 먼저 검증한다. 제품 화면 이관은 `v0.1.0` 이후 pilot 단계에서 진행한다.
@@ -765,7 +767,7 @@ component, migration 문서를 다시 확인했다. 아래 표의 “Routex 결�
 | 레퍼런스에서 확인한 것 | Routex 결정 | 그대로 복사하지 않는 것 |
 |---|---|---|
 | [Skyscanner Backpack 계층](https://www.skyscanner.design/latest/getting-started/backpack-in-figma/foundations-components-and-patterns-4b5yBAjl): foundation→component→pattern, core와 product pattern의 소유 분리 | Runtime Kit은 core를, Routex Navigation pattern은 domain 조합을 소유 | 여행사 컴포넌트 이름과 수치 |
-| [Backpack layout primitive](https://www.skyscanner.design/latest/layout/layout-primitives/overview-tVO0yQeg): Box/Stack/Flex/Grid가 시각 스타일과 분리되어 spacing·정렬을 통제 | v1 component가 안정되면 `RoutexGap`, `RoutexStack`처럼 **레이아웃만** 담당하는 작은 primitive를 검토 | 모든 Container를 wrapper로 감싸는 과도한 추상화 |
+| [Backpack layout primitive](https://www.skyscanner.design/latest/layout/layout-primitives/overview-tVO0yQeg): Box/Stack/Flex/Grid가 시각 스타일과 분리되어 spacing·정렬을 통제 | `RoutexInset`, `RoutexStack`, `RoutexCluster`만 먼저 두고 semantic role과 실패 테스트로 API를 제한 | 모든 Container를 wrapper로 감싸는 과도한 추상화 |
 | [Backpack spacing](https://www.skyscanner.design/latest/foundations/spacing/overview-jCiTHnBD): 반복 scale과 component/section 간격 구분 | 4px scale을 쓰되 component 내부와 section 간격의 의미 이름을 분리 | 큰 웹 여백을 모바일 지도에 적용 |
 | [Backpack icon](https://www.skyscanner.design/latest/foundations/icons/overview-GqEdq0zt): 크기별 live area·padding·stroke와 텍스트 색 연동 | 16/20/24별 optical rule과 semantic foreground를 아이콘 계약에 포함 | 전체 커스텀 아이콘을 v1에서 한꺼번에 제작 |
 | [Wanted Montage Foundation](https://montage.wanted.co.kr/docs/foundations)과 [Grid](https://montage.wanted.co.kr/docs/foundations/base-material/grid): typography/grid/icon/elevation의 명시적 scale, 대표 viewport | 360·375·390과 tablet 대표 폭으로 golden을 만들고 4px 기본, 2px optical correction만 허용 | 8px grid와 웹 breakpoint를 그대로 채택 |

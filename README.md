@@ -8,7 +8,7 @@ Navigation 앱과 릴리스 주기가 다른 디자인 시스템과 프로모션
 |---|---|---|
 | `apps/promo_studio/` | 사용 가능 | 결정론적 Flutter 프로모션 영상 스튜디오 |
 | `docs/design-system-plan.md` | 작성됨 | 진단, 설계 원칙, 레퍼런스 적용 결정, 단계별 실행 계획의 단일 출처 |
-| `packages/routex_design_system/` | bootstrap 완료 | semantic foundation과 첫 beta Button을 제공하는 Runtime Kit |
+| `packages/routex_design_system/` | 기반 구축 중 | semantic foundation, layout primitive, Button·ListCell beta를 제공하는 Runtime Kit |
 | `apps/showcase/` | bootstrap 완료 | 실제 Runtime Kit을 import하는 Flutter Web Showcase |
 | `.github/workflows/verify.yml` | 작성됨 | Runtime Kit, Showcase, Promo Studio 검증 |
 
