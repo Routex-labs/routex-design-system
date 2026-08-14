@@ -308,6 +308,24 @@ Pretendard를 유지하고 역할을 7개 안팎으로 제한한다.
 v0.1에서는 `ListCell`, `SearchField`, `Sheet`와 Button을 정렬 검수의 대표 대상으로 삼는다.
 각 컴포넌트는 왼쪽 시작선, 텍스트 baseline, 제목–보조정보 간격을 fixture와 golden으로 고정한다.
 
+#### 6.3.2 Layout primitive 실패 계약
+
+Layout primitive는 편의 위젯이 아니라 임의 배치를 막는 경계다. 생성자에는 `double`,
+`EdgeInsetsGeometry`, 임의 `alignment`를 받지 않고 아래 semantic role만 공개한다. 새 역할이
+필요하면 기존 화면에서 수치를 넘기는 대신 계약과 테스트를 먼저 추가한다.
+
+| primitive | 고정 계약 | 즉시 실패로 보는 조건 | 자동 검증 |
+|---|---|---|---|
+| `RoutexInset.screen` | start/end 16dp, top/bottom 24dp, directional inset | 값 변경, 물리 방향 기반 inset, 외부 임의 padding 추가 | LTR/RTL widget test |
+| `RoutexInset.component` | 네 방향 16dp | 방향별 예외값 또는 외부 보정 추가 | widget test |
+| `RoutexStack` | 첫·끝 0dp, 자식 사이만 4/8/12/24dp, 가로 stretch | 선행·후행 gap, 역할 외 수치, 자식 순서·폭 변경 | 크기·좌표 widget test |
+| `RoutexCluster` | 가로·세로 gap 8/12dp, start 정렬, 자동 줄바꿈 | 축별 다른 gap, center 정렬, 좁은 폭 overflow | 320dp 이하 wrap test |
+| Showcase section | 같은 부모 안에서 좌우 경계 일치 | 섹션마다 폭 또는 시작선이 달라짐 | 360/390dp rect 비교 |
+
+360/390dp와 text scale 1.0/1.3/2.0 조합에서 overflow, 잘림, 겹침 또는 예외가 하나라도
+발생하면 완료로 보지 않는다. 테스트를 통과시키기 위한 고정 높이, 글자 축소,
+`Transform.translate`도 실패로 취급한다.
+
 ### 6.4 radius, stroke, elevation
 
 - Radius 후보: `8`(작은 컨트롤), `12`(필드/리스트 묶음), `16`(카드),
