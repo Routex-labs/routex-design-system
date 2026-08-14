@@ -25,8 +25,9 @@ Showcase, Promo Studio 핵심 장면, Navigation 1~2개 시범 화면까지만 �
 현재 package 버전 `0.0.1`은 공급 경로를 검증하기 위한 bootstrap이며 Navigation 적용용
 release가 아니다. 실제 시범 적용은 토큰과 핵심 컴포넌트를 검토한 `v0.1.0`부터 시작한다.
 
-현재 폴더는 아직 독립 Git 저장소나 GitHub 원격으로 초기화하지 않았다. 원격 후보는
-`Routex-labs/routex-design-system`이며, 공개 여부와 라이선스를 결정한 뒤 연결한다.
+현재 폴더는 독립 Git 저장소이며 비공개
+[`Routex-labs/routex-design-system`](https://github.com/Routex-labs/routex-design-system)에
+연결되어 있다. 코드와 브랜드 자산 라이선스를 결정하기 전에는 공개로 전환하지 않는다.
 
 ## 다른 앱에서 사용하는 방식
 

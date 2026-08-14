@@ -24,7 +24,7 @@
 | Runtime Kit package | bootstrap 완료 | semantic foundation과 `RoutexButton` beta |
 | Showcase & Lab | 최소 Showcase 완료 | Runtime Kit을 path dependency로 직접 import |
 | 검증 workflow | 완료 | Runtime Kit analyze/test, Showcase analyze/test/web build, Promo analyze/web build |
-| Git 저장소·GitHub 원격 | 미착수 | `Routex-labs/routex-design-system` 후보 |
+| Git 저장소·GitHub 원격 | 완료 | 비공개 `Routex-labs/routex-design-system` |
 | Navigation 앱 package 연동 | 미착수 | 첫 release tag 이후 진행 |
 
 현재 Promo Studio의 `lib/theme/app_theme.dart`는 독립 실행을 위한 임시 snapshot이다.
@@ -390,10 +390,11 @@ dependencies:
       path: packages/routex_design_system
 ```
 
-현재 `Navigation`이 공개 저장소이므로, 새 저장소도 라이선스·브랜드 자산에 문제가 없다면
-**공개로 시작하는 편이 CI와 clone 재현성이 좋다.** 비공개로 시작하면 GitHub Actions와
-외부 checkout에 읽기 credential이 필요하므로, 인증 구성이 끝나기 전에는 앱 의존성을
-전환하지 않는다.
+현재 원격은 코드·브랜드 자산 라이선스를 확정하기 전의 accidental disclosure를 막기 위해
+비공개로 만들었다. GitHub Actions는 repository token으로 checkout하고, 조직 구성원은
+인증된 GitHub 계정으로 package를 받는다. 공개 전환은 라이선스와 공개 가능한 프로모션
+asset 범위를 결정한 뒤 별도 변경으로 진행한다. Navigation에서 private git dependency를
+사용하기 전에는 로컬 개발 환경과 CI의 읽기 credential을 먼저 검증한다.
 
 ### 7.3 저장소 경계
 
@@ -548,15 +549,16 @@ Navigation pilot 1~2개가 v0.1의 범위이며, 나머지 화면 이관은 사�
 
 - **완료:** 로컬 작업 폴더를 만들고 Promo Studio와 이 계획 문서를 Navigation에서 옮겼다.
 - **완료:** Promo Studio의 analyze와 web build로 독립 실행 경계를 확인했다.
-- `Routex-labs/routex-design-system` 원격을 만들고 package/showcase monorepo를 scaffold한다.
+- **완료:** 비공개 `Routex-labs/routex-design-system` 원격과 package/showcase monorepo를 만들었다.
 - 공개 여부, 코드 라이선스, 보호할 브랜드 자산 범위를 결정한다.
-- analyze/test/golden/web build CI와 `v0.x.y` tag release 규칙을 먼저 만든다.
+- **완료:** Runtime Kit analyze/test, Showcase analyze/test/web build와 Promo analyze/web build
+  workflow를 만들었다. golden과 `v0.x.y` release 규칙은 다음 준비 작업이다.
 - Navigation에서 tag pin과 로컬 `pubspec_overrides.yaml` 흐름을 작은 빈 package로 검증한다.
 - 첫 Runtime Kit release 뒤 Promo Studio의 임시 `app_theme.dart`를 package import로 교체한다.
 
-**통과 조건:** 새 clone과 GitHub Actions에서 credential·로컬 경로 없이 package resolve,
-test, Showcase web build가 모두 성공한다. 아직 제품 스타일을 만들기 전 이 공급 경로부터
-고정한다.
+**통과 조건:** 조직 구성원의 새 clone과 GitHub Actions repository token 환경에서 개인 로컬
+경로 없이 package resolve, test, Showcase web build가 모두 성공한다. 아직 제품 스타일을
+확정하기 전 이 공급 경로부터 고정한다.
 
 Navigation 제품 화면은 공급 경로만 검증한 빈 package나 `main` branch를 사용하지 않는다.
 토큰과 최소 컴포넌트가 포함된 `v0.1.0` tag가 만들어진 뒤 pilot 화면 1~2개부터 실제 적용한다.
