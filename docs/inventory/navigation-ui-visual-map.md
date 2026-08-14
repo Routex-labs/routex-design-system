@@ -102,4 +102,5 @@ flowchart LR
 
 단계별 통과 조건은 inventory의
 [pilot 선정](./navigation-ui-inventory.md#8-pilot-선정)과
-[다음 token PR의 결정 항목](./navigation-ui-inventory.md#9-다음-token-pr의-결정-항목)을 따른다.
+[다음 token PR의 결정 항목](./navigation-ui-inventory.md#9-다음-token-pr의-결정-항목),
+[v0.1 foundation token 계약](../decisions/0001-foundation-tokens.md)을 따른다.
