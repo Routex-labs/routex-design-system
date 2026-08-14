@@ -22,6 +22,10 @@ Promo Studio를 주로 운영하는 동안 토큰, 핵심 컴포넌트 6~10개, 
 Showcase, Promo Studio 핵심 장면, Navigation 1~2개 시범 화면까지만 첫 범위에 포함한다.
 전체 앱을 한 번에 재작성하지 않는다.
 
+v0.1의 대표 품질 기준은 “토큰이 존재하는가”가 아니라 같은 역할의 텍스트·아이콘·콘텐츠가
+화면이 달라도 같은 시작선, baseline과 세로 리듬을 유지하는가이다. Showcase의
+Alignment & Rhythm 화면과 대표 컴포넌트 golden으로 이를 검수한다.
+
 현재 package 버전 `0.0.1`은 공급 경로를 검증하기 위한 bootstrap이며 Navigation 적용용
 release가 아니다. 실제 시범 적용은 토큰과 핵심 컴포넌트를 검토한 `v0.1.0`부터 시작한다.
 

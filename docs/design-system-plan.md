@@ -73,6 +73,8 @@ Promo Studio를 주로 운영하므로, 첫 버전은 “완전한 사내 플랫
 - 모든 상호작용은 최소 48×48dp 터치 영역을 확보하고, 텍스트/아이콘 대비는 WCAG 2.2
   AA를 만족하며, 색만으로 상태를 전달하지 않는다.
 - 디자인 시스템 카탈로그에서 토큰과 공통 컴포넌트의 모든 상태를 한 화면씩 확인할 수 있다.
+- 같은 역할의 제목·본문·메타정보·아이콘은 화면이 달라도 같은 시작선과 baseline을 사용하고,
+  제목–본문–메타정보 사이의 세로 리듬이 공통 계약과 일치한다.
 - Showcase에서 브랜드 원칙 → foundation → component → Navigation pattern → 실제 화면으로
   이어지는 이유를 비개발자도 이해할 수 있고, Lab에서는 같은 컴포넌트의 상태·화면 폭·
   텍스트 배율을 개발자가 조절해 검수할 수 있다.
@@ -90,6 +92,9 @@ Promo Studio를 주로 운영하므로, 첫 버전은 “완전한 사내 플랫
 - Material 기본 컴포넌트를 직접 쓴 화면과 공통 컴포넌트를 쓴 화면이 섞여 보인다.
 - 지도 그래픽용 색을 일반 UI 토큰으로 끌어오거나 그 반대가 발생한다.
 - Navigation 앱이 디자인 시스템의 `main` branch나 개인 로컬 경로를 직접 의존한다.
+- spacing token은 존재하지만 화면마다 임의 padding·`SizedBox`를 더해 텍스트 시작선과
+  행간 리듬이 다시 달라진다.
+- 같은 `ListCell` 역할의 제목·메타정보 또는 아이콘이 화면에 따라 다른 baseline에 놓인다.
 
 ---
 
@@ -278,6 +283,30 @@ Pretendard를 유지하고 역할을 7개 안팎으로 제한한다.
 - 빈 공간은 구조를 설명해야 한다. 숫자가 같아도 “내부 padding”과 “형제 gap” 토큰은
   API에서 역할을 구분한다.
 - 방향성 API(`start/end`, `EdgeInsetsDirectional`)를 사용한다.
+
+#### 6.3.1 텍스트 리듬과 정렬 계약
+
+사용자가 가장 자주 체감하는 문제는 개별 spacing 수치보다 **시작선, baseline과 텍스트 사이
+리듬이 화면마다 달라지는 것**이다. 따라서 정렬은 화면 작성자의 미세 조정이 아니라 공통
+컴포넌트가 소유한다.
+
+- 같은 계층의 콘텐츠는 공통 screen gutter와 열(column) 시작선을 공유한다. 검색 결과,
+  즐겨찾기와 장소 목록의 제목 열이 서로 다른 x 좌표에서 시작하지 않는다.
+- 제목·본문·메타정보 사이 간격은 typography 역할 조합별 계약으로 둔다. 예를 들어
+  `title → body`, `bodyStrong → caption` 간격을 화면에서 다시 정하지 않는다.
+- 아이콘의 외곽 bounding box가 아니라 live area의 시각 중심과 텍스트 baseline을 맞춘다.
+  leading icon 유무가 텍스트 열의 시작선을 바꾸지 않도록 컴포넌트 variant가 열을 소유한다.
+- 컴포넌트 내부 padding, 형제 요소 gap, 섹션 간격을 서로 다른 semantic token으로 사용한다.
+  같은 숫자여도 역할을 섞지 않는다.
+- 빈 subtitle, 두 줄 제목, 긴 한글, 숫자·영문 혼합, text scale 1.0/1.3/2.0에서 정렬선과
+  콘텐츠 순서가 유지되어야 한다. 이를 고정 높이 또는 글자 축소로 해결하지 않는다.
+- 화면별 임의 `EdgeInsets`, `SizedBox(height: 7)`, `Transform.translate`로 정렬을 보정하지
+  않는다. 반복되는 차이는 component 계약을 수정하고 한 화면만의 요구는 `app-local`로 둔다.
+- 2px optical correction은 수학적 중앙과 시각적 중앙이 다른 아이콘·glyph에만 허용한다.
+  correction 이름, 대상, 근거와 제거 조건을 문서화하고 일반 spacing token으로 확산하지 않는다.
+
+v0.1에서는 `ListCell`, `SearchField`, `Sheet`와 Button을 정렬 검수의 대표 대상으로 삼는다.
+각 컴포넌트는 왼쪽 시작선, 텍스트 baseline, 제목–보조정보 간격을 fixture와 golden으로 고정한다.
 
 ### 6.4 radius, stroke, elevation
 
@@ -475,6 +504,10 @@ Journey, 전체 접근성 도구, 상태 대시보드와 문서 자동 생성은
 추가한다. 중요한 조건은 페이지 수가 아니라 **Showcase가 Runtime Kit package를 실제로
 import해 같은 컴포넌트를 렌더링하는가**이다.
 
+Showcase에는 **Alignment & Rhythm** 검수 화면을 둔다. 공통 세로 guide와 text baseline을
+겹쳐 표시한 상태에서 Button, ListCell, SearchField, Sheet를 비교하며, leading icon 유무,
+한 줄·두 줄·빈 메타정보, text scale 변화에도 시작선과 간격 계약이 유지되는지 확인한다.
+
 장기적으로 한 사이트 안에 두 모드를 둔다.
 
 | 모드 | 대상 | 보여주는 것 |
@@ -490,7 +523,8 @@ import해 같은 컴포넌트를 렌더링하는가**이다.
 4. **Patterns** — MapChrome, PlaceSummary, RouteEndpoint, RouteInstruction, FloorControl
 5. **Journeys** — 검색 → 장소 선택 → 길찾기 → 층 전환 → 도착의 대표 시나리오
 6. **Accessibility Lab** — 대비, 2배 글자, reduce motion, focus/semantics 점검
-7. **Status** — proposal/beta/stable/deprecated와 변경 기록
+7. **Alignment & Rhythm** — 시작선, baseline, 텍스트 역할 간격과 optical correction 검수
+8. **Status** — proposal/beta/stable/deprecated와 변경 기록
 
 Showcase를 Runtime Kit의 스크린샷 모음으로 만들지 않는다. **실제 컴포넌트를 import해
 렌더링**하고, 문서의 토큰 표도 runtime token에서 생성한다. 설명 문장은 이 문서 계열을
@@ -677,12 +711,15 @@ Navigation 제품 화면은 공급 경로만 검증한 빈 package나 `main` bra
 | 상태 | idle, focused, pressed, selected, disabled, loading, empty, error |
 | 지도 모드 | 야외, 실내, 검색, 길찾기 초안, 안내, 층 전환, 도착 |
 | 접근성 | contrast AA, semantics label/role, focus order, 48dp target, reduce motion |
+| 정렬·리듬 | 공통 gutter/열 시작선, text/icon baseline, 역할 간 세로 간격, optical correction |
 | 플랫폼 | Android, iOS, 지원 웹 화면 |
 
 golden은 픽셀 변화 자체를 전부 오류로 취급하지 않는다. 변경 의도가 설명된 경우 기준을
 갱신하되, 다음 항목은 수동 승인 없이 갱신하지 않는다.
 
 - 텍스트 잘림·겹침·말줄임 위치 변화
+- 같은 역할의 텍스트 시작선·baseline·제목–메타정보 간격 변화
+- leading icon 유무에 따라 공통 텍스트 열이 흔들리는 변화
 - 기본 CTA가 둘 이상 같은 강조를 갖게 되는 변화
 - focus/selected/error 상태가 사라지는 변화
 - 지도 위 overlay의 위치·z-order·hit area 변화

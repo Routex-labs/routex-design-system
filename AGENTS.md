@@ -24,6 +24,10 @@
 - 컴포넌트는 `proposal → beta → stable → deprecated → removed` 상태와 migration 경로를 갖는다.
 - 기존 UI는 사용량과 일관성을 기준으로 `stable / beta / deprecated / app-local`로 분류하고,
   호환 wrapper를 거쳐 점진적으로 교체한다.
+- 같은 역할의 텍스트·아이콘·콘텐츠는 화면이 달라도 같은 시작선, baseline, 내부 간격을
+  사용한다. 임의 `EdgeInsets`, `SizedBox`와 화면별 `TextStyle`로 정렬을 보정하지 않는다.
+- 2px optical correction은 토큰으로 해결할 수 없는 시각 중심 보정에만 허용하고, 적용 대상과
+  이유를 컴포넌트 문서 및 테스트에 남긴다.
 
 ## 프로모션 스튜디오
 
