@@ -10,7 +10,7 @@
 - 대상: sibling `Navigation/client/lib`
 - 기준 commit: `65f4fd7`
 - Dart 파일: 186개
-- 방식: 소스 정적 검색과 실제 호출 경로·테스트 확인
+- 방식: 소스 정적 검색, 실제 호출 경로·테스트 확인, 로컬 실행 화면 상호작용 점검
 - 변경 원칙: Navigation worktree는 읽기만 하고 수정하지 않음
 
 조사 시점의 Navigation에는 지도, 장소 상세와 층 전환 관련 미커밋 변경이 있다. 아래 수치는
@@ -24,6 +24,7 @@
 3. v0.1 컴포넌트 6~10개와 실제 사용 근거를 연결한다.
 4. 현재 수정 중이지 않고 호출 경로와 테스트가 있는 pilot 1~2개를 고른다.
 5. 다음 token PR의 결정 항목과 검증 조건을 남긴다.
+6. 실행 화면에서 확인한 문제와 실행 환경 때문에 확인하지 못한 상태를 구분한다.
 
 다음 상태가 되면 inventory가 실패한 것이다.
 
@@ -33,7 +34,55 @@
 - 현재 수정 중인 장소 상세·지도 파일을 동시에 이관한다.
 - `0.0.1` bootstrap token을 검증 없이 stable로 간주한다.
 
-## 2. 직접 표현 기준선
+## 2. 런타임 UI 점검
+
+2026-08-14에 실행 중인 Flutter Web(`http://localhost:53660`)에서 외부 지도와 실내 지도를
+오가며 다음 흐름을 직접 조작했다.
+
+- 메인 지도, 상단 검색, GPS 신호 약함 상태
+- 앱 메뉴의 저장한 장소, 길찾기, 위치 보정, 디버그 설정
+- 저장한 장소의 빈 상태
+- 길찾기의 자동차·대중교통·도보 선택, 목적지 검색, GPS 실패 피드백
+- 일반 검색의 loading·결과 목록, 장소 상세, 저장 토글, 출발·도착 액션
+- 카테고리 선택, 소분류 chip, 매장 목록과 상세
+- 실내 B1 층 전환, PDR 위치 버튼과 센서 권한 실패
+- 디버그 모드 off/on, 확장 설정과 지도 진단 레이어
+
+브라우저 호스트는 1280×720이었지만 이 제품은 모바일 앱이므로 넓은 폭에서 목록이
+벌어지거나 패널이 커지는 현상은 디자인 시스템 문제로 집계하지 않는다. 이번 실행은 상태와
+구조의 일관성을 확인하는 데 사용하고, 실제 크기 통과 여부는 360/390px fixture와 모바일
+golden으로 판정한다.
+
+### 화면에서 확인한 핵심 문제
+
+| 우선순위 | 문제 | 실행 근거 | 시스템에서 정할 규칙 |
+|---|---|---|---|
+| P0 | 같은 계열 시트의 anatomy와 rhythm이 다름 | 메뉴는 독립 제목, 저장 목록은 `SheetHeader`, 카테고리는 icon+title, 상세는 title+bookmark+action을 각각 직접 조립 | handle/header/body/action 슬롯, 좌우 gutter, header 높이와 시작선을 `Sheet frame` 계약으로 고정 |
+| P0 | 상태 표현 문법이 서로 다름 | 검색·카테고리는 작은 중앙 spinner, GPS/PDR/보정 실패는 화면 전체 폭의 snackbar, GPS 약함은 노란 pill, 저장 토글은 성공·실패 피드백이 보이지 않음 | loading/empty/error/info/success와 persistent/transient 상태를 `Status` 역할로 정의 |
+| P0 | selected 상태의 의미보다 구현 위젯 색이 앞섬 | 이동수단은 파란 segment, 층은 파란 pill, 카테고리는 민트 pill, debug는 초록 switch, bookmark는 선택 변화가 식별되지 않음 | control별 selected 색을 만들지 않고 semantic accent와 icon/fill/stroke 조합을 상태표로 정의 |
+| P1 | 타이포 역할과 정렬선이 화면마다 달라짐 | 메뉴 제목 16, 공통 header 15, 장소명 20대, 목록 14/12, 빈 상태 13이 직접 지정되고 leading 유무에 따라 제목 시작선이 이동 | title/body/label/caption 역할, line-height, weight, leading column과 baseline 규칙을 함께 정의 |
+| P1 | 곡률이 hierarchy가 아니라 개별 위젯에서 결정됨 | sheet 24, chip 15, 저장 아이콘 배경 10, 검색·모드·지도 버튼이 각자 다른 곡률을 사용 | control/field/card/sheet/full의 5개 역할로 제한하고 크기와 radius를 쌍으로 검증 |
+| P1 | 지도 위 layer의 깊이 규칙이 불명확함 | top bar, category chip, floor selector, floating location button, sheet와 dim barrier가 모두 다른 방식으로 떠 있음 | onMap/chrome/overlay elevation, border, dim opacity와 겹침 순서를 하나의 layer scale로 정의 |
+| P1 | 실패 후 다음 행동이 제시되지 않음 | GPS와 동작·피트니스 권한 실패 snackbar에 설정 이동이나 수동 위치 지정 action이 없음 | 오류 문구, icon, 지속시간, recovery action 유무를 원인별로 정의 |
+| P2 | motion의 기능과 시간이 화면별 구현에 묶임 | sheet 진입, 검색 loading, 지도 이동, 층 전환의 목적과 완료 신호가 분리돼 있지 않음 | 제품 component motion만 공통 token으로 두고 지도 camera/PDR 업무 시간은 app-local로 유지 |
+
+빈 즐겨찾기 상태는 문구가 `+ 버튼`을 안내하지만 실제 상세 header는 bookmark 아이콘을
+사용한다. 이처럼 카피가 현재 control과 어긋나는 경우도 component 변경과 함께 고쳐야 한다.
+장소 상세에서 bookmark를 눌렀지만 이번 실행에서는 목록에 항목이 생기지 않았고 성공·실패
+피드백도 없었다. 저장 로직의 결함인지 실행 데이터 조건인지는 이 문서에서 단정하지 않으며,
+pilot fixture에는 반드시 selected/loading/success/error 상태를 독립적으로 넣는다.
+
+### 확인하지 못한 상태
+
+- 현재 위치를 얻지 못해 실제 경로 안내와 도착 화면에는 진입하지 못했다.
+- 브라우저 도구의 viewport가 고정되어 360/390px와 text scale 1.3/2.0은 실행 화면으로
+  캡처하지 못했다. 이 항목은 pilot 완료 조건에서 제거하지 않는다.
+- bookmark 저장 실패의 원인은 별도 Navigation 기능 점검 대상이다.
+
+따라서 런타임 점검은 “모든 화면 검증 완료”가 아니다. 실제로 도달한 상태의 시각 기준선이며,
+경로 안내·도착·모바일 폭·글자 확대는 후속 golden에서 닫아야 한다.
+
+## 3. 직접 표현 기준선
 
 전체 `client/lib`의 단순 출현 수다. 발생 수는 “모두 제거할 위반 수”가 아니라 분류할
 inventory 크기다.
@@ -68,7 +117,7 @@ vertical padding 6은 현재 밀도를 만든다. v0.1에서는 32px control로 
 48dp hit area가 함께 유지되는지 먼저 확인한다. 검증 없이 `spacing6` 토큰을 추가하는 것은
 현재 불규칙을 이름만 바꿔 보존하는 일이다.
 
-## 3. 소유 영역 분류
+## 4. 소유 영역 분류
 
 `screens/widgets/theme`의 파일 단위 1차 분류다. mixed 파일은 UI와 지도 코드가 한 파일 안에
 있어 별도 추출 전까지 파일 전체 allowlist가 될 수 없다.
@@ -92,7 +141,7 @@ vertical padding 6은 현재 밀도를 만든다. v0.1에서는 32px control로 
 프로모션 카메라·파티클·타임라인·장면 연출은 이 집계 대상이 아니며 계속 Promo Studio가
 소유한다.
 
-## 4. 우선 확인할 제품 UI 파일
+## 5. 우선 확인할 제품 UI 파일
 
 직접 style 합계는 `TextStyle + EdgeInsets + SizedBox + BorderRadius + Color`의 단순 합이다.
 
@@ -112,7 +161,7 @@ vertical padding 6은 현재 밀도를 만든다. v0.1에서는 32px control로 
 | `app_menu_sheet.dart` | 13 | 실제 호출, clean, 테스트 있음 | **pilot 1** |
 | `favorites_sheet.dart` | 9 | 실제 호출, clean, 빈 상태·reorder | **pilot 2** |
 
-## 5. 기존 UI 생명주기 분류
+## 6. 기존 UI 생명주기 분류
 
 | 대상 | 분류 | 근거와 migration |
 |---|---|---|
@@ -131,7 +180,7 @@ vertical padding 6은 현재 밀도를 만든다. v0.1에서는 32px control로 
 `deprecated 후보`는 이 PR에서 삭제하지 않는다. 분석 또는 수동 진입 경로를 확인하고 별도
 Navigation PR에서 결정한다.
 
-## 6. v0.1 핵심 컴포넌트 결정
+## 7. v0.1 핵심 컴포넌트 결정
 
 상한은 8개다. 사용량보다 API를 크게 만들지 않고, pilot에서 사용하지 않은 variant는
 stable로 승격하지 않는다.
@@ -150,7 +199,7 @@ stable로 승격하지 않는다.
 Button은 현재 beta다. 나머지는 proposal로 시작하며 Showcase fixture와 pilot을 통과한 API만
 stable로 바꾼다.
 
-## 7. pilot 선정
+## 8. pilot 선정
 
 ### Pilot 1 — `AppMenuSheet`
 
@@ -185,8 +234,11 @@ Navigation에 남긴다.
 - title/subtitle/leading icon의 시작선과 baseline이 같은 ListCell 계약을 따른다.
 - 새 임의 `TextStyle`, `EdgeInsets`, `BorderRadius`, 제품색을 추가하지 않는다.
 - Navigation은 `v0.1.0` release tag를 사용하고 로컬 path나 `main`을 사용하지 않는다.
+- 저장 토글처럼 제자리에서 바뀌는 action은 selected/loading/success/error 중 현재 상태가
+  시각적으로 식별되고, 실패 시 복구 경로를 제공한다.
+- 빈 상태 안내 문구는 실제 노출 control의 이름과 icon을 사용한다.
 
-## 8. 다음 token PR의 결정 항목
+## 9. 다음 token PR의 결정 항목
 
 이 inventory는 숫자를 확정하지 않는다. 다음 PR에서 아래 순서로 fixture와 함께 결정한다.
 
@@ -201,11 +253,13 @@ Navigation에 남긴다.
    Promo Studio timeline은 포함하지 않는다.
 6. **Showcase:** Alignment & Rhythm fixture에서 ListCell과 Sheet의 시작선, baseline, 긴 한글,
    leading 유무와 text scale을 비교한다.
+7. **상태 문법:** GPS/PDR, 검색, 저장을 예제로 persistent warning, inline loading, snackbar,
+   recovery action의 사용 조건을 표로 만든다.
 
 다음 PR의 완료 조건은 token 개수가 늘어나는 것이 아니라 AppMenu/Favorites fixture를 임의
 수치 없이 만들 수 있고, 현재 UI와 달라지는 지점마다 의도와 접근성 근거가 있는 상태다.
 
-## 9. 재현 명령
+## 10. 재현 명령
 
 아래 명령은 `Navigation` 저장소 루트에서 실행한다.
 
