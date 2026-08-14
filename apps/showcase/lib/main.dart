@@ -158,6 +158,38 @@ class _ShowcaseHomeState extends State<ShowcaseHome> {
                         ],
                       ),
                     ),
+                    const _ShowcaseSection(
+                      title: 'ListCell · beta',
+                      description:
+                          'leading 유무에도 텍스트 열을 유지하고 상태·긴 문장·접근성을 함께 검증합니다.',
+                      child: RoutexStack(
+                        gap: RoutexStackGap.content,
+                        children: [
+                          RoutexListCell(
+                            title: '더현대 서울',
+                            subtitle: 'B2 · 카페·베이커리',
+                            leadingIcon: Icons.storefront_outlined,
+                            trailingIcon: Icons.chevron_right,
+                            onPressed: _noop,
+                          ),
+                          RoutexListCell(
+                            title: '아이콘이 없는 선택 상태',
+                            subtitle: '텍스트 시작선은 위 행과 같습니다.',
+                            selected: true,
+                            onPressed: _noop,
+                          ),
+                          RoutexListCell(
+                            title: '보조정보가 없는 장소',
+                            onPressed: _noop,
+                          ),
+                          RoutexListCell(
+                            title: '현재 사용할 수 없는 장소',
+                            enabled: false,
+                            onPressed: _noop,
+                          ),
+                        ],
+                      ),
+                    ),
                     const _FoundationCatalog(),
                     const _ShowcaseSection(
                       title: 'Motion boundary',
@@ -177,6 +209,8 @@ class _ShowcaseHomeState extends State<ShowcaseHome> {
     );
   }
 }
+
+void _noop() {}
 
 class _FoundationCatalog extends StatelessWidget {
   const _FoundationCatalog();
