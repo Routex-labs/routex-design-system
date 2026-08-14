@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../foundations/routex_motion.dart';
-import '../foundations/routex_tokens.dart';
+import '../foundations/routex_metrics.dart';
+import '../foundations/routex_radii.dart';
+import '../foundations/routex_spacing.dart';
+import '../foundations/routex_typography.dart';
 import '../theme/routex_color_tokens.dart';
 
 enum RoutexButtonVariant { primary, secondary, quiet, danger }
@@ -40,10 +43,12 @@ class RoutexButton extends StatelessWidget {
       child: TextButton(
         onPressed: disabled ? null : onPressed,
         style: ButtonStyle(
-          minimumSize: const WidgetStatePropertyAll(Size(64, 48)),
+          minimumSize: const WidgetStatePropertyAll(
+            Size(64, RoutexMetrics.minimumTouchTarget),
+          ),
           padding: const WidgetStatePropertyAll(
             EdgeInsetsDirectional.symmetric(
-              horizontal: RoutexSpacing.controlPadding,
+              horizontal: RoutexSpacing.componentPadding,
               vertical: RoutexSpacing.controlGap,
             ),
           ),
@@ -58,14 +63,14 @@ class RoutexButton extends StatelessWidget {
           side: WidgetStatePropertyAll(_border(colors, disabled: disabled)),
         ),
         child: AnimatedSwitcher(
-          duration: RoutexMotion.duration(
+          duration: RoutexMotion.effectiveDuration(
             disableAnimations: disableAnimations,
-            standard: RoutexMotion.fast,
+            role: RoutexMotionRole.feedback,
           ),
           child: isLoading
               ? SizedBox.square(
                   key: const ValueKey('loading'),
-                  dimension: 20,
+                  dimension: RoutexMetrics.iconMedium,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color: foreground,
@@ -76,7 +81,7 @@ class RoutexButton extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (leadingIcon case final icon?) ...[
-                      Icon(icon, size: 20),
+                      Icon(icon, size: RoutexMetrics.iconMedium),
                       const SizedBox(width: RoutexSpacing.controlGap),
                     ],
                     Flexible(child: Text(label)),
@@ -102,7 +107,7 @@ class RoutexButton extends StatelessWidget {
     Set<WidgetState> states, {
     required bool disabled,
   }) {
-    if (disabled) return colors.borderSubtle;
+    if (disabled) return colors.actionDisabled;
     if (variant == RoutexButtonVariant.quiet) return Colors.transparent;
     if (variant == RoutexButtonVariant.secondary) {
       return states.contains(WidgetState.pressed)

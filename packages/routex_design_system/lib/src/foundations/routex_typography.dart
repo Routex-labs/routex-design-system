@@ -1,40 +1,26 @@
 import 'package:flutter/material.dart';
 
-/// 4px grid에서 파생된 의미 기반 간격이다.
-abstract final class RoutexSpacing {
-  static const controlGap = 8.0;
-  static const contentGap = 12.0;
-  static const controlPadding = 16.0;
-  static const sectionGap = 24.0;
-  static const screenGutterCompact = 16.0;
-  static const screenGutterWide = 24.0;
+/// 제품 문장에서 맡는 정보 위계다.
+enum RoutexTypographyRole {
+  display,
+  headline,
+  title,
+  body,
+  bodyStrong,
+  label,
+  caption,
 }
 
-/// 컴포넌트 역할에 연결된 곡률이다.
-abstract final class RoutexRadii {
-  static const control = BorderRadius.all(Radius.circular(8));
-  static const field = BorderRadius.all(Radius.circular(12));
-  static const card = BorderRadius.all(Radius.circular(16));
-  static const sheet = BorderRadius.vertical(top: Radius.circular(24));
-  static const pill = BorderRadius.all(Radius.circular(999));
-}
-
-/// z-order를 표현하는 제품 UI elevation이다.
-abstract final class RoutexElevation {
-  static const onMap = 1.0;
-  static const chrome = 3.0;
-  static const overlay = 8.0;
-}
-
-/// 카드 장식이 아니라 레이어 분리가 필요할 때만 사용하는 그림자다.
-abstract final class RoutexShadows {
-  static const chrome = <BoxShadow>[
-    BoxShadow(color: Color(0x14000000), blurRadius: 12, offset: Offset(0, 4)),
-  ];
-
-  static const overlay = <BoxShadow>[
-    BoxShadow(color: Color(0x24000000), blurRadius: 24, offset: Offset(0, 8)),
-  ];
+extension RoutexTypographyRoleValue on RoutexTypographyRole {
+  TextStyle get textStyle => switch (this) {
+    RoutexTypographyRole.display => RoutexTypography.display,
+    RoutexTypographyRole.headline => RoutexTypography.headline,
+    RoutexTypographyRole.title => RoutexTypography.title,
+    RoutexTypographyRole.body => RoutexTypography.body,
+    RoutexTypographyRole.bodyStrong => RoutexTypography.bodyStrong,
+    RoutexTypographyRole.label => RoutexTypography.label,
+    RoutexTypographyRole.caption => RoutexTypography.caption,
+  };
 }
 
 /// v0.1에서 허용하는 타이포그래피 역할이다.
