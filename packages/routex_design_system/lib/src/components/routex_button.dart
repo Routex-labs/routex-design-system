@@ -44,18 +44,21 @@ class RoutexButton extends StatelessWidget {
         onPressed: disabled ? null : onPressed,
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(
-            Size(64, RoutexMetrics.minimumTouchTarget),
+            Size(64, RoutexMetrics.standardControl),
           ),
+          tapTargetSize: MaterialTapTargetSize.padded,
           padding: const WidgetStatePropertyAll(
             EdgeInsetsDirectional.symmetric(
               horizontal: RoutexSpacing.componentPadding,
-              vertical: RoutexSpacing.controlGap,
+              vertical: RoutexSpacing.inlineGap,
             ),
           ),
           shape: const WidgetStatePropertyAll(
             RoundedRectangleBorder(borderRadius: RoutexRadii.field),
           ),
-          textStyle: const WidgetStatePropertyAll(RoutexTypography.bodyStrong),
+          textStyle: WidgetStatePropertyAll(
+            RoutexTypography.control(RoutexTypography.bodyStrong),
+          ),
           foregroundColor: WidgetStatePropertyAll(foreground),
           backgroundColor: WidgetStateProperty.resolveWith(
             (states) => _background(colors, states, disabled: disabled),
