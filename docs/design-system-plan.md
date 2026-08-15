@@ -21,8 +21,8 @@
 | 프로모션 코드 이동 | 완료 | `apps/promo_studio/`에서 독립 실행 |
 | 프로모션 정적 분석·웹 빌드 | 완료 | `flutter analyze`, `flutter build web` 통과 |
 | 디자인 시스템 계획 이동 | 완료 | 이 문서가 단일 출처 |
-| Runtime Kit package | 기반 구축 중 | semantic foundation, layout primitive, `RoutexButton`·`RoutexListCell` beta |
-| Showcase & Lab | 최소 Showcase 완료 | Runtime Kit을 path dependency로 직접 import |
+| Runtime Kit package | v0.2 검수 중 | semantic foundation, layout primitive, 핵심 컴포넌트와 Navigation 제품 패턴 beta (v0.2에서 매장 상세·목록·안내 역할 보강) |
+| Showcase & Lab | 컴포넌트·모바일 UX 검수 중 | Runtime Kit 공개 API와 19.5:9 제품 흐름을 같은 코드로 렌더링 |
 | 검증 workflow | 완료 | Runtime Kit analyze/test, Showcase analyze/test/web build, Promo analyze/web build |
 | Git 저장소·GitHub 원격 | 완료 | 공개 `Routex-labs/routex-design-system` |
 | Navigation 앱 package 연동 | 미착수 | 첫 release tag 이후 진행 |
@@ -31,8 +31,9 @@
 Runtime Kit가 생기면 package import로 교체하고 이 사본을 제거한다.
 
 현재 package의 `0.0.1`은 monorepo 공급과 Showcase import를 확인하는 bootstrap 버전이다.
-토큰 수치와 `RoutexButton`·`RoutexListCell` API는 pilot 전이므로 beta이며, Navigation은 이를
-소비하지 않는다.
+토큰 수치와 핵심 컴포넌트·Navigation 제품 패턴 API는 pilot 전이므로 beta이며, Navigation은 이를 아직
+소비하지 않는다. 컴포넌트별 목록과 실패 조건은
+[`component-systemization-v0.1.md`](component-systemization-v0.1.md)를 단일 출처로 사용한다.
 
 ### 3인 팀의 v0.1 범위 제한
 
@@ -253,7 +254,7 @@ modal을 다시 열어야 한다면 기존 것을 교체하거나 새 page로 �
   `statusSuccess/Warning/Error`, `focusRing`으로 시작한다.
 - `blue50`, `blue500` 같은 숫자 이름은 foundation 밖에서 금지한다.
 - `primary`와 `indoor`처럼 거의 같은 색에 서로 다른 의미를 부여한 현재 구조는 해소한다.
-- 지도 도면, 경로, POI, 대중교통 노선색은 별도 `MapVisualTokens`로 두고 UI semantic
+- 지도 도면, 경로, POI, 대중교통 노선색은 별도 `RoutexMapVisualTokens`로 두고 UI semantic
   token과 1:1로 묶지 않는다.
 - 카테고리색은 분류 보조다. 본문 텍스트, CTA, 오류 의미로 재사용하지 않는다.
 
@@ -264,16 +265,21 @@ Pretendard를 유지하고 역할을 7개 안팎으로 제한한다.
 | 역할 | 후보 크기/굵기 | 용도 |
 |---|---|---|
 | display | 28/800 | 도착·완료처럼 화면당 한 번 |
-| headline | 20/800 | 장소명, 안내 핵심 |
-| title | 16/700 | 시트·섹션 제목 |
-| body | 14/400 | 기본 본문 |
-| bodyStrong | 14/700 | 목록의 이름·판단값 |
-| label | 12/600 | 칩, 배지, 보조 액션 |
-| caption | 11/500 | 출처·시간 등 정말 낮은 위계 |
+| headline | 22/700 | 장소명, 안내 핵심 |
+| title | 18/700 | 시트·섹션 제목 |
+| body | 16/400 | 기본 본문 |
+| bodyStrong | 16/600 | 목록의 이름·판단값 |
+| bodySmall | 14/400 | 주소·영업시간처럼 밀도 높은 보조 본문 |
+| label | 14/600 | 칩, 배지, 보조 액션 |
+| caption | 12/500 | 출처·시간 등 정말 낮은 위계 |
 
 - 행간도 역할에 포함한다. 화면에서 `copyWith`로 크기·굵기를 바꾸지 않는다.
 - 색 변경, 말줄임, 장식은 허용하되 역할 자체를 재조합하지 않는다.
-- 숫자 ETA처럼 tabular figure가 필요한 경우 별도 숫자 역할을 검토한다.
+- 14px는 굵기로 역할이 갈린다. 보조 본문은 `bodySmall`, 칩·배지·보조 액션은 `label`이다.
+  긴 문장을 `label`로 쓰지 않는다.
+- 남은 거리·시간·층처럼 값이 실시간으로 바뀌는 자리는 `RoutexTypography.tabular(...)`로
+  고정폭 숫자를 켠다. 가변폭 숫자는 값이 바뀔 때마다 폭이 흔들려 이동 중 읽기를 방해한다.
+  이것이 typography 역할에 허용하는 유일한 변형이며 크기·굵기·행간은 바꾸지 않는다.
 - 2.0 배율에서 줄바꿈을 허용하고 높이가 늘어나야 한다. 고정 높이로 자르지 않는다.
 
 ### 6.3 간격과 레이아웃
@@ -321,6 +327,7 @@ Layout primitive는 편의 위젯이 아니라 임의 배치를 막는 경계다
 | `RoutexInset.component` | 네 방향 16dp | 방향별 예외값 또는 외부 보정 추가 | widget test |
 | `RoutexStack` | 첫·끝 0dp, 자식 사이만 4/8/12/24dp, 가로 stretch | 선행·후행 gap, 역할 외 수치, 자식 순서·폭 변경 | 크기·좌표 widget test |
 | `RoutexCluster` | 가로·세로 gap 8/12dp, start 정렬, 자동 줄바꿈 | 축별 다른 gap, center 정렬, 좁은 폭 overflow | 320dp 이하 wrap test |
+| `RoutexMapOverlay` | 좌우 16dp gutter, 상단은 안전 영역 기준, 아래에서 위로 시트 → 알림 → 지도 컨트롤 | 화면에서 `Positioned` 좌표로 오버레이 배치, 시트 높이를 손으로 계산한 `bottom` 값 | 시트 높이 변화·2배 글자 좌표 test |
 | Showcase section | 같은 부모 안에서 좌우 경계 일치 | 섹션마다 폭 또는 시작선이 달라짐 | 360/390dp rect 비교 |
 
 360/390dp와 text scale 1.0/1.3/2.0 조합에서 overflow, 잘림, 겹침 또는 예외가 하나라도
@@ -385,14 +392,24 @@ Routex-labs/routex-design-system/
     routex_design_system/       # 앱이 소비하는 Flutter package
       lib/
         src/
-          foundations/
-          theme/
-          components/
-          patterns/
+          foundations/          # 토큰: 색 역할, typography, 간격, 곡률, 크기, 깊이, motion
+          theme/                # primitive palette와 semantic token 매핑, ThemeExtension
+          layout/               # 배치 계약: inset, stack, cluster, map overlay
+          components/           # 도메인과 무관한 재사용 컴포넌트
+          patterns/             # 내비게이션 도메인 제품 패턴
       test/
   apps/
     showcase/                   # Flutter Web Showcase & Lab
       lib/
+        src/
+          app/                  # 앱 shell과 페이지 전환
+          pages/                # 페이지별 내용과 조작 상태
+          catalog/              # 역할 catalog와 공통 타일
+          mockup/               # 목업 흐름과 단계별 제품 화면
+          device/               # 기기 프레임·상태바 (제품 UI 아님)
+          map/                  # 지도 렌더러 (제품 UI 아님)
+          data/                 # Showcase 전용 데이터 adapter
+          fixtures/             # 정렬·리듬 검증 fixture
       test/
     promo_studio/               # 이미 이동한 결정론적 제품 영상 앱
   docs/                         # 원칙·사용/금지·마이그레이션의 단일 출처
@@ -479,8 +496,9 @@ package 업데이트가 앱 비즈니스 로직 변경을 강요하게 된다.
 - Material component theme은 공통 컴포넌트의 안전한 기본값으로 설정한다. 제품 화면은
   Material 버튼을 직접 조립하지 않는다.
 - `ThemeExtension`으로 semantic token을 읽어 향후 dark/high-contrast 테마를 교체한다.
-- `MapVisualTokens`, `MapRouteStyle`, 카테고리 팔레트는 Navigation에 남기고, 공통
-  primitive가 필요한 경우에만 package에 의존한다. package가 앱을 역참조하지 않는다.
+- 공통 지도 시각 역할과 색·굵기 primitive는 package의 `RoutexMapVisualTokens`가 소유한다.
+  Navigation의 `MapRouteStyle`와 실제 MapLibre source/layer·renderer, 카테고리 팔레트는
+  Navigation에 남긴다. package가 앱을 역참조하지 않는다.
 
 기존 화면과 위젯은 전부 package로 옮기지 않고 먼저 다음 네 상태로 inventory한다.
 
@@ -518,9 +536,9 @@ Runtime Kit의 성공 기준은 “값을 찾기 쉽다”가 아니라 **시스
 `apps/showcase/lib/main.dart`로 별도 실행하는 Flutter Web 카탈로그를 만든다. v1은 로컬에서
 실행하고, 팀 공유가 필요해지는 시점에 정적 호스팅을 붙인다.
 
-v0.1에서는 Welcome, Foundations, 핵심 Components와 state/viewport/text-scale 조절만 만든다.
-Journey, 전체 접근성 도구, 상태 대시보드와 문서 자동 생성은 실제 사용 필요가 확인된 뒤
-추가한다. 중요한 조건은 페이지 수가 아니라 **Showcase가 Runtime Kit package를 실제로
+v0.1에서는 Foundations, 핵심 Components, state/viewport/text-scale 조절과 대표 Journey
+목업만 만든다. 전체 접근성 도구, 상태 대시보드와 문서 자동 생성은 실제 사용 필요가 확인된
+뒤 추가한다. 중요한 조건은 페이지 수가 아니라 **Showcase가 Runtime Kit package를 실제로
 import해 같은 컴포넌트를 렌더링하는가**이다.
 
 Showcase에는 **Alignment & Rhythm** 검수 화면을 둔다. 공통 세로 guide와 text baseline을
@@ -536,7 +554,7 @@ Showcase에는 **Alignment & Rhythm** 검수 화면을 둔다. 공통 세로 gui
 
 정보 구조는 다음으로 고정한다.
 
-1. **Welcome** — “차분한 공간 안내, 명료한 다음 행동, 신뢰할 수 있는 상태”를 실제 화면으로 설명
+1. **Overview** — 페이지 목적, package 버전, 현재 완료·미착수 범위를 사실로 표시
 2. **Foundations** — color, type, spacing, radius, stroke, elevation, icon, motion과 사용 금지 예
 3. **Components** — 상태표, 사용/금지 상황, 접근성, 실제 Flutter 렌더링
 4. **Patterns** — MapChrome, PlaceSummary, RouteEndpoint, RouteInstruction, FloorControl
@@ -544,6 +562,15 @@ Showcase에는 **Alignment & Rhythm** 검수 화면을 둔다. 공통 세로 gui
 6. **Accessibility Lab** — 대비, 2배 글자, reduce motion, focus/semantics 점검
 7. **Alignment & Rhythm** — 시작선, baseline, 텍스트 역할 간격과 optical correction 검수
 8. **Status** — proposal/beta/stable/deprecated와 변경 기록
+
+현재 Showcase는 `한눈에`를 첫 진입점으로 두고, 5번 Journey의 첫 범위인 메인 → 장소 선택 →
+경로 미리보기 → 이동 안내 → 실내 전환 → 도착을 19.5:9 휴대폰 목업에서 조작할 수 있게
+제공한다. 목업은 단색 지도 canvas를 공통 바탕으로 두고 Runtime Kit의 공개 컴포넌트와
+Navigation 패턴을 조합한다. 메인·장소·상세·경로 미리보기에는 canvas 색만 남기며, 이동 안내·
+실내 전환·도착에서만 Showcase 앱 계층의 지도 시각 계층이 `RoutexMapVisualTokens`를 소비해 경로선과
+마커를 그린다. Promo Studio에서는 휴대폰 비율만 공유하며 camera·particle·timeline·장면
+연출은 가져오지 않는다. MapLibre controller·실제 지도 source/layer·도메인 경로 데이터는
+Navigation에 남기고, 저장·경로 선택·음소거·층 선택 상태는 로컬 고정 데이터로 검증한다.
 
 Showcase를 Runtime Kit의 스크린샷 모음으로 만들지 않는다. **실제 컴포넌트를 import해
 렌더링**하고, 문서의 토큰 표도 runtime token에서 생성한다. 설명 문장은 이 문서 계열을

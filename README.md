@@ -8,14 +8,15 @@ Navigation 앱과 릴리스 주기가 다른 디자인 시스템과 프로모션
 |---|---|---|
 | `apps/promo_studio/` | 사용 가능 | 결정론적 Flutter 프로모션 영상 스튜디오 |
 | `docs/design-system-plan.md` | 작성됨 | 진단, 설계 원칙, 레퍼런스 적용 결정, 단계별 실행 계획의 단일 출처 |
-| `packages/routex_design_system/` | 기반 구축 중 | semantic foundation, layout primitive, Button·ListCell beta를 제공하는 Runtime Kit |
-| `apps/showcase/` | bootstrap 완료 | 실제 Runtime Kit을 import하는 Flutter Web Showcase |
+| `packages/routex_design_system/` | v0.2 검수 중 | foundation, layout primitive, 핵심 컴포넌트와 Navigation 제품 패턴(매장 상세·목록·안내 포함)을 제공하는 Runtime Kit |
+| `apps/showcase/` | v0.2 검수 중 | `한눈에`를 첫 화면으로 열고 실제 Runtime Kit과 조작 가능한 19.5:9 모바일 UX 목업을 렌더링하는 Flutter Web Showcase |
 | `.github/workflows/verify.yml` | 작성됨 | Runtime Kit, Showcase, Promo Studio 검증 |
 
 디자인 시스템 package와 Showcase는 같은 저장소에 둔다. Showcase는 package의 실제
 컴포넌트를 import해 렌더링하고, Navigation 앱은 release tag를 고정해 package를 사용한다.
-구체적인 계층, 수치 후보, 저장소 경계와 검증 조건은
-[`docs/design-system-plan.md`](docs/design-system-plan.md)만 기준으로 삼는다.
+구체적인 계층, 수치 후보와 저장소 경계는
+[`docs/design-system-plan.md`](docs/design-system-plan.md), v0.1 컴포넌트의 실패·완료 조건은
+[`docs/component-systemization-v0.1.md`](docs/component-systemization-v0.1.md)를 기준으로 삼는다.
 
 현재 구조는 유지하되 3인 팀에 맞는 경량 v0.1로 시작한다. 한 명이 디자인 시스템과
 Promo Studio를 주로 운영하는 동안 토큰, 핵심 컴포넌트 6~10개, 실제 패키지를 사용하는
@@ -23,8 +24,9 @@ Showcase, Promo Studio 핵심 장면, Navigation 1~2개 시범 화면까지만 �
 전체 앱을 한 번에 재작성하지 않는다.
 
 v0.1의 대표 품질 기준은 “토큰이 존재하는가”가 아니라 같은 역할의 텍스트·아이콘·콘텐츠가
-화면이 달라도 같은 시작선, baseline과 세로 리듬을 유지하는가이다. Showcase의
-Alignment & Rhythm 화면과 대표 컴포넌트 golden으로 이를 검수한다.
+화면이 달라도 같은 시작선, baseline과 세로 리듬을 유지하는가이다. Showcase 목업도 별도
+복제품이 아니라 Runtime Kit의 공개 컴포넌트와 제품 패턴을 조합한다. 360/390px, 글자 배율
+1.0/1.3/2.0, 상태별 widget 테스트와 대표 흐름 golden으로 이를 검수한다.
 
 현재 package 버전 `0.0.1`은 공급 경로를 검증하기 위한 bootstrap이며 Navigation 적용용
 release가 아니다. 실제 시범 적용은 토큰과 핵심 컴포넌트를 검토한 `v0.1.0`부터 시작한다.
