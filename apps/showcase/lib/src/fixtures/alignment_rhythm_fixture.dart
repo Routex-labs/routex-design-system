@@ -34,27 +34,22 @@ class _MobileFixtureSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.routexColors;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.surfaceBase,
-        borderRadius: RoutexRadii.card,
-        border: Border.all(color: colors.borderStrong),
-      ),
+    return RoutexSurface(
+      role: RoutexSurfaceRole.outlined,
       child: RoutexInset(
         role: RoutexInsetRole.component,
         child: RoutexStack(
           gap: RoutexStackGap.section,
           children: [
-            Text('저장한 장소', style: RoutexTypography.title),
+            const RoutexSectionHeader(title: '저장한 장소'),
             const RoutexStack(
               gap: RoutexStackGap.content,
               children: [
                 RoutexListCell(
                   title: '더현대 서울에서 저장한 아주 긴 장소 이름',
                   subtitle: 'B2 · 카페·베이커리',
-                  leadingIcon: Icons.storefront_outlined,
-                  trailingIcon: Icons.chevron_right,
+                  leadingIcon: RoutexIcons.place,
+                  trailingIcon: RoutexIcons.forward,
                   onPressed: _noop,
                 ),
                 RoutexListCell(
@@ -70,51 +65,20 @@ class _MobileFixtureSurface extends StatelessWidget {
                 ),
               ],
             ),
-            RoutexStack(
+            const RoutexStack(
               gap: RoutexStackGap.content,
               children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colors.statusWarningSubtle,
-                    borderRadius: RoutexRadii.field,
-                  ),
-                  child: RoutexInset(
-                    role: RoutexInsetRole.component,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          Icons.location_searching,
-                          size: RoutexMetrics.iconMedium,
-                          color: colors.statusWarning,
-                        ),
-                        const SizedBox(width: RoutexSpacing.controlGap),
-                        Expanded(
-                          child: RoutexStack(
-                            gap: RoutexStackGap.inline,
-                            children: [
-                              Text(
-                                '현재 위치를 확인할 수 없어요',
-                                style: RoutexTypography.bodyStrong,
-                              ),
-                              Text(
-                                '지도에서 위치를 직접 지정하거나 기기의 위치 권한을 확인해주세요.',
-                                style: RoutexTypography.body.copyWith(
-                                  color: colors.contentSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                RoutexStatusBanner(
+                  title: '현재 위치를 확인할 수 없어요',
+                  detail: '지도에서 위치를 직접 지정하거나 기기의 위치 권한을 확인해주세요.',
+                  icon: RoutexIcons.currentLocation,
+                  tone: RoutexStatusBannerTone.warning,
                 ),
                 SizedBox(
                   width: double.infinity,
                   child: RoutexButton(
                     label: '지도에서 현재 위치 직접 지정',
-                    leadingIcon: Icons.pin_drop_outlined,
+                    leadingIcon: RoutexIcons.placeLocation,
                     onPressed: _noop,
                   ),
                 ),
