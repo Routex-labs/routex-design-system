@@ -33,6 +33,9 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# 골든 테스트 실패 산출물은 기준 이미지가 아니라 진단용 출력이다.
+/test/failures/
+
 # Symbolication related
 app.*.symbols
 
