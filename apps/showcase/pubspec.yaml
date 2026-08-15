@@ -7,8 +7,10 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
+  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  http: ^1.5.0
   routex_design_system:
     path: ../../packages/routex_design_system
 
@@ -19,3 +21,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    # 상세 컴포넌트를 실제 내용으로 검수하기 위해 Navigation 앱이 번들로 가진 오설록
+    # 매장 사진 중 대표 몇 장만 옮겨 왔다. Runtime Kit package에는 넣지 않는다 —
+    # 자산은 소비 앱이 소유한다.
+    - assets/place_details/
