@@ -1,63 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Showcase와 진단 도구가 색 역할을 별도 목록으로 복사하지 않게 하는 catalog다.
-enum RoutexColorRole {
-  surfaceCanvas,
-  surfaceBase,
-  surfaceRaised,
-  contentPrimary,
-  contentSecondary,
-  contentDisabled,
-  contentInverse,
-  actionPrimary,
-  actionPrimaryPressed,
-  actionPrimarySubtle,
-  actionDisabled,
-  borderSubtle,
-  borderStrong,
-  statusInfo,
-  statusSuccess,
-  statusWarning,
-  statusError,
-  statusInfoSubtle,
-  statusSuccessSubtle,
-  statusWarningSubtle,
-  statusErrorSubtle,
-  focusRing,
-  shadow,
-  shadowStrong,
-  scrim,
-}
-
-extension RoutexColorRoleValue on RoutexColorRole {
-  Color resolve(RoutexColorTokens tokens) => switch (this) {
-    RoutexColorRole.surfaceCanvas => tokens.surfaceCanvas,
-    RoutexColorRole.surfaceBase => tokens.surfaceBase,
-    RoutexColorRole.surfaceRaised => tokens.surfaceRaised,
-    RoutexColorRole.contentPrimary => tokens.contentPrimary,
-    RoutexColorRole.contentSecondary => tokens.contentSecondary,
-    RoutexColorRole.contentDisabled => tokens.contentDisabled,
-    RoutexColorRole.contentInverse => tokens.contentInverse,
-    RoutexColorRole.actionPrimary => tokens.actionPrimary,
-    RoutexColorRole.actionPrimaryPressed => tokens.actionPrimaryPressed,
-    RoutexColorRole.actionPrimarySubtle => tokens.actionPrimarySubtle,
-    RoutexColorRole.actionDisabled => tokens.actionDisabled,
-    RoutexColorRole.borderSubtle => tokens.borderSubtle,
-    RoutexColorRole.borderStrong => tokens.borderStrong,
-    RoutexColorRole.statusInfo => tokens.statusInfo,
-    RoutexColorRole.statusSuccess => tokens.statusSuccess,
-    RoutexColorRole.statusWarning => tokens.statusWarning,
-    RoutexColorRole.statusError => tokens.statusError,
-    RoutexColorRole.statusInfoSubtle => tokens.statusInfoSubtle,
-    RoutexColorRole.statusSuccessSubtle => tokens.statusSuccessSubtle,
-    RoutexColorRole.statusWarningSubtle => tokens.statusWarningSubtle,
-    RoutexColorRole.statusErrorSubtle => tokens.statusErrorSubtle,
-    RoutexColorRole.focusRing => tokens.focusRing,
-    RoutexColorRole.shadow => tokens.shadow,
-    RoutexColorRole.shadowStrong => tokens.shadowStrong,
-    RoutexColorRole.scrim => tokens.scrim,
-  };
-}
+import 'routex_palette.dart';
 
 /// 제품 UI가 용도로 읽는 semantic color token이다.
 @immutable
@@ -74,6 +17,7 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
     required this.actionPrimaryPressed,
     required this.actionPrimarySubtle,
     required this.actionDisabled,
+    required this.accentBrand,
     required this.borderSubtle,
     required this.borderStrong,
     required this.statusInfo,
@@ -92,31 +36,32 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
 
   /// v0.1은 현재 제품과 같은 light theme만 지원한다.
   static const light = RoutexColorTokens(
-    surfaceCanvas: Color(0xFFF4F7FC),
-    surfaceBase: Color(0xFFFFFFFF),
-    surfaceRaised: Color(0xFFFFFFFF),
-    contentPrimary: Color(0xFF172033),
-    contentSecondary: Color(0xFF4F5D73),
-    contentDisabled: Color(0xFF8B96A8),
-    contentInverse: Color(0xFFFFFFFF),
-    actionPrimary: Color(0xFF2563C7),
-    actionPrimaryPressed: Color(0xFF194EAA),
-    actionPrimarySubtle: Color(0xFFE7F0FF),
-    actionDisabled: Color(0xFFDDE3EC),
-    borderSubtle: Color(0xFFDDE3EC),
-    borderStrong: Color(0xFF98A3B3),
-    statusInfo: Color(0xFF1E5EAA),
-    statusSuccess: Color(0xFF1E743B),
-    statusWarning: Color(0xFF855600),
-    statusError: Color(0xFFB9382E),
-    statusInfoSubtle: Color(0xFFE8F2FF),
-    statusSuccessSubtle: Color(0xFFE8F6EC),
-    statusWarningSubtle: Color(0xFFFFF2D6),
-    statusErrorSubtle: Color(0xFFFFECEA),
-    focusRing: Color(0xFF1559BE),
-    shadow: Color(0x1F172033),
-    shadowStrong: Color(0x38172033),
-    scrim: Color(0x73172033),
+    surfaceCanvas: RoutexPalette.neutral50,
+    surfaceBase: RoutexPalette.neutral0,
+    surfaceRaised: RoutexPalette.neutral0,
+    contentPrimary: RoutexPalette.neutral900,
+    contentSecondary: RoutexPalette.neutral600,
+    contentDisabled: RoutexPalette.neutral500,
+    contentInverse: RoutexPalette.neutral0,
+    actionPrimary: RoutexPalette.blue500,
+    actionPrimaryPressed: RoutexPalette.blue800,
+    actionPrimarySubtle: RoutexPalette.blue50,
+    actionDisabled: RoutexPalette.neutral200,
+    accentBrand: RoutexPalette.blue400,
+    borderSubtle: RoutexPalette.neutral200,
+    borderStrong: RoutexPalette.neutral400,
+    statusInfo: RoutexPalette.blue700,
+    statusSuccess: RoutexPalette.green700,
+    statusWarning: RoutexPalette.amber800,
+    statusError: RoutexPalette.red700,
+    statusInfoSubtle: RoutexPalette.blue100,
+    statusSuccessSubtle: RoutexPalette.green50,
+    statusWarningSubtle: RoutexPalette.amber50,
+    statusErrorSubtle: RoutexPalette.red50,
+    focusRing: RoutexPalette.blue600,
+    shadow: RoutexPalette.neutral900At12,
+    shadowStrong: RoutexPalette.neutral900At22,
+    scrim: RoutexPalette.neutral900At45,
   );
 
   final Color surfaceCanvas;
@@ -130,6 +75,13 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
   final Color actionPrimaryPressed;
   final Color actionPrimarySubtle;
   final Color actionDisabled;
+
+  /// RoutEx를 대표하는 하늘색. **글자가 올라가지 않는 자리에만 쓴다.**
+  ///
+  /// 선택 상태의 테두리, 탭 표시줄, 지도 위 표시처럼 선과 면으로만 뜻을 전하는
+  /// 자리다. 흰 배경 기준 3.48이라 비텍스트 3:1은 넘지만 글자 4.5에는 못 미친다.
+  /// 글자나 글자 밑 배경이 필요하면 actionPrimary를 쓴다.
+  final Color accentBrand;
   final Color borderSubtle;
   final Color borderStrong;
   final Color statusInfo;
@@ -158,6 +110,7 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
     Color? actionPrimaryPressed,
     Color? actionPrimarySubtle,
     Color? actionDisabled,
+    Color? accentBrand,
     Color? borderSubtle,
     Color? borderStrong,
     Color? statusInfo,
@@ -185,6 +138,7 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
       actionPrimaryPressed: actionPrimaryPressed ?? this.actionPrimaryPressed,
       actionPrimarySubtle: actionPrimarySubtle ?? this.actionPrimarySubtle,
       actionDisabled: actionDisabled ?? this.actionDisabled,
+      accentBrand: accentBrand ?? this.accentBrand,
       borderSubtle: borderSubtle ?? this.borderSubtle,
       borderStrong: borderStrong ?? this.borderStrong,
       statusInfo: statusInfo ?? this.statusInfo,
@@ -229,6 +183,7 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
         t,
       )!,
       actionDisabled: Color.lerp(actionDisabled, other.actionDisabled, t)!,
+      accentBrand: Color.lerp(accentBrand, other.accentBrand, t)!,
       borderSubtle: Color.lerp(borderSubtle, other.borderSubtle, t)!,
       borderStrong: Color.lerp(borderStrong, other.borderStrong, t)!,
       statusInfo: Color.lerp(statusInfo, other.statusInfo, t)!,
