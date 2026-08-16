@@ -335,12 +335,14 @@ void main() {
       required RoutexHoursState state,
       required bool expanded,
       String? detail,
+      String? staleNote,
     }) => MaterialApp(
       theme: RoutexTheme.light,
       home: Scaffold(
         body: RoutexHours(
           state: state,
           detail: detail,
+          staleNote: staleNote,
           expanded: expanded,
           onExpanded: (_) {},
           days: const [
@@ -377,6 +379,36 @@ void main() {
 
       expect(find.text('영업 종료'), findsNothing);
       expect(find.text('영업시간 정보가 오래됐어요'), findsOneWidget);
+    });
+
+    // 머리 줄의 "오래됐어요"는 주장이고 확인일은 그 근거다. 주장만 보이고 근거는
+    // 펼쳐야 나오면, 읽는 사람은 무엇을 보고 판단할지 알 수 없다.
+    testWidgets('접혀 있어도 오래됐다는 근거는 남는다', (tester) async {
+      const note = '2026-01-01 기준 · 영업시간이 달라졌을 수 있어요';
+
+      await tester.pumpWidget(
+        hours(
+          state: RoutexHoursState.unknown,
+          expanded: false,
+          staleNote: note,
+        ),
+      );
+
+      expect(find.text(note), findsOneWidget);
+      // 근거만 남기고 나머지 요일은 그대로 접혀 있다.
+      expect(find.text('수 · 휴무'), findsNothing);
+    });
+
+    testWidgets('오래되지 않았으면 근거 줄 자리를 만들지 않는다', (tester) async {
+      await tester.pumpWidget(
+        hours(
+          state: RoutexHoursState.open,
+          expanded: false,
+          detail: '20:00 종료',
+        ),
+      );
+
+      expect(find.textContaining('기준'), findsNothing);
     });
   });
 

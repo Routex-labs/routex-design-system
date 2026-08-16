@@ -84,7 +84,12 @@ class _PlaceFactsCardState extends State<PlaceFactsCard> {
           days: showcaseHoursWeek(detail.hours, widget.now),
           expanded: _expanded,
           onExpanded: (value) => setState(() => _expanded = value),
-          staleNote: '${detail.hours.confirmedAt} 기준 · 영업시간이 달라졌을 수 있어요',
+          // 판정을 거둔 상태에서만 근거를 붙인다. 늘 붙이면 방금 확인한
+          // 영업시간에도 "달라졌을 수 있어요"가 따라와, 정작 오래된 매장에서
+          // 그 문장이 아무 뜻도 갖지 못한다.
+          staleNote: status.state == RoutexHoursState.unknown
+              ? '${detail.hours.confirmedAt} 기준 · 영업시간이 달라졌을 수 있어요'
+              : null,
         ),
         const RoutexDivider(),
         RoutexStack(

@@ -76,6 +76,11 @@ class RoutexHours extends StatelessWidget {
   final String? detail;
 
   /// 데이터가 오래됐을 때 남기는 근거 한 줄이다.
+  ///
+  /// 접혀 있어도 보인다. 머리 줄의 "정보가 오래됐어요"는 주장이고 이 줄이 그
+  /// 근거이므로, 주장만 보이고 근거는 펼쳐야 나오면 읽는 사람이 무엇을 보고
+  /// 판단할지 알 수 없다. 오래되지 않았으면 넘기지 않는다 — 늘 넘기면 멀쩡한
+  /// 데이터에도 경고가 붙는다.
   final String? staleNote;
 
   final bool expanded;
@@ -125,13 +130,8 @@ class RoutexHours extends StatelessWidget {
           _HoursRow(day: days.first, isToday: true, compact: true),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          for (final day in days.skip(1)) _HoursRow(day: day, isToday: false),
-          if (staleNote?.trim().isNotEmpty ?? false)
-            Padding(
+      preview: (staleNote?.trim().isNotEmpty ?? false)
+          ? Padding(
               padding: const EdgeInsetsDirectional.only(
                 top: RoutexSpacing.controlGap,
               ),
@@ -141,7 +141,13 @@ class RoutexHours extends StatelessWidget {
                   color: colors.contentSecondary,
                 ),
               ),
-            ),
+            )
+          : null,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final day in days.skip(1)) _HoursRow(day: day, isToday: false),
         ],
       ),
     );
