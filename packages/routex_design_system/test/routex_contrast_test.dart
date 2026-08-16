@@ -174,13 +174,14 @@ void main() {
     // accentBrand는 "아직 안 쓴 색"이 아니라 "글자에 쓰면 안 되는 색"이다. 3:1은
     // 넘고 4.5는 못 넘는 그 사이에 있다는 것이 이 색의 정의다. 누군가 라벨이나
     // 버튼 채움에 쓰면 그 순간 대비가 무너지므로, 못 넘는다는 사실을 못박아 둔다.
-    test('브랜드 하늘색은 글자 기준에 닿지 않는다', () {
+    test('브랜드 초록은 글자 기준에 닿지 않는다', () {
       for (final (surface, background) in surfaces) {
         expect(
           contrastRatio(colors.accentBrand, background),
           lessThan(4.5),
           reason:
-              'accentBrand가 $surface에서 글자 기준을 넘었다면 하늘색이 아니게 된 것이다. '
+              'accentBrand가 $surface에서 글자 기준을 넘었다면 포인트 초록의 밝은 단계가 '
+              '아니게 된 것이다. '
               '글자에 쓸 색이 필요하면 actionPrimary를 쓴다',
         );
       }

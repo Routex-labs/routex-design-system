@@ -20,19 +20,28 @@ abstract final class RoutexPalette {
   static const neutral600 = Color(0xFF4F5D73);
   static const neutral900 = Color(0xFF172033);
 
-  static const blue50 = Color(0xFFE7F0FF);
-  static const blue100 = Color(0xFFE8F2FF);
-
-  /// Navigation 앱이 쓰던 하늘색이다. `AppColors.blue500`, 경로선과 같은 값이다.
+  /// 안내 상태 전용 파랑이다. 포인트 색이 아니다.
   ///
-  /// 흰 배경에서 3.48이라 글자에는 못 쓴다(글자 기준 4.5 미달). 비텍스트 3:1은
-  /// 넘으므로 선·표시·아이콘에만 쓴다. accentBrand가 이 제약을 문서가 아니라
-  /// contrast test로 지킨다.
-  static const blue400 = Color(0xFF4A87F1);
-  static const blue500 = Color(0xFF2563C7);
-  static const blue600 = Color(0xFF1559BE);
+  /// 포인트 색이 teal로 옮겨간 뒤에도 statusInfo는 파랑에 남는다. 안내는 브랜드가
+  /// 아니라 상태이고, 상태 네 가지(안내·성공·주의·오류)가 서로 다른 색상을 지켜야
+  /// 색만 보고 무슨 알림인지 구분된다.
+  static const blue100 = Color(0xFFE8F2FF);
   static const blue700 = Color(0xFF1E5EAA);
-  static const blue800 = Color(0xFF194EAA);
+
+  /// RoutEx 포인트 색이다. 교통 안내판 계열의 짙은 초록을 제품 UI 채도로 다듬었다.
+  ///
+  /// 아래 green(성공)과 **색상이 다르다** — teal은 163°, green은 141°다. 브랜드
+  /// 채움과 성공 표시가 같은 초록으로 보이면 "됐다"는 신호가 사라지므로, 두 계열을
+  /// 한 자리에서 섞지 않는다.
+  static const teal50 = Color(0xFFE6F2EE);
+
+  /// accentBrand 전용. 흰 배경에서 4.12라 글자에는 못 쓴다(글자 기준 4.5 미달).
+  /// 비텍스트 3:1은 넘으므로 선·표시·아이콘에만 쓴다. accentBrand가 이 제약을 문서가
+  /// 아니라 contrast test로 지킨다.
+  static const teal400 = Color(0xFF2F8C6F);
+  static const teal600 = Color(0xFF0F5A46);
+  static const teal700 = Color(0xFF0C4A3A);
+  static const teal800 = Color(0xFF093A2D);
 
   static const green50 = Color(0xFFE8F6EC);
   static const green700 = Color(0xFF1E743B);

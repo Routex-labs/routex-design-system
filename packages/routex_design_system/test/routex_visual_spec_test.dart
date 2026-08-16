@@ -616,10 +616,10 @@ void main() {
       expect(locationTarget.focusColor, isNot(locationTarget.hoverColor));
     });
 
-    // 선택을 진한 파랑 채움으로 그리면 지도 위 한 줄이 통째로 무거워진다. 옅은
-    // 배경 + 하늘색 테두리 + 진한 파랑 글자 세 가지가 함께 있어야 선택으로 읽힌다.
+    // 선택을 진한 포인트 채움으로 그리면 지도 위 한 줄이 통째로 무거워진다. 옅은
+    // 배경 + 브랜드 테두리 + 진한 포인트 글자 세 가지가 함께 있어야 선택으로 읽힌다.
     // 셋 중 하나라도 빠지면 약해지므로 세 값을 다 고정한다.
-    testWidgets('선택된 칩은 채움이 아니라 tint와 하늘색 테두리로 표시한다', (tester) async {
+    testWidgets('선택된 칩은 채움이 아니라 tint와 브랜드 테두리로 표시한다', (tester) async {
       await pump(
         tester,
         RoutexChipBar(

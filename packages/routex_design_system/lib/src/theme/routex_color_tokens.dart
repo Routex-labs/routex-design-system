@@ -43,11 +43,11 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
     contentSecondary: RoutexPalette.neutral600,
     contentDisabled: RoutexPalette.neutral500,
     contentInverse: RoutexPalette.neutral0,
-    actionPrimary: RoutexPalette.blue500,
-    actionPrimaryPressed: RoutexPalette.blue800,
-    actionPrimarySubtle: RoutexPalette.blue50,
+    actionPrimary: RoutexPalette.teal600,
+    actionPrimaryPressed: RoutexPalette.teal800,
+    actionPrimarySubtle: RoutexPalette.teal50,
     actionDisabled: RoutexPalette.neutral200,
-    accentBrand: RoutexPalette.blue400,
+    accentBrand: RoutexPalette.teal400,
     borderSubtle: RoutexPalette.neutral200,
     borderStrong: RoutexPalette.neutral400,
     statusInfo: RoutexPalette.blue700,
@@ -58,7 +58,7 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
     statusSuccessSubtle: RoutexPalette.green50,
     statusWarningSubtle: RoutexPalette.amber50,
     statusErrorSubtle: RoutexPalette.red50,
-    focusRing: RoutexPalette.blue600,
+    focusRing: RoutexPalette.teal700,
     shadow: RoutexPalette.neutral900At12,
     shadowStrong: RoutexPalette.neutral900At22,
     scrim: RoutexPalette.neutral900At45,
@@ -76,10 +76,10 @@ class RoutexColorTokens extends ThemeExtension<RoutexColorTokens> {
   final Color actionPrimarySubtle;
   final Color actionDisabled;
 
-  /// RoutEx를 대표하는 하늘색. **글자가 올라가지 않는 자리에만 쓴다.**
+  /// RoutEx를 대표하는 포인트 초록의 밝은 단계. **글자가 올라가지 않는 자리에만 쓴다.**
   ///
   /// 선택 상태의 테두리, 탭 표시줄, 지도 위 표시처럼 선과 면으로만 뜻을 전하는
-  /// 자리다. 흰 배경 기준 3.48이라 비텍스트 3:1은 넘지만 글자 4.5에는 못 미친다.
+  /// 자리다. 흰 배경 기준 4.12라 비텍스트 3:1은 넘지만 글자 4.5에는 못 미친다.
   /// 글자나 글자 밑 배경이 필요하면 actionPrimary를 쓴다.
   final Color accentBrand;
   final Color borderSubtle;

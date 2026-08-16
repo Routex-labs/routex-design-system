@@ -1,6 +1,6 @@
 name: routex_design_system
 description: Routex 제품 UI의 semantic token과 공통 Flutter 컴포넌트.
-version: 0.2.21
+version: 0.2.22
 publish_to: none
 
 environment:

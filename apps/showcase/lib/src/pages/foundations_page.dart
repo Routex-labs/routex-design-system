@@ -35,7 +35,7 @@ class FoundationsPage extends StatelessWidget {
           title: '지도 시각 토큰',
           description:
               '지도 바탕·구조물·경로·마커는 제품 semantic 색과 분리된 지도 역할입니다. '
-              '경로선과 UI 버튼의 파랑을 한 의미로 묶지 않습니다.',
+              '경로선의 파랑과 UI 버튼의 포인트 초록을 한 의미로 묶지 않습니다.',
           child: MapVisualCatalog(),
         ),
         ShowcaseSection(
