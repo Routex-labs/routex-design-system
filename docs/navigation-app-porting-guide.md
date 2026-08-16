@@ -8,7 +8,7 @@
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
 - 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
 - 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
-- 앱이 소비 중인 Runtime Kit release: `v0.2.13`. 앱이 실제로 고정한 전체 SHA는 Navigation
+- 앱이 소비 중인 Runtime Kit release: `v0.2.16`. 앱이 실제로 고정한 전체 SHA는 Navigation
   `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
 
 ### 적용 상태
@@ -20,7 +20,7 @@
 | 2. 저위험 기반 요소 | 적용 | 아래 표 |
 | 3. 하단 시트 | 적용 | 시트 여덟이 `RoutexBottomSheet` 표면을 쓴다. 손잡이 판정은 `client/test/widgets/sheet_handle_test.dart` |
 | 4. 검색과 결과 목록 | 진행 중 | 아래 표 |
-| 5. 장소 상세와 공유 | 진행 중 | 헤더가 `RoutexPlaceHeader`. 공유·딥링크는 미착수 |
+| 5. 장소 상세와 공유 | 진행 중 | 아래 표. 공유·딥링크는 미착수 |
 | 6 이후 | 미착수 | — |
 
 전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
@@ -83,6 +83,12 @@ SHA는 그럴 수 없다.
 > **단계 5에서도 같은 일이 두 번 더 있었다.** 저장할 수 없는 장소에 토글이 남았고(v0.2.12),
 > 헤더의 저장만 타일 배경을 가져 공유와 다른 컨트롤로 읽혔다(v0.2.13). 둘 다 소비 화면을 실제로
 > 조립하면서 드러났다.
+>
+> **여섯 번째는 계약을 늘리는 쪽이 맞았다.** 값 옆 복사 버튼의 성공 알림은 컴포넌트가 띄우는데,
+> Android 13부터는 **시스템이 같은 말을 스스로 띄운다.** 그 판정은 기기 SDK를 조회해야 알 수 있어
+> Runtime Kit이 할 수 없고, 어댑터로도 표현되지 않았다 — 버튼을 컴포넌트가 소유하기 때문이다.
+> 그래서 성공 알림 자리만 소비 앱에 넘기는 `onCopied`를 냈다(v0.2.16). 실패 알림은 컴포넌트가
+> 계속 맡는다. **어댑터를 먼저 시도해 본 뒤에 늘린 것**이 앞의 세 번과 다른 점이다.
 >
 > **그리고 화면은 실기기에서 한 번 열어 본다.** 한 줄짜리 목록 행에서 끝 동작이 제목보다 12
 > 내려가 있던 것(v0.2.10)은 테스트도 Showcase도 잡지 못했고, 소비 앱을 폰에 올려서야 보였다.
@@ -453,6 +459,22 @@ ThemeData가 이전과 같다**는 것이다. `AppTheme.light.copyWith(extension
 - 글자 배율 2.0에서 header와 행이 겹치지 않는다.
 
 ### 단계 5. 장소 상세와 공유
+
+#### 단계 5 안쪽
+
+| 항목 | 상태 |
+|---|---|
+| 장소 헤더(이름·층·분류·저장·공유) | 적용 (`RoutexPlaceHeader`) |
+| 영업시간 접힘·펼침 | 적용 (`RoutexHours`) |
+| SNS 링크 목록 | 적용 (`RoutexLinkList`). 번들 로고는 `RoutexLinkAccent.image` |
+| 매장 정보·영업 정보 행 | 적용 (`RoutexInfoRow`). 라벨→글리프 표는 앱이 갖는다 |
+| 섹션 제목 | 적용 (`RoutexSectionHeader`). 16 → 18로 오른다 |
+| 메뉴 팝업의 영양정보 표 | 적용 (`RoutexKeyValueRows`) |
+| 잘린 목록의 더보기 줄 | 적용 (`RoutexShowMore`). 메뉴 쪽은 접기도 생겼다 |
+| 대표 사진·사진 격자 | 적용 (`RoutexMediaCarousel`·`RoutexPhotoGrid`) |
+| 메뉴 줄·갈래 탭·검색창 | 미착수 |
+| 소개·특징·공지·위치 안내 | 미착수 |
+| 공유, 딥링크 | 미착수 — manifest·entitlement를 처음 건드리는 자리다 |
 
 진행:
 
