@@ -1,3 +1,8 @@
+## 0.2.2
+
+- `RoutexFeedbackTiming.noticeVisibility` 추가. 되돌리기가 붙은 알림은 읽는 시간에 더해 손이 닿을
+  시간이 필요해 토스트보다 길다. 소비 앱이 알림 유지 시간을 직접 적지 않게 한다.
+
 ## 0.2.1
 
 - `RoutexHours`의 `staleNote`가 접혀 있을 때 트리에서 빠지던 것을 고쳤다. 머리 줄의

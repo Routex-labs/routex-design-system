@@ -32,6 +32,15 @@ void main() {
         RoutexFeedbackTiming.toastVisibility,
         const Duration(milliseconds: 1600),
       );
+      expect(
+        RoutexFeedbackTiming.noticeVisibility,
+        const Duration(seconds: 4),
+      );
+      // 되돌리기가 붙은 알림은 읽는 시간에 더해 손이 닿을 시간이 필요하다.
+      expect(
+        RoutexFeedbackTiming.noticeVisibility,
+        greaterThan(RoutexFeedbackTiming.toastVisibility),
+      );
     });
 
     test('곡률과 layer는 제한된 위계를 유지한다', () {

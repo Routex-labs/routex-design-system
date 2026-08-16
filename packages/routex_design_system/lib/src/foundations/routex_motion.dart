@@ -41,4 +41,14 @@ abstract final class RoutexMotion {
 /// motion duration과 분리해 전환 속도를 조정해도 피드백 노출 시간이 흔들리지 않게 한다.
 abstract final class RoutexFeedbackTiming {
   static const toastVisibility = Duration(milliseconds: 1600);
+
+  /// 되돌리기가 붙은 알림이 떠 있는 시간이다.
+  ///
+  /// 토스트보다 긴 이유는 문장이 길어서가 아니라 **읽고 나서 손이 닿아야** 하기
+  /// 때문이다. 읽는 시간만 재면 누르려던 사람의 손이 도착하기 전에 사라진다.
+  ///
+  /// 그래도 사라지기는 한다. 이 알림의 되돌리기는 화면에 남아 있는 토글의 지름길일
+  /// 뿐 유일한 경로가 아니므로, 놓쳐도 되돌릴 방법이 사라지지 않는다. 되돌릴 길이
+  /// 여기뿐인 동작이라면 시간으로 지우지 말고 확인을 받는다(`RoutexDialog`).
+  static const noticeVisibility = Duration(seconds: 4);
 }
