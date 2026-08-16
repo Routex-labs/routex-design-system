@@ -2,14 +2,31 @@
 
 ## 문서 상태와 범위
 
-- 상태: 구현 전 계획
+- 상태: 단계 1까지 적용, 단계 2부터는 계획
 - 공급자: `packages/routex_design_system`
 - 소비자: `Routex-labs/Navigation`의 Flutter 클라이언트
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
-- 비목적: 이 문서만으로 실제 포팅을 시작하거나 승인하지 않음
-- 원본 코드 조사 기준: Navigation `main`의 `b54b73001b8935dcb9781b054635d849b823cdbc`
-- Runtime Kit 조사 기준: 이 문서와 함께 검토 중인 작업 트리. release tag가 아니므로 앱 의존성에
-  직접 사용하지 않음
+- 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
+- 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
+- 앱이 소비 중인 Runtime Kit release: `v0.2.0`. 앱이 실제로 고정한 전체 SHA는 Navigation
+  `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
+
+### 적용 상태
+
+| 단계 | 상태 | 증거 |
+|---|---|---|
+| 0. 기준선과 release 고정 | 적용 | 적용 직전 Navigation `flutter test` 1457개 전부 통과, `flutter analyze` 무결 |
+| 1. 의존성과 테마 브리지 | 적용 | `client/pubspec.yaml`·`client/pubspec.lock`의 고정 ref, `AppTheme.withRoutexTokens`, `client/test/theme/routex_theme_bridge_test.dart` |
+| 2 이후 | 미착수 | — |
+
+단계 1 적용 뒤 Navigation은 테스트 1465개(기준선 1457 + 신규 8)가 통과하고 analyze가 무결하다.
+전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
+더하며, 그 사실 자체를 `withRoutexTokens`에 대한 테스트가 지킨다.
+
+공급은 `v0.2.0`으로 끊었다. 4.3의 게이트 항목은 모두 닫혔다 — package·Showcase의 analyze·test가
+통과하고, 골든은 CI(ubuntu-latest)가 검증하며, CHANGELOG에 앱 영향과 breaking 여부가 적혀 있다.
+tag는 사람이 읽는 이름이고 **앱이 고정하는 것은 그 tag가 가리키는 전체 SHA**다. tag는 옮길 수 있지만
+SHA는 그럴 수 없다.
 
 이 문서는 **어떻게 옮길지**를 설명한다. 장소 상세·공유·안내 화면의 제품 결정은
 [`place-detail-guidance-decisions.md`](place-detail-guidance-decisions.md), 현재 픽셀을 바꾸지 않고
@@ -25,8 +42,9 @@
 
 - `client/lib/app.dart`의 `NavigationApp`은 `WidgetsBindingObserver`로 PDR background/foreground를
   중계한다. 링크 수신을 붙일 때 이 lifecycle을 대체하거나 두 번 구독하면 안 된다.
-- `client/lib/routing/app_routes.dart`에는 `/`, `/indoor-map`, `/destination`, `/route-guide`,
-  `/arrival`, debug route만 있다. `/place/...` named route나 URI coordinator는 없다.
+- `client/lib/routing/app_routes.dart`에는 named route가 `outdoorMap = '/'` **하나뿐이다.** 지도 셸이
+  야외·실내와 그 사이 모든 단계를 시트로 그려서 push할 곳이 없다. `/place/...` named route나 URI
+  coordinator는 없다.
 - `client/lib/screens/map_shell/map_shell_screen.dart`의 `_MapShellScreenState`가 검색, route draft,
   sheet chain, 지도 focus와 현재 demo 건물 상태를 소유한다.
 - 같은 파일의 `_buildingId`는 `demoBuildingId`로 고정돼 있다. 현재 앱은 링크가 가리키는 임의
@@ -51,19 +69,25 @@
 
 | 영역 | 원본 코드 |
 |---|---|
-| 앱 lifecycle·theme·route 설치 | [`client/lib/app.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/app.dart) |
-| named route 목록 | [`client/lib/routing/app_routes.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/routing/app_routes.dart) |
-| 전역 theme·legacy token | [`client/lib/theme/app_theme.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/theme/app_theme.dart) |
-| 검색·sheet chain·route draft | [`client/lib/screens/map_shell/map_shell_screen.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/screens/map_shell/map_shell_screen.dart) |
-| MapLibre·GPS·실내 안내·도착 | [`client/lib/screens/outdoor_map/outdoor_map_screen.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/screens/outdoor_map/outdoor_map_screen.dart) |
-| 장소 상세 sheet | [`client/lib/widgets/place_detail_sheet.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/place_detail_sheet.dart) |
-| 카테고리 sheet | [`client/lib/widgets/category_stores_sheet.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/category_stores_sheet.dart) |
-| 저장한 장소·reorder | [`client/lib/widgets/favorites_sheet.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/favorites_sheet.dart) |
-| 검색 상태 | [`client/lib/widgets/search_panel.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/search_panel.dart) |
-| 안내 표시 | [`client/lib/widgets/eta_card.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/eta_card.dart) |
-| 도착 표시 | [`client/lib/widgets/indoor_arrival_card.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/indoor_arrival_card.dart) |
-| 영업시간 판정 | [`client/lib/domain/store_hours.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/domain/store_hours.dart) |
-| sheet pointer route | [`client/lib/widgets/map_pass_through_sheet_route.dart`](https://github.com/Routex-labs/Navigation/blob/b54b73001b8935dcb9781b054635d849b823cdbc/client/lib/widgets/map_pass_through_sheet_route.dart) |
+| 앱 lifecycle·theme·route 설치 | [`client/lib/app.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/app.dart) |
+| named route 목록 | [`client/lib/routing/app_routes.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/routing/app_routes.dart) |
+| 전역 theme·legacy token·브리지 | [`client/lib/theme/app_theme.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/theme/app_theme.dart) |
+| 검색·sheet chain·route draft | [`client/lib/screens/map_shell/map_shell_screen.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/map_shell/map_shell_screen.dart) |
+| MapLibre·GPS·실내 안내·도착 | [`client/lib/screens/outdoor_map/outdoor_map_screen.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/outdoor_map/outdoor_map_screen.dart) |
+| 장소 상세 sheet | [`client/lib/screens/map_shell/widgets/sheets/place_detail_sheet.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/map_shell/widgets/sheets/place_detail_sheet.dart) |
+| 카테고리 sheet | [`client/lib/screens/map_shell/widgets/sheets/category_stores_sheet.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/map_shell/widgets/sheets/category_stores_sheet.dart) |
+| 저장한 장소·reorder | [`client/lib/screens/map_shell/widgets/sheets/favorites_sheet.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/map_shell/widgets/sheets/favorites_sheet.dart) |
+| 검색 상태 | [`client/lib/screens/map_shell/widgets/search/search_panel.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/map_shell/widgets/search/search_panel.dart) |
+| 경로 입력 결과 | [`client/lib/screens/map_shell/widgets/search/route_field_results.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/map_shell/widgets/search/route_field_results.dart) |
+| 안내 표시 | [`client/lib/widgets/eta_card.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/widgets/eta_card.dart) |
+| 도착 표시 | [`client/lib/screens/outdoor_map/widgets/indoor_arrival_card.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/screens/outdoor_map/widgets/indoor_arrival_card.dart) |
+| 영업시간 판정 | [`client/lib/domain/store/store_hours.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/domain/store/store_hours.dart) |
+| sheet pointer route | [`client/lib/widgets/map_pass_through_sheet_route.dart`](https://github.com/Routex-labs/Navigation/blob/b655c066e00ca6b2bab6dd9035c37a9d8d54fe62/client/lib/widgets/map_pass_through_sheet_route.dart) |
+
+이전 기준 `b54b7300`과 비교하면 `client/lib` 232개 파일이 바뀌었고, 시트·검색·안내 위젯이
+`client/lib/widgets/`에서 `client/lib/screens/<화면>/widgets/` 아래로 옮겨졌다. 경로만 보고 이 문서의
+옛 판을 따르면 존재하지 않는 파일을 고치게 된다. 지도 pointer 계약(`map_pass_through_sheet_route`,
+`map_overlay_guard`)과 `eta_card`는 여러 화면이 공유하므로 `client/lib/widgets/`에 남아 있다.
 
 ## 1. 실패 기준부터 확정한다
 
@@ -207,8 +231,9 @@ dependencies:
 - package 버전 상승은 별도 PR 또는 명확히 분리된 commit으로 처리한다.
 - package 변경 내역, 영향 받은 앱 화면, migration 필요 여부를 기록한다.
 
-현재 bootstrap 버전은 Navigation 적용용 release가 아니다. README에 명시된 검토 release가
-발행되기 전에는 실제 앱 포팅을 시작하지 않는다.
+Navigation이 소비하는 release는 `v0.2.0`이다. tag 이름이 아니라 그것이 가리키는 전체 SHA를 적는다 —
+tag는 나중에 옮길 수 있고, 그러면 같은 앱 커밋이 다른 package를 가리키게 된다. 다음 release도
+같은 절차를 거치기 전에는 앱이 소비하지 않는다.
 
 Navigation은 Dart `^3.12.2`, Runtime Kit은 Dart `^3.12.2`와 Flutter `>=3.44.0`을 요구하므로
 현재 선언만 보면 SDK 축은 맞는다. 그래도 소비 앱 CI의 실제 Flutter 버전을 기준으로
@@ -542,7 +567,7 @@ Runtime Kit 공개 pattern을 먼저 보강한다.
 
 #### 영업시간
 
-판정은 `client/lib/domain/store_hours.dart`를 그대로 사용한다. Runtime Kit은 판정하지 않는다.
+판정은 `client/lib/domain/store/store_hours.dart`를 그대로 사용한다. Runtime Kit은 판정하지 않는다.
 
 ```text
 computeStoreHoursStatus(hours, now) → RoutexHoursState
@@ -585,12 +610,32 @@ Runtime Kit 위젯 하나로 다시 만들지 말고 `OutdoorMapBody._buildBody`
 
 #### `client/pubspec.yaml`
 
-1. 불변 Runtime Kit ref를 dependencies에 추가한다.
+1. 불변 Runtime Kit ref를 dependencies에 추가한다. (적용 완료)
 2. 장소 링크 단계에서 검토한 URI 수신 package를 별도 추가한다.
-3. 기존 `indoor_pdr_core` path와 `objective_c` override를 보존한다.
+3. 기존 `indoor_pdr_core` path와 `objective_c` override를 보존한다. (적용 시 확인 완료 —
+   lockfile 변화는 `routex_design_system` 항목 9줄 추가뿐이고 transitive plugin은 그대로다.)
 4. `flutter pub get` 후 lockfile의 Runtime Kit ref와 transitive plugin 변화를 검토한다.
 5. package가 가진 Pretendard와 앱 asset의 중복 번들 크기를 측정한다. 첫 단계에서는 앱 font 선언을
    제거하지 않는다.
+
+5번 측정 결과(`flutter build bundle`의 `FontManifest.json`)는 다음과 같다. 두 벌은 SHA-256이 서로
+같은 파일이다.
+
+| family | 위치 | 크기 |
+|---|---|---|
+| `Pretendard` | `assets/fonts/` | 7.6MB (5 face) |
+| `packages/routex_design_system/Pretendard` | `packages/routex_design_system/assets/fonts/` | 7.6MB (5 face) |
+
+즉 다리를 놓는 것만으로 번들이 약 7.6MB 늘고, 웹에서는 그만큼이 그대로 내려간다. 그런데 **두 벌은
+모두 실제로 쓰인다.** `RoutexTypography`의 모든 style은 `package: 'routex_design_system'`을 넘기므로
+Runtime Kit 텍스트는 `packages/routex_design_system/Pretendard`로 해석되고, 앱이 소유한 Material
+텍스트와 지도 fontstack·mock SVG는 앱이 선언한 `Pretendard`로 해석된다
+(`test/core/pretendard_font_assets_test.dart`). 이름이 다른 두 family라 한쪽이 다른 쪽을 대신하지
+못한다.
+
+따라서 한 벌로 줄이는 것은 asset 정리가 아니라 **font family 계약을 어느 쪽으로 정할지**의 문제이며,
+전역 theme 전환(단계 8)에서 함께 판단한다. 그전에 한쪽 선언만 지우면 지우는 쪽 텍스트가 조용히
+플랫폼 기본 글꼴로 떨어진다.
 
 #### `client/lib/app.dart`와 routing
 
@@ -624,7 +669,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 바꾸고 repository cache, category future, floor overlay, route draft 초기화 규칙을 정해야 한다. 이는
 디자인 포팅이 아니라 별도 제품·상태 architecture 작업이다.
 
-#### `client/lib/widgets/place_detail_sheet.dart`
+#### `client/lib/screens/map_shell/widgets/sheets/place_detail_sheet.dart`
 
 1. `show`, `MapPassThroughSheetRoute`, `MapOverlayGuard`, `PopScope`, `_intentionalPop`을 유지한다.
 2. `DraggableScrollableSheet`의 0.5/0.3/0.92 extent와 `expand: false`를 우선 보존한다. 시각 검수로
@@ -641,7 +686,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 8. 공유 button의 `RenderBox`를 share 호출 직전에 읽어 iPad origin을 만든다. async 이전에 context와
    mounted 상태를 확인한다.
 
-#### `client/lib/widgets/category_stores_sheet.dart`
+#### `client/lib/screens/map_shell/widgets/sheets/category_stores_sheet.dart`
 
 1. `MapPassThroughSheetRoute`와 chain-close flag를 유지한다.
 2. 0.55/0.35/0.9 extent 및 상위 camera의 `kCategoryStoresSheetInitialSize` 연결을 유지한다.
@@ -650,7 +695,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
    않는다.
 5. `CustomScrollView(controller: scrollController)`를 유지한 채 header, filter, 상태, cell만 포팅한다.
 
-#### `client/lib/widgets/favorites_sheet.dart`
+#### `client/lib/screens/map_shell/widgets/sheets/favorites_sheet.dart`
 
 1. 첫 포팅에서는 `showModalBottomSheet`, 최대 높이 80%, `ReorderableListView`를 유지한다.
 2. 고정형이므로 Runtime Kit `showHandle`은 false로 둔다. 현재 `SheetGrabHandle`은 제거 대상이다.
@@ -662,7 +707,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 6. 확장형 favorites는 이 포팅에서 하지 않는다. 필요하면 gesture architecture와 테스트를 별도
    결정한다.
 
-#### `client/lib/widgets/search_panel.dart`
+#### `client/lib/screens/map_shell/widgets/search/search_panel.dart`
 
 1. `_SearchPhase`, debounce 300ms + semantic grace 400ms, `_requestId`를 그대로 둔다.
 2. `_storeIndex`, `_suggestions`, `_sortOverride`, `_floorScopeOnce`, discovery facet 상태를 UI
@@ -675,7 +720,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 7. `highlightedNameSpans`, nearest ordering, distinctive reason, indoor/outdoor merge는 domain/adapter로
    유지한다.
 
-#### `client/lib/widgets/route_field_results.dart`
+#### `client/lib/screens/map_shell/widgets/search/route_field_results.dart`
 
 1. `RoutePlanField`에 따른 현재 위치 shortcut과 문구를 유지한다.
 2. 야외에서는 `showPickOnMap`이 false인 계약을 유지한다.
@@ -709,6 +754,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 | iPad 공유 anchor | `RoutexPlaceHeader.onShare`만 공개 | 실제 share icon의 non-zero bounds 필요 | header bounds 사용 승인 또는 action key/context 계약 보강 |
 | draggable sheet 조합 | `RoutexBottomSheet`는 drag를 소유하지 않고 `expand`만 제공 | 전달 controller, scroll되는 header 여부, keyboard inset | 실제 Draggable fixture와 pointer test 통과 |
 | theme font | `RoutexTheme.light`에 명시 font family 없음 | 앱·지도·SVG Pretendard 고정 | 브리지와 최종 theme font 계약 테스트 |
+| route planner focus | `RoutexRoutePlanner`만 `Theme.of(context).focusColor`를 읽는다 | 브리지는 앱의 Material 기본 focus를 유지한다 | 단계 4 착수 전에 semantic focus 입력 보강 또는 국소 `Theme` 결정 |
 | map overlay | semantic slot 중심 | shell의 동적 Column, keyboard inset, GlobalKey hit exclusion | 기존 pointer/key 계약을 표현할 수 있는지 proof |
 
 이 표의 항목은 “나중에 개선” 목록이 아니다. 해당 기능을 포팅하려면 먼저 결정하고 공급자 release에
@@ -864,15 +910,15 @@ flutter test
 수직 기능 작업 중에는 먼저 좁은 회귀를 실행한 뒤 전체 suite를 실행한다.
 
 ```bash
-flutter test test/widgets/place_detail_sheet_test.dart
-flutter test test/widgets/place_detail/place_detail_hours_section_test.dart
-flutter test test/widgets/search_panel_test.dart
+flutter test test/screens/map_shell/widgets/sheets/place_detail_sheet_test.dart
+flutter test test/screens/map_shell/widgets/sheets/place_detail/place_detail_hours_section_test.dart
+flutter test test/screens/map_shell/widgets/search/search_panel_test.dart
 flutter test test/widgets/eta_card_test.dart
-flutter test test/widgets/indoor_arrival_card_test.dart
-flutter test test/domain/store_hours_test.dart
-flutter test test/domain/route_guidance_test.dart
-flutter test test/domain/route_arrival_auto_clear_test.dart
-flutter test test/domain/dijkstra_test.dart
+flutter test test/screens/outdoor_map/widgets/indoor_arrival_card_test.dart
+flutter test test/domain/store/store_hours_test.dart
+flutter test test/domain/guidance/route_guidance_test.dart
+flutter test test/domain/guidance/route_arrival_auto_clear_test.dart
+flutter test test/domain/route/dijkstra_test.dart
 ```
 
 PDR smoke는 센서와 실기기 조건이 필요하므로 일반 widget test 통과로 대체하지 않는다.

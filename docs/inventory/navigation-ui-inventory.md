@@ -3,7 +3,7 @@
 ## 조사 조건
 
 - 원본 저장소: `Routex-labs/Navigation`
-- 확인 commit: `b54b73001b8935dcb9781b054635d849b823cdbc`
+- 확인 commit: `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
 - 목적: Runtime Kit 포팅 시 보존할 상태·책임과 교체할 시각 구현을 분리한다.
 - 제한: 이 문서는 원본 앱의 현재 구현 snapshot이다. 포팅 착수 시 HEAD가 다르면 다시 조사한다.
 
@@ -14,13 +14,13 @@
 | `client/lib/app.dart` | lifecycle, router, deep-link coordinator, theme 설치 | semantic theme |
 | `screens/map_shell/map_shell_screen.dart` | 검색·sheet chain·route draft·선택 상태 | overlay slot과 제품 패턴 |
 | `screens/outdoor_map/outdoor_map_screen.dart` | MapLibre, GPS, 실내 전환, 안내·도착 상태 | 지도 chrome과 상태 표현 |
-| `widgets/place_detail_sheet.dart` | 상세 조회, 저장, 공유 callback, 출발·도착 intent | sheet/header/actions/tabs/content |
-| `widgets/category_stores_sheet.dart` | 분류·정렬 데이터 | result list, sort, list cell |
-| `widgets/favorites_sheet.dart` | 저장 데이터, reorder, route intent | 확장형 sheet와 목록 표현 |
-| `widgets/search_panel.dart` | query와 비동기 상태 | search/result/empty/loading 표현 |
+| `screens/map_shell/widgets/sheets/place_detail_sheet.dart` | 상세 조회, 저장, 공유 callback, 출발·도착 intent | sheet/header/actions/tabs/content |
+| `screens/map_shell/widgets/sheets/category_stores_sheet.dart` | 분류·정렬 데이터 | result list, sort, list cell |
+| `screens/map_shell/widgets/sheets/favorites_sheet.dart` | 저장 데이터, reorder, route intent | 확장형 sheet와 목록 표현 |
+| `screens/map_shell/widgets/search/search_panel.dart` | query와 비동기 상태 | search/result/empty/loading 표현 |
 | `widgets/eta_card.dart` | ETA·소요·거리 계산값 | 안내 전 요약 위계 |
-| `widgets/indoor_arrival_card.dart` | 도착 판정과 종료 action | 도착 상태·후속 행동 표현 |
-| `domain/store_hours.dart` | 영업 상태와 요일 계산 | 접힘/펼침 영업시간 표현 |
+| `screens/outdoor_map/widgets/indoor_arrival_card.dart` | 도착 판정과 종료 action | 도착 상태·후속 행동 표현 |
+| `domain/store/store_hours.dart` | 영업 상태와 요일 계산 | 접힘/펼침 영업시간 표현 |
 | `widgets/map_pass_through_sheet_route.dart` | pointer routing과 sheet lifecycle | 없음 |
 
 ## 현재 포팅 위험

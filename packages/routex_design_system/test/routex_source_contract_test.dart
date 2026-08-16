@@ -120,7 +120,10 @@ void main() {
       final count = 'Transform.translate('
           .allMatches(file.readAsStringSync())
           .length;
-      if (count > 0) actual[file.path] = count;
+      // 허용 목록의 key는 저장소 기준 POSIX 경로다. Windows의 `listSync`는
+      // `\`로 된 경로를 돌려주므로 그대로 쓰면 같은 파일이 다른 key가 되어
+      // 예외가 등록돼 있어도 실패한다.
+      if (count > 0) actual[file.path.replaceAll(r'\', '/')] = count;
     }
 
     expect(actual, {

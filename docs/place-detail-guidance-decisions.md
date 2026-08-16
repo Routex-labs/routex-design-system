@@ -154,7 +154,7 @@ Navigation 저장소에서 다음 순서로 연결한다.
 
 ### 3. 공유 action
 
-`client/lib/widgets/place_detail_sheet.dart`의 상세 헤더에서 저장 icon action 옆에 공유 callback을
+`client/lib/screens/map_shell/widgets/sheets/place_detail_sheet.dart`의 상세 헤더에서 저장 icon action 옆에 공유 callback을
 추가한다. 출발·도착 text button 행에는 섞지 않는다. 다음을 모두 만족할 때만 활성화한다.
 
 - `buildingId.trim().isNotEmpty`
