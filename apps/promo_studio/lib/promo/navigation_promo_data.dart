@@ -1,4 +1,4 @@
-// GENERATED FILE — promo/generate_navigation_promo_data.py
+// GENERATED FILE — tool/generate_navigation_promo_data.py
 // Source: deployed thehyundai-seoul building/floor/graph API, revision fc117808ffa1c5aa9887788da0745a3d.
 // Product runtime does not import this snapshot.
 import 'dart:ui';

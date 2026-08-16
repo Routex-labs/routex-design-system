@@ -1,8 +1,8 @@
 """배포 백엔드의 더현대 지도/그래프를 촬영용 Dart 상수로 고정한다.
 
 실행:
-  cd client
-  python3 promo/generate_navigation_promo_data.py
+  cd apps/promo_studio
+  python3 tool/generate_navigation_promo_data.py
 
 제품 코드나 백엔드 데이터는 수정하지 않는다. API 응답을 읽어 촬영 레이어 안의
 `navigation_promo_data.dart`만 다시 만든다.
@@ -170,7 +170,7 @@ def main() -> None:
     transfer_to = node_by_id[transfer["to"]]
     distance = sum(edge["length_m"] for _from, _to, edge in path)
 
-    source = f"""// GENERATED FILE — promo/generate_navigation_promo_data.py
+    source = f"""// GENERATED FILE — tool/generate_navigation_promo_data.py
 // Source: deployed {BUILDING_ID} building/floor/graph API, revision {graph['revision']}.
 // Product runtime does not import this snapshot.
 import 'dart:ui';
