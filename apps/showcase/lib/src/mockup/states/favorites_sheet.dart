@@ -25,6 +25,9 @@ class FavoritesSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RoutexBottomSheet(
+      // 저장 목록은 목록 스크롤과 함께 높이를 확장하는 제품 시트를 대표한다.
+      // 실제 drag controller는 소비 앱이 소유하고 Showcase는 handle 계약을 보인다.
+      showHandle: true,
       header: RoutexSheetHeader(
         title: '저장한 장소',
         onBack: onBack,

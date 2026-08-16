@@ -18,6 +18,14 @@ const _gap = RoutexSpacing.contentGap;
 /// 이 결과를 통째로 축소해 보여 줄 뿐이라, 두 가지를 한 test에서 재면 어느 쪽이
 /// 어긋났는지 알 수 없다.
 void main() {
+  testWidgets('갤러리는 저장 피드백과 검색 중 스켈레톤을 한 번씩만 보여 준다', (tester) async {
+    await _layoutGallery(tester, 1800);
+
+    expect(find.text('장소를 저장했습니다.'), findsOneWidget);
+    expect(find.text('장소에 저장했습니다'), findsNothing);
+    expect(find.byType(RoutexSkeletonList), findsOneWidget);
+  });
+
   testWidgets('카드 폭은 제품 폭을 넘지 않고 창이 넓어져도 늘어나지 않는다', (tester) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = const Size(1600, 3000);

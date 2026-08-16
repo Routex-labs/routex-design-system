@@ -73,9 +73,9 @@ void main() {
         DateTime(2026, 8, 18, 14, 30),
       );
       expect(week, hasLength(7));
-      expect(week.first.label, '화(8/18)');
+      expect(week.first.label, '화');
       expect(week.first.value, '10:30 - 20:00');
-      expect(week[3].label, '금(8/21)');
+      expect(week[3].label, '금');
       expect(week[3].value, '10:30 - 20:30');
     });
   });

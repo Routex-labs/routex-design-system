@@ -32,6 +32,7 @@ class DetailStateState extends State<DetailState> {
       sheetExtent: RoutexSheetExtent.large,
       sheet: RoutexBottomSheet(
         expand: true,
+        showHandle: true,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -39,9 +40,8 @@ class DetailStateState extends State<DetailState> {
               name: widget.place.name,
               metadata:
                   '${widget.place.floorName} · ${widget.place.category}${widget.place.subcategory == null ? '' : ' · ${widget.place.subcategory}'}',
-              supportingText: widget.place.buildingName,
-              leadingIcon: RoutexIcons.place,
               saved: widget.saved,
+              onShare: () => RoutexToast.show(context, '장소 공유 링크를 준비했습니다'),
               onSaved: widget.onSaved,
               expanded: true,
               onToggleExpanded: widget.onClose,

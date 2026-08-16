@@ -271,6 +271,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
                       onSelected: (value) => setState(() => _tab = value),
                     ),
                     const RoutexBottomSheet(
+                      showHandle: true,
                       child: Text(
                         '하단 표면은 handle, 곡률, 내부 여백과 지도 위 그림자를 공통 규칙으로 사용합니다.',
                         style: RoutexTypography.body,
@@ -283,6 +284,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
                 label: '제목이 있는 시트',
                 surface: MobileFrameSurface.map,
                 child: RoutexBottomSheet(
+                  showHandle: true,
                   header: RoutexSheetHeader(
                     title: '저장한 장소',
                     onBack: () {},
@@ -352,7 +354,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
                     ),
                     RoutexTripProgress(
                       metrics: const [
-                        RoutexTripMetric(value: '6분 후', label: '예상 시각'),
+                        RoutexTripMetric(value: '오후 3:24', label: '도착 예정'),
                         RoutexTripMetric(value: '6분', label: '남은 시간'),
                         RoutexTripMetric(value: '410m', label: '남은 거리'),
                       ],
@@ -644,7 +646,6 @@ class _ComponentsPageState extends State<ComponentsPage> {
                         RoutexTripMetric(value: '1.4km', label: '거리'),
                       ],
                       onStart: () {},
-                      onCancel: () {},
                     ),
                     RoutexArrivalCard(
                       destination: '발렌시아가',

@@ -63,10 +63,7 @@ class GuidanceState extends StatelessWidget {
       ],
       sheet: RoutexTripProgress(
         metrics: [
-          RoutexTripMetric(
-            value: '${(6 - progress * 5).ceil()}분 후',
-            label: '예상 시각',
-          ),
+          RoutexTripMetric(value: '오후 3:24', label: '도착 예정'),
           RoutexTripMetric(
             value: '${(6 - progress * 5).ceil()}분',
             label: '남은 시간',

@@ -186,6 +186,7 @@ class _GalleryGridState extends State<GalleryGrid> {
             // 요점이다. 한 카드에 겹쳐 두면 "찾는 중"과 "찾지 못함"의 차이가 안 보인다.
             _Card(
               surface: _CardSurface.sheet,
+              compact: true,
               child: RoutexResultList(
                 status: RoutexResultStatus.ready,
                 summary: '32개 결과',
@@ -228,6 +229,7 @@ class _GalleryGridState extends State<GalleryGrid> {
             ),
             _Card(
               surface: _CardSurface.sheet,
+              compact: true,
               child: RoutexStack(
                 gap: RoutexStackGap.control,
                 children: [
@@ -260,7 +262,7 @@ class _GalleryGridState extends State<GalleryGrid> {
                   ),
                   RoutexTripProgress(
                     metrics: const [
-                      RoutexTripMetric(value: '6분 후', label: '예상 시각'),
+                      RoutexTripMetric(value: '오후 3:24', label: '도착 예정'),
                       RoutexTripMetric(value: '6분', label: '남은 시간'),
                       RoutexTripMetric(value: '410m', label: '남은 거리'),
                     ],
@@ -280,7 +282,6 @@ class _GalleryGridState extends State<GalleryGrid> {
                   RoutexTripMetric(value: '1.4km', label: '거리'),
                 ],
                 onStart: () {},
-                onCancel: () {},
               ),
             ),
             _Card(
@@ -499,6 +500,14 @@ class _GalleryGridState extends State<GalleryGrid> {
                     ],
                   ),
                 ),
+                const _Card(
+                  surface: _CardSurface.map,
+                  child: RoutexStack(
+                    gap: RoutexStackGap.control,
+                    fill: RoutexStackFill.content,
+                    children: [RoutexToastSurface(message: '복사했습니다')],
+                  ),
+                ),
               ],
             ),
             _Card(
@@ -514,6 +523,7 @@ class _GalleryGridState extends State<GalleryGrid> {
                   // 이 카드가 보여주는 것은 시트의 머리 부분과 표면이다. 내용은
                   // 저장한 장소 카드와 겹치지 않게 검색 결과로 둔다.
                   RoutexBottomSheet(
+                    showHandle: true,
                     header: RoutexSheetHeader(
                       title: '검색 결과',
                       onBack: () {},
@@ -564,31 +574,69 @@ class _GalleryGridState extends State<GalleryGrid> {
                 children: [],
               ),
             ),
-            // 배지는 상태를 알리는 표시고 표는 값을 세는 자리다. 한 카드에 두면
-            // 배지가 표의 머리글처럼 읽힌다.
+            // 표면은 그 자체로 보이는 컴포넌트가 아니라 다른 것이 올라가는 바닥이다.
+            // 네 역할을 나란히 두어야 어떤 것이 그림자를 갖고 어떤 것이 경계선만
+            // 갖는지가 비교된다.
+            _Card(
+              surface: _CardSurface.map,
+              child: RoutexStack(
+                gap: RoutexStackGap.content,
+                children: [
+                  for (final (role, label) in const [
+                    (RoutexSurfaceRole.flat, '평평한 묶음'),
+                    (RoutexSurfaceRole.outlined, '경계로만 구분'),
+                    (RoutexSurfaceRole.onMap, '지도 위 조작'),
+                    (RoutexSurfaceRole.chrome, '지도 위 주 표면'),
+                  ])
+                    RoutexSurface(
+                      role: role,
+                      child: Padding(
+                        padding: const EdgeInsetsDirectional.all(
+                          RoutexSpacing.componentPadding,
+                        ),
+                        child: Text(label, style: RoutexTypography.label),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            // 분류·경로 속성과 낮은 강도의 위치 품질은 읽기 전용 배지로 둔다.
+            // 자동 복구가 시작되는 경로 이탈만 잠시 보이는 상단 상태 알림으로 올린다.
             _Card(
               surface: _CardSurface.sheet,
-              child: RoutexCluster(
-                gap: RoutexClusterGap.control,
+              child: RoutexStack(
+                gap: RoutexStackGap.control,
                 children: [
-                  RoutexBadge(label: 'NEW', accent: showcaseBadgeAccent('NEW')),
-                  const RoutexBadge(
-                    label: '시즌 한정',
-                    accent: RoutexBadgeAccent(
-                      surface: Color(0xFFFDF0E7),
-                      ink: Color(0xFF9A4F0C),
-                    ),
+                  RoutexCluster(
+                    gap: RoutexClusterGap.control,
+                    children: [
+                      RoutexBadge(
+                        label: 'NEW',
+                        accent: showcaseBadgeAccent('NEW'),
+                      ),
+                      const RoutexBadge(
+                        label: '시즌 한정',
+                        accent: RoutexBadgeAccent(
+                          surface: Color(0xFFFDF0E7),
+                          ink: Color(0xFF9A4F0C),
+                        ),
+                      ),
+                      const RoutexBadge(
+                        label: '최단 시간',
+                        tone: RoutexBadgeTone.info,
+                      ),
+                      const RoutexBadge(
+                        label: 'GPS 약함',
+                        icon: RoutexIcons.warning,
+                        tone: RoutexBadgeTone.warning,
+                      ),
+                    ],
                   ),
-                  const RoutexBadge(label: '최단 시간', tone: RoutexBadgeTone.info),
-                  const RoutexBadge(
-                    label: 'GPS 약함',
-                    tone: RoutexBadgeTone.warning,
-                    icon: RoutexIcons.warning,
-                  ),
-                  const RoutexBadge(
-                    label: '경로 이탈',
-                    tone: RoutexBadgeTone.error,
+                  const RoutexStatusBanner(
+                    title: '경로를 벗어났습니다',
+                    detail: '새 경로를 자동으로 찾고 있습니다.',
                     icon: RoutexIcons.error,
+                    tone: RoutexStatusBannerTone.error,
                   ),
                 ],
               ),
@@ -623,30 +671,12 @@ class _GalleryGridState extends State<GalleryGrid> {
                 ],
               ),
             ),
-            _Card(
-              surface: _CardSurface.sheet,
-              child: const RoutexSkeletonList(count: 3),
-            ),
-            // 토스트와 dialog는 눌러야 뜨는 표면이라, 카탈로그에서는 제자리에
-            // 세워 둔다. 눌러야만 볼 수 있는 컴포넌트는 목록에 없는 것과 같다 —
-            // 1.6초 뒤 사라지는 표면일수록 더 그렇다.
-            //
-            // 두 표면 모두 제 내용만큼만 넓다. 열을 통째로 주면 알약 하나가 카드
-            // 한 칸을 차지해 실제보다 크게 보인다.
+            // dialog는 눌러야 뜨는 표면이라 카탈로그에서는 제자리에 세워 둔다.
+            // 복사 토스트는 위의 층·지도 조작 narrow row에 합쳐 빈 갤러리 칸을 만들지
+            // 않는다. 역할을 합친 것이 아니라 좁은 예시끼리 한 칸을 나눈 것이다.
             _NarrowRow(
               key: const ValueKey('gallery-feedback-row'),
               children: [
-                _Card(
-                  surface: _CardSurface.map,
-                  child: RoutexStack(
-                    gap: RoutexStackGap.control,
-                    fill: RoutexStackFill.content,
-                    children: const [
-                      RoutexToastSurface(message: '복사했습니다'),
-                      RoutexToastSurface(message: '장소에 저장했습니다'),
-                    ],
-                  ),
-                ),
                 const _Card(
                   surface: _CardSurface.map,
                   child: RoutexDialog(
@@ -694,10 +724,15 @@ enum _CardSurface { map, sheet }
 /// 줄어든다. 카드가 스스로 폭을 정하지 않으므로 "좁은 카드"라는 종류를 따로 두지
 /// 않아도 된다.
 class _Card extends StatelessWidget {
-  const _Card({required this.surface, required this.child});
+  const _Card({
+    required this.surface,
+    required this.child,
+    this.compact = false,
+  });
 
   final _CardSurface surface;
   final Widget child;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -712,8 +747,8 @@ class _Card extends StatelessWidget {
         border: Border.all(color: colors.borderSubtle),
       ),
       child: Padding(
-        padding: const EdgeInsetsDirectional.all(
-          RoutexSpacing.componentPadding,
+        padding: EdgeInsetsDirectional.all(
+          compact ? RoutexSpacing.controlGap : RoutexSpacing.componentPadding,
         ),
         child: child,
       ),

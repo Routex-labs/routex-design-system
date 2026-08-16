@@ -51,8 +51,20 @@ class RouteState extends StatelessWidget {
           onPressed: onRecenter,
         ),
       ],
-      sheet: RoutexBottomSheet(
-        child: RoutexStack(
+      sheet: RoutexEtaCard(
+        arrivalTime: '오후 3:24',
+        metrics: [
+          RoutexTripMetric(
+            value: selectedRoute == 0 ? '6분' : '7분',
+            label: '소요',
+          ),
+          RoutexTripMetric(
+            value: selectedRoute == 0 ? '410m' : '460m',
+            label: '거리',
+          ),
+        ],
+        onStart: onStart,
+        routeOptions: RoutexStack(
           gap: RoutexStackGap.control,
           children: [
             RoutexRouteOption(
@@ -68,10 +80,6 @@ class RouteState extends StatelessWidget {
               meta: '+1분',
               selected: selectedRoute == 1,
               onPressed: () => onRoute(1),
-            ),
-            SizedBox(
-              width: double.infinity,
-              child: RoutexButton(label: '안내 시작', onPressed: onStart),
             ),
           ],
         ),
