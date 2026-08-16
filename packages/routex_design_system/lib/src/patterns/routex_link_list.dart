@@ -19,6 +19,12 @@ enum RoutexLinkDisplay {
   /// 라벨의 성격으로 정한다 — 순서로 정하면 배열을 바꿨을 때 뜻 없이 화면이 따라
   /// 바뀐다.
   url,
+
+  /// 라벨이 브랜드를 말하면서 주소도 필요한 줄이다(`오설록 공식 홈페이지`).
+  ///
+  /// 라벨을 주소로 덮으면 어느 브랜드인지가 사라지고, 주소를 지우면 어디로 나가는지가
+  /// 사라진다. 둘 다 남길 이유가 있을 때만 두 줄이 된다.
+  labelAndUrl,
 }
 
 /// 브랜드 배지의 색이다.
@@ -108,8 +114,9 @@ class _LinkRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
+    final showBoth = item.display == RoutexLinkDisplay.labelAndUrl;
     final showUrl =
-        item.display == RoutexLinkDisplay.url || item.label.trim().isEmpty;
+        item.display != RoutexLinkDisplay.label || item.label.trim().isEmpty;
 
     return Semantics(
       button: true,
@@ -139,19 +146,40 @@ class _LinkRow extends StatelessWidget {
                     _LinkBadge(accent: item.accent),
                     const SizedBox(width: RoutexSpacing.contentGap),
                     Expanded(
-                      child: Text(
-                        showUrl ? item.url : item.label,
-                        // **한 줄 말줄임이고 자르는 곳은 뒤다.** 주소는 앞쪽(호스트)이
-                        // 어디로 가는지를 말하고 뒤쪽(경로)은 그렇지 않다. 두 줄로
-                        // 흘리면 줄 높이가 항목마다 달라져 목록이 글 덩어리가 된다.
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: RoutexTypography.bodySmall.copyWith(
-                          // 주소만 링크 색이다. 이 줄이 글자가 아니라 주소라는 표시.
-                          color: showUrl
-                              ? colors.actionPrimary
-                              : colors.contentPrimary,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (showBoth)
+                            Text(
+                              item.label,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: RoutexTypography.bodySmall.copyWith(
+                                color: colors.contentPrimary,
+                              ),
+                            ),
+                          Text(
+                            showUrl ? item.url : item.label,
+                            // **한 줄 말줄임이고 자르는 곳은 뒤다.** 주소는 앞쪽
+                            // (호스트)이 어디로 가는지를 말하고 뒤쪽(경로)은 그렇지
+                            // 않다. 두 줄로 흘리면 줄 높이가 항목마다 달라져 목록이
+                            // 글 덩어리가 된다.
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                (showBoth
+                                        ? RoutexTypography.caption
+                                        : RoutexTypography.bodySmall)
+                                    .copyWith(
+                                      // 주소만 링크 색이다. 이 줄이 글자가 아니라
+                                      // 주소라는 표시.
+                                      color: showUrl
+                                          ? colors.actionPrimary
+                                          : colors.contentPrimary,
+                                    ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: RoutexSpacing.controlGap),

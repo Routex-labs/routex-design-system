@@ -502,6 +502,35 @@ void main() {
     });
   });
 
+  // 라벨을 주소로 덮으면 어느 브랜드인지가 사라지고, 주소를 지우면 어디로 나가는지가
+  // 사라진다. 둘 다 남길 이유가 있는 줄만 두 줄이다.
+  testWidgets('라벨이 브랜드를 말하면 주소와 함께 두 줄로 선다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexLinkList(
+            items: const [
+              RoutexLinkItem(
+                label: '오설록 공식 홈페이지',
+                url: 'https://osulloc.com',
+                display: RoutexLinkDisplay.labelAndUrl,
+              ),
+              RoutexLinkItem(label: '인스타그램', url: 'https://example.com/ig'),
+            ],
+            onSelected: _ignoreLink,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('오설록 공식 홈페이지'), findsOneWidget);
+    expect(find.text('https://osulloc.com'), findsOneWidget);
+    // 나머지 줄은 라벨만이다.
+    expect(find.text('인스타그램'), findsOneWidget);
+    expect(find.text('https://example.com/ig'), findsNothing);
+  });
+
   // 로고 파일은 이 저장소가 담지 않는다. 소비 앱이 이미 번들에 가진 그림만 받는다.
   testWidgets('배지 그림을 받으면 그것을 그리고, 없으면 브랜드 배지로 떨어진다', (tester) async {
     await tester.pumpWidget(
