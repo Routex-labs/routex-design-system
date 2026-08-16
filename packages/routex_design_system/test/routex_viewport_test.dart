@@ -150,10 +150,10 @@ class _PublicUiSet extends StatelessWidget {
               children: [
                 RoutexFloorSelector(
                   options: const [
-                    RoutexFloorOption(id: 1, label: '1F'),
-                    RoutexFloorOption(id: -1, label: 'B1'),
+                    RoutexFloorOption(id: '1F', label: '1F'),
+                    RoutexFloorOption(id: 'B1', label: 'B1'),
                   ],
-                  selectedId: 1,
+                  selectedId: '1F',
                   onSelected: (_) {},
                 ),
                 const SizedBox(width: RoutexSpacing.contentGap),

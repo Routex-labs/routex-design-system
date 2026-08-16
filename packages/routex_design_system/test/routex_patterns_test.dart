@@ -146,6 +146,72 @@ void main() {
     expect(find.text('오후 3:24'), findsOneWidget, reason: '요약은 그대로 남는다');
   });
 
+  // 지하 4층·지상 8층인 건물에서 전량을 세우면 기둥 하나가 지도 좌측을 통째로
+  // 가린다. 다섯까지만 세우고 나머지는 굴린다.
+  testWidgets('층이 많으면 다섯만 세우고 지금 층을 가운데로 옮긴다', (tester) async {
+    const floors = ['4F', '3F', '2F', '1F', 'B1', 'B2', 'B3'];
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexFloorSelector(
+            options: [
+              for (final floor in floors)
+                RoutexFloorOption(id: floor, label: floor),
+            ],
+            selectedId: 'B3',
+            onSelected: (_) {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getSize(find.byType(RoutexFloorSelector)).height,
+      RoutexMetrics.minimumTouchTarget * 5,
+      reason: '일곱 층이어도 기둥은 다섯 칸이다',
+    );
+    // 마지막 층을 골랐으니 목록 끝까지 굴러가 있어야 한다 — 가운데 맞춤은
+    // 끝에서 포기한다.
+    final position = tester
+        .widget<Scrollable>(find.byType(Scrollable))
+        .controller!
+        .position;
+    expect(position.pixels, position.maxScrollExtent);
+    expect(find.text('B3'), findsOneWidget);
+    expect(find.text('4F'), findsNothing, reason: '뷰포트 밖은 그리지 않는다');
+  });
+
+  testWidgets('층이 다섯 이하면 굴리지 않는다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexFloorSelector(
+            options: const [
+              RoutexFloorOption(id: '1F', label: '1F'),
+              RoutexFloorOption(id: 'B1', label: 'B1'),
+            ],
+            selectedId: 'B1',
+            onSelected: (_) {},
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      tester.getSize(find.byType(RoutexFloorSelector)).height,
+      RoutexMetrics.minimumTouchTarget * 2,
+    );
+    expect(
+      tester.widget<Scrollable>(find.byType(Scrollable)).physics,
+      isA<NeverScrollableScrollPhysics>(),
+      reason: '굴릴 것이 없는데 미끄러지면 "덜 왔나" 싶게 만든다',
+    );
+  });
+
   testWidgets('장소·경로·안내 패턴은 상태와 callback을 분리하지 않는다', (tester) async {
     var saved = false;
     var expanded = false;
