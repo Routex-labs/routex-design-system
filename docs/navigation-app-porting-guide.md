@@ -2,13 +2,13 @@
 
 ## 문서 상태와 범위
 
-- 상태: 단계 2 진행 중
+- 상태: 단계 3까지 적용
 - 공급자: `packages/routex_design_system`
 - 소비자: `Routex-labs/Navigation`의 Flutter 클라이언트
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
 - 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
 - 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
-- 앱이 소비 중인 Runtime Kit release: `v0.2.2`. 앱이 실제로 고정한 전체 SHA는 Navigation
+- 앱이 소비 중인 Runtime Kit release: `v0.2.5`. 앱이 실제로 고정한 전체 SHA는 Navigation
   `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
 
 ### 적용 상태
@@ -17,8 +17,9 @@
 |---|---|---|
 | 0. 기준선과 release 고정 | 적용 | 적용 직전 Navigation `flutter test` 1457개 전부 통과, `flutter analyze` 무결 |
 | 1. 의존성과 테마 브리지 | 적용 | `client/pubspec.yaml`·`client/pubspec.lock`의 고정 ref, `AppTheme.withRoutexTokens`, `client/test/theme/routex_theme_bridge_test.dart` |
-| 2. 저위험 기반 요소 | 진행 중 | 아래 표 |
-| 3 이후 | 미착수 | — |
+| 2. 저위험 기반 요소 | 적용 | 아래 표 |
+| 3. 하단 시트 | 적용 | 시트 여덟이 `RoutexBottomSheet` 표면을 쓴다. 손잡이 판정은 `client/test/widgets/sheet_handle_test.dart` |
+| 4 이후 | 미착수 | — |
 
 전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
 더하며, 그 사실 자체를 `withRoutexTokens`에 대한 테스트가 지킨다.
@@ -30,15 +31,27 @@ SHA는 그럴 수 없다.
 
 | 항목 | 상태 | 증거 |
 |---|---|---|
-| Badge·Chip·status banner 의미 분리 | 지도 위 표시만 적용 | `parts/ui.dart`의 `RoutexBadge`·`RoutexInlineNotice`, `client/test/app_test.dart` |
+| Badge·Chip·status banner 의미 분리 | 지도 위 표시 적용 | `parts/ui.dart`의 `RoutexBadge`·`RoutexInlineNotice`, 지도 칩 줄의 `RoutexChipBar` |
 | 공통 list cell | 미착수 | 목록이 전부 시트·검색 안이라 단계 3~5에서 그 표면과 함께 옮긴다 |
 | 영업시간 접힘·펼침 | 적용 | `place_detail_hours_section.dart`(`RoutexHours`) |
 | 저장 피드백 단일 notice | 적용 | `place_detail_sheet.dart`(`RoutexInlineNotice`) |
 | toast·skeleton 중복 제한 | 적용 | `place_detail_rich_sections.dart`(`RoutexToast`). skeleton은 앱에 아직 없다 |
 
-**칩은 지도 위 대분류 줄까지만 이 단계에서 옮긴다.** 시트 안 소분류 줄과 검색 되물음 줄은 계약이
-아직 모자라고(7.4), 그 표면 자체가 단계 3·4에서 옮겨간다 — 먼저 칩만 바꾸면 같은 파일을 두 번
-건드리게 된다.
+**칩은 지도 위 대분류 줄까지만 이 단계에서 옮겼다.** 시트 안 소분류 줄과 검색 되물음 줄은 계약이
+아직 모자라다(7.4). 앱의 `filter_pill.dart`가 그 자리를 지키고 있으며, 단계 4에서 함께 옮긴다.
+
+#### 단계 3에서 드러난 것
+
+시트 여덟을 옮기며 **표면이 무엇을 소유해야 하는지**가 세 번 갱신됐다. 셋 다 "지금 디자인을 표현할
+수 있는가"에서 걸렸고, 앱에서 흉내 내는 대신 공급자 계약으로 올렸다.
+
+| 걸린 것 | 왜 | 어디서 |
+|---|---|---|
+| 손잡이가 표면 위에 고정돼 있었다 | `DraggableScrollableSheet`는 제 scrollController가 받은 드래그로만 크기가 바뀐다. 표면 위 손잡이는 끌리지 않는 장식이다 | `RoutexSheetHandle`(v0.2.4) |
+| 표면이 본문 여백을 강제했다 | 대표 사진은 가장자리까지 닿아야 하고 글은 안으로 들어와야 한다 | `contentInset`(v0.2.4) |
+| 표면이 잉크 면을 주지 않았다 | 시트 안의 누를 수 있는 줄이 배경·물결을 칠할 자리가 시트 색 아래로 내려갔다. `ListTile`이 단언으로 잡는다 | 투명 `Material`(v0.2.5) |
+
+셋 다 **화면을 열어 보기 전에는 안 보이는** 종류였다. 계약을 문서에서만 대조했다면 셋 다 놓쳤다.
 
 이 문서는 **어떻게 옮길지**를 설명한다. 장소 상세·공유·안내 화면의 제품 결정은
 [`place-detail-guidance-decisions.md`](place-detail-guidance-decisions.md), 현재 픽셀을 바꾸지 않고
@@ -764,7 +777,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 | favorites drag | `reorderable`은 손잡이 시각만 소유 | 실제 long-press reorder | semantics와 affordance test 확정 |
 | 도착 권장 구조 | `RoutexArrivalCard`가 도착 문구+행동 소유 | 상단 상태 1회 + 하단 후속 행동 | 둘 중 하나만 쓰는 Showcase 상태 확정 |
 | iPad 공유 anchor | `RoutexPlaceHeader.onShare`만 공개 | 실제 share icon의 non-zero bounds 필요 | header bounds 사용 승인 또는 action key/context 계약 보강 |
-| draggable sheet 조합 | `RoutexBottomSheet`는 drag를 소유하지 않고 `expand`만 제공 | 전달 controller, scroll되는 header 여부, keyboard inset | 실제 Draggable fixture와 pointer test 통과 |
+| draggable sheet 조합 | `RoutexBottomSheet`는 drag를 소유하지 않고 `expand`만 제공 | 전달 controller, scroll되는 header 여부, keyboard inset | **닫힘.** 드래그·라우트·keyboard inset은 앱이 그대로 소유하고, 표면만 옮겼다(단계 3) |
 | theme font | `RoutexTheme.light`에 명시 font family 없음 | 앱·지도·SVG Pretendard 고정 | 브리지와 최종 theme font 계약 테스트 |
 | route planner focus | `RoutexRoutePlanner`만 `Theme.of(context).focusColor`를 읽는다 | 브리지는 앱의 Material 기본 focus를 유지한다 | 단계 4 착수 전에 semantic focus 입력 보강 또는 국소 `Theme` 결정 |
 | map overlay | semantic slot 중심 | shell의 동적 Column, keyboard inset, GlobalKey hit exclusion | 기존 pointer/key 계약을 표현할 수 있는지 proof |
