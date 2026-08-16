@@ -333,6 +333,36 @@ void main() {
           .toSet();
       expect(labels, hasLength(1), reason: '모든 칩이 같은 줄에 남는다');
     });
+
+    // 지도 위 오버레이는 스크롤을 이미 소유한다. 그 안에 이 줄이 제 뷰포트를 또
+    // 만들면 무한 폭을 받아 그 자리에서 터진다.
+    testWidgets('부모가 가로 스크롤을 소유하면 뷰포트를 겹쳐 만들지 않는다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: RoutexChipBar(
+                options: options,
+                selectedId: null,
+                onSelected: _ignoreSelection,
+                overflow: RoutexChipBarOverflow.deferToParent,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(Scrollable), findsOneWidget, reason: '뷰포트는 부모 하나뿐이다');
+    });
+
+    testWidgets('기본값은 스스로 스크롤한다', (tester) async {
+      await pumpBar(tester, selectedId: null, onSelected: _ignoreSelection);
+
+      expect(find.byType(Scrollable), findsOneWidget);
+    });
   });
 
   group('RoutexSectionHeader', () {

@@ -80,10 +80,25 @@ class RoutexChipOption {
 /// 것"을 구분하지 못한다.
 enum RoutexChipSurface { inSheet, onMap }
 
+/// 칩이 한 줄에 다 안 들어갈 때 그 넘침을 누가 맡는가.
+///
+/// 기본은 줄 자신이다([scroll]). 소비 화면이 **이미 가로 스크롤 뷰포트를 소유한**
+/// 자리에서는 [deferToParent]로 넘긴다 — 가로 스크롤 안에 가로 스크롤을 또 두면
+/// 안쪽이 무한 폭을 받아 그 자리에서 터진다.
+///
+/// 지도 위 오버레이가 그런 자리다. 거기서는 스크롤이 시각이 아니라 **입력 계약**을
+/// 함께 진다. 지도가 플랫폼 뷰라 이 줄 위의 휠이 지도까지 내려가고, 잠금을 뷰포트
+/// 전체가 아니라 칩이 실제로 그려진 영역에만 걸어야 한다. 그 판단에 필요한 것을
+/// 아는 쪽은 소비 앱이므로, 그 자리에서는 스크롤 소유권을 넘긴다.
+///
+/// **[deferToParent]를 고르면 부모가 가로 스크롤을 반드시 제공해야 한다.** 칩은 큰
+/// 글자에서 폭이 늘고 이 줄은 스스로 접히지 않는다.
+enum RoutexChipBarOverflow { scroll, deferToParent }
+
 /// 목록을 좁히는 선택지를 내용 폭 그대로 한 줄에 나열한다.
 ///
 /// 선택은 없거나 하나다. 선택된 항목을 다시 누르면 선택이 풀린다. 큰 글자에서도
-/// 세로로 접지 않고 내부에서 가로 스크롤한다.
+/// 세로로 접지 않고 가로로 넘긴다 — 그 넘침을 누가 맡는지는 [overflow]가 정한다.
 ///
 /// 상호배타적인 전체 선택지를 균등 폭으로 보여줘야 하면 `RoutexTravelModeBar`
 /// 같은 세그먼트 컨트롤을 쓴다. 이 컴포넌트는 항목 수가 바뀌는 필터를 맡는다.
@@ -93,6 +108,7 @@ class RoutexChipBar extends StatelessWidget {
     required this.selectedId,
     required this.onSelected,
     this.surface = RoutexChipSurface.inSheet,
+    this.overflow = RoutexChipBarOverflow.scroll,
     this.semanticsLabel,
     super.key,
   });
@@ -107,34 +123,42 @@ class RoutexChipBar extends StatelessWidget {
 
   final RoutexChipSurface surface;
 
+  final RoutexChipBarOverflow overflow;
+
   final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     assert(options.isNotEmpty, '선택지가 없으면 줄 자체를 그리지 않는다');
 
+    final row = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (var index = 0; index < options.length; index++) ...[
+          if (index > 0) const SizedBox(width: RoutexSpacing.controlGap),
+          _Chip(
+            key: ValueKey(options[index].id),
+            option: options[index],
+            surface: surface,
+            selected: options[index].id == selectedId,
+            onPressed: () => onSelected(
+              options[index].id == selectedId ? null : options[index].id,
+            ),
+          ),
+        ],
+      ],
+    );
+
     return Semantics(
       container: true,
       label: semanticsLabel,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (var index = 0; index < options.length; index++) ...[
-              if (index > 0) const SizedBox(width: RoutexSpacing.controlGap),
-              _Chip(
-                key: ValueKey(options[index].id),
-                option: options[index],
-                surface: surface,
-                selected: options[index].id == selectedId,
-                onPressed: () => onSelected(
-                  options[index].id == selectedId ? null : options[index].id,
-                ),
-              ),
-            ],
-          ],
+      child: switch (overflow) {
+        RoutexChipBarOverflow.scroll => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: row,
         ),
-      ),
+        RoutexChipBarOverflow.deferToParent => row,
+      },
     );
   }
 }
