@@ -28,7 +28,19 @@ enum RoutexLinkDisplay {
 /// 아이콘을 쓰고 **색만** 브랜드에서 가져온다 — 색은 로고가 아니라서 담을 것이 없다.
 @immutable
 class RoutexLinkAccent {
-  const RoutexLinkAccent({required this.icon, required this.colors});
+  const RoutexLinkAccent({
+    required this.icon,
+    required this.colors,
+    this.image,
+  });
+
+  /// 배지를 채울 그림이다. **로고 파일은 여기 담지 않는다** — 소비 앱이 이미
+  /// 번들에 갖고 있는 그림만 넘길 수 있게 자리만 연다.
+  ///
+  /// 저작권 범위가 그 매장 자산과 이미 같아진 경우에만 쓴다. 그림이 빠져도 줄이
+  /// 사라지지 않도록 [icon]·[colors] 배지로 되돌아간다 — 자산 누락은 빌드가 아니라
+  /// 실행 중에 드러난다.
+  final ImageProvider? image;
 
   final IconData icon;
 
@@ -174,6 +186,24 @@ class _LinkBadge extends StatelessWidget {
     final brandColors = accent?.colors.isNotEmpty ?? false
         ? accent!.colors
         : [colors.contentSecondary];
+
+    if (accent?.image case final image?) {
+      return ClipOval(
+        child: Image(
+          image: image,
+          width: RoutexMetrics.compactControl,
+          height: RoutexMetrics.compactControl,
+          fit: BoxFit.cover,
+          // 그림이 빠져도 줄이 사라지지 않게 기본 배지로 되돌린다.
+          errorBuilder: (_, _, _) => _LinkBadge(
+            accent: RoutexLinkAccent(
+              icon: accent!.icon,
+              colors: accent!.colors,
+            ),
+          ),
+        ),
+      );
+    }
 
     return Container(
       width: RoutexMetrics.compactControl,

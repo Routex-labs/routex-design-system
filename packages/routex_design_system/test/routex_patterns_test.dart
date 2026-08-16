@@ -502,6 +502,42 @@ void main() {
     });
   });
 
+  // 로고 파일은 이 저장소가 담지 않는다. 소비 앱이 이미 번들에 가진 그림만 받는다.
+  testWidgets('배지 그림을 받으면 그것을 그리고, 없으면 브랜드 배지로 떨어진다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexLinkList(
+            items: const [
+              RoutexLinkItem(
+                label: '공식 사이트',
+                url: 'https://example.com',
+                accent: RoutexLinkAccent(
+                  icon: RoutexIcons.link,
+                  colors: [Color(0xFF3C4043)],
+                  image: AssetImage('favicon.png'),
+                ),
+              ),
+              RoutexLinkItem(
+                label: '인스타그램',
+                url: 'https://example.com/ig',
+                accent: RoutexLinkAccent(
+                  icon: RoutexIcons.link,
+                  colors: [Color(0xFFE1306C)],
+                ),
+              ),
+            ],
+            onSelected: _ignoreLink,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(Image), findsOneWidget, reason: '그림을 준 줄만');
+    expect(find.byIcon(RoutexIcons.link), findsOneWidget, reason: '나머지는 글리프');
+  });
+
   // 헤더 안 두 동작이 같은 평면에 있어야 한다. 하나만 타일 배경을 가지면 사용자는
   // 둘을 서로 다른 종류의 컨트롤로 읽는다.
   testWidgets('저장과 공유는 같은 평면에 선다', (tester) async {
@@ -792,3 +828,5 @@ void main() {
     });
   });
 }
+
+void _ignoreLink(RoutexLinkItem item) {}
