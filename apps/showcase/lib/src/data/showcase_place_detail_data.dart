@@ -308,7 +308,7 @@ List<RoutexHoursDay> showcaseHoursWeek(ShowcaseHours hours, DateTime now) {
         final intervals =
             hours.weekly[date.weekday] ?? const <ShowcaseHoursInterval>[];
         return RoutexHoursDay(
-          label: '${_weekdayLabel(date.weekday)}(${date.month}/${date.day})',
+          label: _weekdayLabel(date.weekday),
           value: intervals.isEmpty
               ? '휴무'
               : intervals

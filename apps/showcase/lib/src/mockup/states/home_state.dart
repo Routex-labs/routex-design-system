@@ -93,7 +93,7 @@ class HomeState extends StatelessWidget {
     final searching = searchController.text.trim().isNotEmpty;
     final searchResults = RoutexSurface(
       role: RoutexSurfaceRole.chrome,
-      radius: RoutexRadii.field,
+      shape: RoutexSurfaceShape.field,
       child: RoutexInset(
         role: RoutexInsetRole.component,
         child: searching

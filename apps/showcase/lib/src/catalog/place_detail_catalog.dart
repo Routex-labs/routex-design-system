@@ -38,10 +38,8 @@ class _PlaceDetailHeaderCardState extends State<PlaceDetailHeaderCard> {
         RoutexPlaceHeader(
           name: detail.name,
           metadata: '${detail.floorLabel} · ${detail.category}',
-          supportingText: '더현대 서울 · 도보 3분',
-          supportingIcon: RoutexIcons.walk,
-          leadingIcon: RoutexIcons.place,
           saved: _saved,
+          onShare: () => RoutexToast.show(context, '장소 공유 링크를 준비했습니다'),
           onSaved: (value) {
             setState(() => _saved = value);
             RoutexToast.show(context, value ? '장소에 저장했습니다' : '저장을 취소했습니다');
@@ -97,7 +95,6 @@ class _PlaceFactsCardState extends State<PlaceFactsCard> {
                 label: item.label,
                 value: item.value,
                 icon: showcaseInfoIcon(item.label),
-                copyText: item.label == '주소' ? item.value : null,
               ),
             RoutexInfoRow(
               label: '정보 출처',
@@ -123,7 +120,10 @@ class PlaceMenuCard extends StatefulWidget {
 }
 
 class _PlaceMenuCardState extends State<PlaceMenuCard> {
-  String? _category;
+  static const _all = 'all';
+  static const _new = 'new';
+
+  String _filter = _all;
   bool _expanded = false;
 
   @override
@@ -131,7 +131,10 @@ class _PlaceMenuCardState extends State<PlaceMenuCard> {
     final categories = widget.detail.menuCategories;
     final items = [
       for (final item in widget.detail.menu)
-        if (_category == null || item.category == _category) item,
+        if (_filter == _all ||
+            (_filter == _new && item.badges.contains('NEW')) ||
+            item.category == _filter)
+          item,
     ];
 
     return RoutexStack(
@@ -142,11 +145,19 @@ class _PlaceMenuCardState extends State<PlaceMenuCard> {
           RoutexChipBar(
             semanticsLabel: '메뉴 분류',
             options: [
+              const RoutexChipOption(id: _all, label: '전체'),
+              const RoutexChipOption(id: _new, label: '신상품'),
               for (final category in categories)
                 RoutexChipOption(id: category, label: category),
             ],
-            selectedId: _category,
-            onSelected: (value) => setState(() => _category = value),
+            selectedId: _filter,
+            onSelected: (value) {
+              if (value == null) return;
+              setState(() {
+                _filter = value;
+                _expanded = false;
+              });
+            },
           ),
         RoutexMenuList(
           collapsedCount: 3,
@@ -165,10 +176,11 @@ class _PlaceMenuCardState extends State<PlaceMenuCard> {
                       ),
                 badges: [
                   for (final badge in item.badges)
-                    RoutexBadge(
-                      label: badge,
-                      accent: showcaseBadgeAccent(badge),
-                    ),
+                    if (!(_filter == _new && badge == 'NEW'))
+                      RoutexBadge(
+                        label: badge,
+                        accent: showcaseBadgeAccent(badge),
+                      ),
                 ],
                 // 가격 말고는 더 볼 것이 없는 항목이 있다. 눌러도 줄에 이미 있는
                 // 값만 나오는 팝업은 막다른 길이다.

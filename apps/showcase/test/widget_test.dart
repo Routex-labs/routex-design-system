@@ -165,6 +165,13 @@ void main() {
     await tester.pump();
     expect(find.text('저장한 장소'), findsWidgets);
     expect(
+      find.descendant(
+        of: home,
+        matching: find.byKey(RoutexBottomSheet.handleKey),
+      ),
+      findsOneWidget,
+    );
+    expect(
       find.descendant(of: home, matching: find.byTooltip('발렌시아가 더보기')),
       findsOneWidget,
     );
@@ -213,6 +220,25 @@ void main() {
     );
     expect(find.text('영업시간'), findsOneWidget);
     expect(find.text('발렌시아가'), findsWidgets);
+    final detailState = find.byKey(const ValueKey('detail-state'));
+    expect(
+      find.descendant(
+        of: detailState,
+        matching: find.textContaining('현재 위치에서'),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: detailState,
+        matching: find.byKey(RoutexBottomSheet.handleKey),
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byTooltip('장소 공유'));
+    await tester.pump();
+    expect(find.text('장소 공유 링크를 준비했습니다'), findsOneWidget);
 
     await tester.tap(find.text('메뉴'));
     await tester.pump();
@@ -230,6 +256,7 @@ void main() {
     expect(find.text('대중교통'), findsNothing);
     expect(find.byType(InteractiveViewer), findsNothing);
     expect(find.byKey(const ValueKey('mockup-map-canvas')), findsNothing);
+    expect(find.text('경로 지우기'), findsNothing);
 
     await tester.tap(find.byKey(const ValueKey('mockup-step-guidance')));
     await tester.pump(const Duration(milliseconds: 400));
