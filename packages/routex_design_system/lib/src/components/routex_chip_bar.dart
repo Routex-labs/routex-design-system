@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../foundations/routex_icons.dart';
 import '../foundations/routex_layer.dart';
 import '../foundations/routex_metrics.dart';
 import '../foundations/routex_radii.dart';
@@ -104,22 +103,6 @@ enum RoutexChipSurface { inSheet, onMap }
 /// 글자에서 폭이 늘고 이 줄은 스스로 접히지 않는다.
 enum RoutexChipBarOverflow { scroll, deferToParent }
 
-/// 선택을 푸는 방법이 눈에 보이는가.
-///
-/// 칩 줄은 선택된 칩을 다시 누르면 풀린다. 그것이 화면에 드러나지 않으면, 고른 값이
-/// 쌓인 줄에서 사용자는 무엇을 눌러야 되돌아가는지 모른다. [visible]은 선택된 칩 끝에
-/// ×를 그려 그 사실을 말한다.
-enum RoutexChipDismiss { hidden, visible }
-
-/// 선택이 없는 상태가 있을 수 있는가.
-///
-/// [optional]은 고른 것을 다시 눌러 모두 풀 수 있다 — 지도 위 분류 줄이 그렇다.
-///
-/// [required]는 늘 하나가 선택돼 있다. `전체`처럼 "좁히지 않음"을 뜻하는 칩이 줄
-/// 안에 있는 경우다. 여기서 해제를 허용하면 그 칩의 강조만 사라져, 지금 전체를 보고
-/// 있다는 사실이 화면에서 없어진다. 선택된 칩을 다시 눌러도 아무 일도 일어나지 않는다.
-enum RoutexChipSelection { optional, required }
-
 /// 목록을 좁히는 선택지를 내용 폭 그대로 한 줄에 나열한다.
 ///
 /// 선택은 없거나 하나다. 선택된 항목을 다시 누르면 선택이 풀린다. 큰 글자에서도
@@ -134,8 +117,6 @@ class RoutexChipBar extends StatelessWidget {
     required this.onSelected,
     this.surface = RoutexChipSurface.inSheet,
     this.overflow = RoutexChipBarOverflow.scroll,
-    this.dismiss = RoutexChipDismiss.hidden,
-    this.selection = RoutexChipSelection.optional,
     this.semanticsLabel,
     super.key,
   });
@@ -152,19 +133,11 @@ class RoutexChipBar extends StatelessWidget {
 
   final RoutexChipBarOverflow overflow;
 
-  final RoutexChipDismiss dismiss;
-
-  final RoutexChipSelection selection;
-
   final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     assert(options.isNotEmpty, '선택지가 없으면 줄 자체를 그리지 않는다');
-    assert(
-      selection == RoutexChipSelection.optional || selectedId != null,
-      '늘 하나가 선택돼 있는 줄이라면 지금 무엇이 선택됐는지도 함께 준다',
-    );
 
     final row = Row(
       mainAxisSize: MainAxisSize.min,
@@ -176,15 +149,9 @@ class RoutexChipBar extends StatelessWidget {
             option: options[index],
             surface: surface,
             selected: options[index].id == selectedId,
-            dismissible:
-                dismiss == RoutexChipDismiss.visible &&
-                options[index].id == selectedId,
-            onPressed: () {
-              final already = options[index].id == selectedId;
-              // 늘 하나가 선택된 줄에서는 다시 눌러도 바뀌는 것이 없다.
-              if (already && selection == RoutexChipSelection.required) return;
-              onSelected(already ? null : options[index].id);
-            },
+            onPressed: () => onSelected(
+              options[index].id == selectedId ? null : options[index].id,
+            ),
           ),
         ],
       ],
@@ -209,7 +176,6 @@ class _Chip extends StatelessWidget {
     required this.option,
     required this.surface,
     required this.selected,
-    required this.dismissible,
     required this.onPressed,
     super.key,
   });
@@ -217,7 +183,6 @@ class _Chip extends StatelessWidget {
   final RoutexChipOption option;
   final RoutexChipSurface surface;
   final bool selected;
-  final bool dismissible;
   final VoidCallback onPressed;
 
   @override
@@ -301,14 +266,6 @@ class _Chip extends StatelessWidget {
                               RoutexTypography.label,
                             ).copyWith(color: foreground),
                           ),
-                          if (dismissible) ...[
-                            const SizedBox(width: RoutexSpacing.inlineGap),
-                            Icon(
-                              RoutexIcons.close,
-                              size: RoutexMetrics.iconSmall,
-                              color: foreground,
-                            ),
-                          ],
                         ],
                       ),
                     ),
