@@ -32,7 +32,10 @@ abstract final class RoutexTheme {
         displayColor: colors.contentPrimary,
       ),
       extensions: const [colors],
-      focusColor: colors.focusRing,
+      // Material 기본 컨트롤은 선택 채움과 구분되는 옅은 focus state layer를
+      // 사용한다. 경계가 있는 커스텀 표면은 RoutexFocusRing이 같은 token의
+      // 불투명한 2dp 링을 그린다.
+      focusColor: colors.focusRing.withValues(alpha: 0.12),
       dividerColor: colors.borderSubtle,
       disabledColor: colors.contentDisabled,
     );

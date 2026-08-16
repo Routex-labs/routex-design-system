@@ -90,7 +90,9 @@ class RoutexBadge extends StatelessWidget {
           borderRadius: RoutexRadii.control,
           // 테두리는 배경과 같은 색 계열이다. 연한 배경만으로는 흰 표면 위에서
           // 배지의 경계가 사라진다.
-          border: Border.all(color: resolved.ink.withValues(alpha: 0.24)),
+          border: Border.all(
+            color: resolved.ink.withValues(alpha: RoutexOpacity.subtleOutline),
+          ),
           boxShadow: switch (surface) {
             RoutexBadgeSurface.inSheet => null,
             RoutexBadgeSurface.onMap => RoutexLayer.shadow(

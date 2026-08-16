@@ -38,6 +38,11 @@ class RoutexSheetHeader extends StatelessWidget {
   /// 닫기 왼쪽에 붙는, 화면을 바꾸지 않는 보조 동작이다.
   final Widget? trailing;
 
+  // ListCell의 실제 glyph 중심은 `contentGap + iconMedium / 2`이고, 48dp
+  // IconAction의 중심보다 2dp 바깥에 있다. 제목 열은 그대로 둔 채 glyph만 같은
+  // 중심에 맞춘다. 터치 영역 크기는 변하지 않는다.
+  static const _listGlyphOffset = RoutexOpticalCorrection.sheetHeaderGlyph;
+
   @override
   Widget build(BuildContext context) {
     return Semantics(
@@ -52,11 +57,19 @@ class RoutexSheetHeader extends StatelessWidget {
               width: RoutexMetrics.textKeyline,
               child: Align(
                 alignment: AlignmentDirectional.centerStart,
-                child: RoutexIconAction(
-                  label: '이전으로',
-                  icon: RoutexIcons.back,
-                  tone: RoutexIconActionTone.quiet,
-                  onPressed: onBack,
+                child: Transform.translate(
+                  offset: Offset(
+                    Directionality.of(context) == TextDirection.ltr
+                        ? -_listGlyphOffset
+                        : _listGlyphOffset,
+                    0,
+                  ),
+                  child: RoutexIconAction(
+                    label: '이전으로',
+                    icon: RoutexIcons.back,
+                    tone: RoutexIconActionTone.quiet,
+                    onPressed: onBack,
+                  ),
                 ),
               ),
             ),
@@ -77,11 +90,19 @@ class RoutexSheetHeader extends StatelessWidget {
           ],
           if (onClose case final onClose?) ...[
             const SizedBox(width: RoutexSpacing.controlGap),
-            RoutexIconAction(
-              label: '닫기',
-              icon: RoutexIcons.close,
-              tone: RoutexIconActionTone.quiet,
-              onPressed: onClose,
+            Transform.translate(
+              offset: Offset(
+                Directionality.of(context) == TextDirection.ltr
+                    ? _listGlyphOffset
+                    : -_listGlyphOffset,
+                0,
+              ),
+              child: RoutexIconAction(
+                label: '닫기',
+                icon: RoutexIcons.close,
+                tone: RoutexIconActionTone.quiet,
+                onPressed: onClose,
+              ),
             ),
           ],
         ],

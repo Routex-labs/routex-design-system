@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../foundations/routex_metrics.dart';
 import '../foundations/routex_radii.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
@@ -65,7 +66,9 @@ class RoutexDialog extends StatelessWidget {
       child: ConstrainedBox(
         // 폭을 제한하지 않으면 태블릿·웹에서 한 줄이 화면 폭만큼 길어져 읽는 눈이
         // 줄 끝에서 다음 줄 첫 글자를 찾지 못한다.
-        constraints: const BoxConstraints(maxWidth: 360),
+        constraints: const BoxConstraints(
+          maxWidth: RoutexContentMeasure.dialog,
+        ),
         child: SingleChildScrollView(
           child: Semantics(
             container: true,

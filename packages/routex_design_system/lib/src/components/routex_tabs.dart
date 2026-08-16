@@ -43,7 +43,9 @@ class RoutexTabs extends StatelessWidget {
                           color: selectedIndex == index
                               ? colors.accentBrand
                               : colors.borderSubtle,
-                          width: selectedIndex == index ? 2 : 1,
+                          width: selectedIndex == index
+                              ? RoutexStroke.emphasis
+                              : RoutexStroke.hairline,
                         ),
                       ),
                     ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../foundations/routex_metrics.dart';
 import '../foundations/routex_radii.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
@@ -46,7 +47,7 @@ class RoutexRouteOption extends StatelessWidget {
               borderRadius: RoutexRadii.field,
               border: Border.all(
                 color: selected ? colors.accentBrand : colors.borderSubtle,
-                width: selected ? 2 : 1,
+                width: selected ? RoutexStroke.emphasis : RoutexStroke.hairline,
               ),
             ),
             child: Row(

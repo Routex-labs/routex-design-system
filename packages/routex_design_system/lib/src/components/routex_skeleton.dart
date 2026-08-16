@@ -37,18 +37,20 @@ enum RoutexSkeletonShape {
 /// 하나만 있어도 프레임이 끝없이 그려져, 아무도 보고 있지 않은 동안 기기가 계속
 /// 일한다. 자리표시의 목적은 자리를 잡는 것이고, **진행 중이라는 사실은 문장이
 /// 말한다**(`RoutexResultList.loadingMessage`). 두 장치가 같은 말을 반복할 이유가 없다.
+enum RoutexSkeletonWidth { full, long, short }
+
 class RoutexSkeleton extends StatelessWidget {
-  const RoutexSkeleton({required this.shape, this.widthFactor, super.key})
-    : assert(
-        widthFactor == null || (widthFactor > 0 && widthFactor <= 1),
-        '폭은 부모 폭에 대한 비율로만 줄인다',
-      );
+  const RoutexSkeleton({
+    required this.shape,
+    this.width = RoutexSkeletonWidth.full,
+    super.key,
+  });
 
   final RoutexSkeletonShape shape;
 
   /// 마지막 줄처럼 폭이 덜 찬 글자 자리를 표현한다. 줄마다 폭이 같으면 글이
   /// 아니라 표로 읽힌다.
-  final double? widthFactor;
+  final RoutexSkeletonWidth width;
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +70,11 @@ class RoutexSkeleton extends StatelessWidget {
 
     final surface = FractionallySizedBox(
       alignment: AlignmentDirectional.centerStart,
-      widthFactor: widthFactor,
+      widthFactor: switch (width) {
+        RoutexSkeletonWidth.full => null,
+        RoutexSkeletonWidth.long => RoutexProportion.longLine,
+        RoutexSkeletonWidth.short => RoutexProportion.shortLine,
+      },
       child: SizedBox(
         height: height,
         width: shape == RoutexSkeletonShape.thumbnail
@@ -140,7 +146,9 @@ class RoutexSkeletonList extends StatelessWidget {
                           shape: RoutexSkeletonShape.line,
                           // 부제는 제목보다 짧다. 두 줄 폭이 같으면 목록이 아니라
                           // 표가 로딩되는 것처럼 보인다.
-                          widthFactor: index.isEven ? 0.6 : 0.45,
+                          width: index.isEven
+                              ? RoutexSkeletonWidth.long
+                              : RoutexSkeletonWidth.short,
                         ),
                       ],
                     ),

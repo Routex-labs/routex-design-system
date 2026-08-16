@@ -16,6 +16,7 @@ class RoutexPlaceHeader extends StatelessWidget {
     required this.metadata,
     required this.saved,
     required this.onSaved,
+    this.onShare,
     this.supportingText,
     this.supportingIcon,
     this.leadingIcon,
@@ -27,9 +28,8 @@ class RoutexPlaceHeader extends StatelessWidget {
   final String name;
   final String metadata;
 
-  /// 이름과 분류 다음 줄이다. "어디인가" 다음은 "어떻게 닿는가"라 도보 거리·시간이
-  /// 여기 온다. 목록에서 이미 본 값을 상세에서도 같은 자리에 두어, 눌러 들어온 뒤
-  /// 다시 찾지 않게 한다.
+  /// 이름과 분류 다음 줄이다. 검색 결과·장소 요약에서 "어떻게 닿는가"인 도보
+  /// 거리·시간이 여기 온다. 선택을 마친 상세 헤더에서는 같은 값을 반복하지 않는다.
   final String? supportingText;
 
   /// 보조 줄 앞의 글리프다. 도보·엘리베이터처럼 **닿는 방식**이 값의 뜻을 바꾸는
@@ -39,6 +39,10 @@ class RoutexPlaceHeader extends StatelessWidget {
   final IconData? leadingIcon;
   final bool saved;
   final ValueChanged<bool> onSaved;
+
+  /// 장소 식별 링크를 공유한다. 링크 생성과 플랫폼 공유 시트는 소비 앱이 맡는다.
+  /// null이면 공유 계약이 준비되지 않은 화면이라 action을 숨긴다.
+  final VoidCallback? onShare;
   final bool expanded;
   final VoidCallback? onToggleExpanded;
 
@@ -120,6 +124,15 @@ class RoutexPlaceHeader extends StatelessWidget {
                   ),
                 ),
         ),
+        if (onShare != null) ...[
+          RoutexIconAction(
+            label: '장소 공유',
+            icon: RoutexIcons.share,
+            tone: RoutexIconActionTone.quiet,
+            onPressed: onShare,
+          ),
+          const SizedBox(width: RoutexSpacing.inlineGap),
+        ],
         RoutexIconAction(
           label: saved ? '저장 취소' : '장소 저장',
           icon: saved ? RoutexIcons.saved : RoutexIcons.save,

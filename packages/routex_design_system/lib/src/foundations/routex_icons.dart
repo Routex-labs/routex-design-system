@@ -29,6 +29,7 @@ abstract final class RoutexIcons {
   static const menuBook = Icons.menu_book_outlined;
   static const schedule = Icons.schedule_outlined;
   static const link = Icons.link_rounded;
+  static const share = Icons.share_outlined;
 
   /// 목록을 다시 세우는 기준을 고르는 자리다. 화살표 한 쌍이라 "정렬"로만 읽힌다 —
   /// 목록을 좁히는 `filter`(깔때기)와 같은 글리프를 쓰면 두 동작이 섞인다.

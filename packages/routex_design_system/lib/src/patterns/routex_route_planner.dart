@@ -53,7 +53,7 @@ class RoutexRoutePlanner extends StatelessWidget {
               actionIcon: RoutexIcons.close,
               onAction: onClose,
             ),
-            Divider(height: 1, color: colors.borderSubtle),
+            Divider(height: RoutexStroke.hairline, color: colors.borderSubtle),
             _RouteLocationField(
               label: destinationLabel,
               destination: true,
@@ -105,7 +105,10 @@ class _RouteLocationField extends StatelessWidget {
             shape: BoxShape.circle,
             border: destination
                 ? null
-                : Border.all(color: colors.actionPrimary, width: 2),
+                : Border.all(
+                    color: colors.actionPrimary,
+                    width: RoutexStroke.emphasis,
+                  ),
           ),
         ),
         const SizedBox(width: RoutexSpacing.contentGap),
@@ -118,13 +121,13 @@ class _RouteLocationField extends StatelessWidget {
             child: InkWell(
               onTap: onPressed,
               borderRadius: RoutexRadii.control,
-              // focus·hover는 화면마다 Material 기본 회색이 되지 않도록
-              // 목록 행과 같은 tint를 쓴다.
-              focusColor: colors.actionPrimarySubtle,
+              // focus는 theme의 focus state layer를, hover는 중립적인 제품 tint를
+              // 쓴다. 둘을 같은 채움으로 두면 키보드 초점을 구분할 수 없다.
+              focusColor: Theme.of(context).focusColor,
               hoverColor: colors.actionPrimarySubtle,
               child: ConstrainedBox(
                 constraints: const BoxConstraints(
-                  minHeight: RoutexMetrics.standardControl,
+                  minHeight: RoutexMetrics.minimumTouchTarget,
                 ),
                 child: Padding(
                   // 두 칸의 강조 영역이 같은 여백을 갖도록 텍스트 열 안쪽에서
@@ -147,7 +150,7 @@ class _RouteLocationField extends StatelessWidget {
           ),
         ),
         SizedBox.square(
-          dimension: RoutexMetrics.standardControl,
+          dimension: RoutexMetrics.minimumTouchTarget,
           child: IconButton(
             tooltip: actionLabel,
             onPressed: onAction,

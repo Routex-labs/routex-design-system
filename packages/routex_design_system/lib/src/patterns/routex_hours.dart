@@ -4,6 +4,7 @@ import '../foundations/routex_icons.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
 import '../components/routex_disclosure.dart';
+import '../layout/routex_stack.dart';
 import '../theme/routex_color_tokens.dart';
 
 /// 지금 문을 열었는지에 대한 답이다.
@@ -28,8 +29,8 @@ class RoutexHoursDay {
     this.closed = false,
   });
 
-  /// `화(8/11)`처럼 요일과 날짜를 한 낱말로 적은 값이다. 서식은 소비 앱이 정한다 —
-  /// 날짜 표기는 지역과 데이터 출처를 따라가는 값이지 디자인 결정이 아니다.
+  /// `화`처럼 반복 영업시간의 요일을 적은 값이다. 특정 날짜의 예외 영업이라면
+  /// 날짜를 이 라벨에 섞지 말고 [note]로 이유와 함께 알린다.
   final String label;
 
   /// `10:30 - 20:00`, `휴무`처럼 그날의 영업시간이다.
@@ -50,7 +51,8 @@ class RoutexHoursDay {
 /// 위젯 안에 있으면 경계(폐점 정각·자정 넘김)를 화면 없이 확인할 수 없다.
 ///
 /// **오늘 줄은 접혀 있어도 보인다.** 이 섹션을 보는 사람의 질문은 거의 언제나 "지금
-/// 갈 수 있나"이고 그 다음이 "오늘 몇 시까지"다([RoutexDisclosure.preview]).
+/// 갈 수 있나"이고 그 다음이 "오늘 몇 시까지"다. 상태와 오늘 시간을 한 header
+/// 묶음으로 두어 두 줄 사이에 별도 본문 간격이 생기지 않게 한다.
 class RoutexHours extends StatelessWidget {
   const RoutexHours({
     required this.state,
@@ -94,30 +96,35 @@ class RoutexHours extends StatelessWidget {
       semanticsLabel: detail == null ? headline : '$headline, $detail',
       expanded: expanded,
       onExpanded: onExpanded,
-      header: Text.rich(
-        TextSpan(
-          children: [
+      header: RoutexStack(
+        gap: RoutexStackGap.inline,
+        children: [
+          Text.rich(
             TextSpan(
-              text: headline,
-              style: RoutexTypography.label.copyWith(
-                // 열려 있다는 것만 색으로 말한다. 닫힘까지 색을 주면 "지금 갈 수
-                // 있나"의 답이 두 색 중 무엇인지를 다시 읽어야 한다.
-                color: state == RoutexHoursState.open
-                    ? colors.actionPrimary
-                    : colors.contentPrimary,
-              ),
-            ),
-            if (detail != null)
-              TextSpan(
-                text: ' · $detail',
-                style: RoutexTypography.bodySmall.copyWith(
-                  color: colors.contentSecondary,
+              children: [
+                TextSpan(
+                  text: headline,
+                  style: RoutexTypography.label.copyWith(
+                    // 열려 있다는 것만 색으로 말한다. 닫힘까지 색을 주면 "지금 갈 수
+                    // 있나"의 답이 두 색 중 무엇인지를 다시 읽어야 한다.
+                    color: state == RoutexHoursState.open
+                        ? colors.actionPrimary
+                        : colors.contentPrimary,
+                  ),
                 ),
-              ),
-          ],
-        ),
+                if (detail != null)
+                  TextSpan(
+                    text: ' · $detail',
+                    style: RoutexTypography.bodySmall.copyWith(
+                      color: colors.contentSecondary,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          _HoursRow(day: days.first, isToday: true, compact: true),
+        ],
       ),
-      preview: _HoursRow(day: days.first, isToday: true),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -141,17 +148,16 @@ class RoutexHours extends StatelessWidget {
   }
 }
 
-/// 요일 라벨 열의 폭이다. `화(8/11)` 다섯 글자가 들어가는 값이다.
-///
-/// 줄마다 라벨 폭을 제 글자에 맞추면 `월(8/4)`과 `수(8/13)`의 시간 열이 어긋난다.
-/// 표는 세로로 읽는 것이라 시작선이 흔들리면 값끼리 비교할 수 없다.
-const _labelColumn = 88.0;
-
 class _HoursRow extends StatelessWidget {
-  const _HoursRow({required this.day, required this.isToday});
+  const _HoursRow({
+    required this.day,
+    required this.isToday,
+    this.compact = false,
+  });
 
   final RoutexHoursDay day;
   final bool isToday;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -165,46 +171,51 @@ class _HoursRow extends StatelessWidget {
       label: '${day.label}, ${day.value}',
       excludeSemantics: true,
       child: Padding(
-        padding: const EdgeInsetsDirectional.symmetric(
-          vertical: RoutexSpacing.inlineGap,
+        padding: EdgeInsetsDirectional.symmetric(
+          vertical: compact ? 0 : RoutexSpacing.inlineGap,
         ),
-        child: Row(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              width: _labelColumn,
-              child: Text(
-                day.label,
-                style: emphasis.copyWith(
-                  color: isToday
-                      ? colors.contentPrimary
-                      : colors.contentSecondary,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Text.rich(
+              TextSpan(
                 children: [
-                  Text(
-                    day.value,
+                  TextSpan(
+                    text: day.label,
+                    style: emphasis.copyWith(
+                      color: isToday
+                          ? colors.contentPrimary
+                          : colors.contentSecondary,
+                    ),
+                  ),
+                  TextSpan(
+                    text: ' · ',
+                    style: emphasis.copyWith(color: colors.contentSecondary),
+                  ),
+                  TextSpan(
+                    text: day.value,
                     style: RoutexTypography.tabular(emphasis).copyWith(
                       color: day.closed
                           ? colors.contentSecondary
                           : colors.contentPrimary,
                     ),
                   ),
-                  if (day.note?.trim().isNotEmpty ?? false)
-                    Text(
-                      day.note!,
-                      style: RoutexTypography.caption.copyWith(
-                        color: colors.contentSecondary,
-                      ),
-                    ),
                 ],
               ),
             ),
+            if (day.note?.trim().isNotEmpty ?? false)
+              Padding(
+                padding: const EdgeInsetsDirectional.only(
+                  top: RoutexSpacing.inlineGap,
+                ),
+                child: Text(
+                  day.note!,
+                  style: RoutexTypography.caption.copyWith(
+                    color: colors.contentSecondary,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

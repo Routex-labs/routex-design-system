@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../foundations/routex_metrics.dart';
 import '../foundations/routex_spacing.dart';
 
 /// 지도 위 하단 표면이 차지하는 높이다.
@@ -10,7 +11,7 @@ enum RoutexSheetExtent {
   content(null),
 
   /// 지도를 맥락으로만 남기고 시트가 대부분을 차지한다.
-  large(.75);
+  large(RoutexProportion.largeSheet);
 
   const RoutexSheetExtent(this.heightFactor);
 

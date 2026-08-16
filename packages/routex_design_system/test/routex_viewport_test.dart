@@ -139,7 +139,7 @@ class _PublicUiSet extends StatelessWidget {
             ),
             RoutexTripProgress(
               metrics: const [
-                RoutexTripMetric(value: '6분 후', label: '예상 시각'),
+                RoutexTripMetric(value: '오후 3:24', label: '도착 예정'),
                 RoutexTripMetric(value: '6분', label: '남은 시간'),
                 RoutexTripMetric(value: '410m', label: '남은 거리'),
               ],
@@ -186,9 +186,9 @@ class _PublicUiSet extends StatelessWidget {
               state: RoutexHoursState.open,
               detail: '20:00 종료',
               days: const [
-                RoutexHoursDay(label: '화(8/12)', value: '10:30 - 20:00'),
+                RoutexHoursDay(label: '화', value: '10:30 - 20:00'),
                 RoutexHoursDay(
-                  label: '수(8/13)',
+                  label: '수',
                   value: '휴무',
                   note: '정기 휴점',
                   closed: true,
@@ -297,7 +297,6 @@ class _PublicUiSet extends StatelessWidget {
                 RoutexTripMetric(value: '1.4km', label: '거리'),
               ],
               onStart: () {},
-              onCancel: () {},
             ),
             RoutexArrivalCard(
               destination: '발렌시아가',

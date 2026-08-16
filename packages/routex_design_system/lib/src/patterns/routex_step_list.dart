@@ -124,7 +124,7 @@ class _StepRow extends StatelessWidget {
                           top: RoutexSpacing.inlineGap,
                         ),
                         child: SizedBox(
-                          width: 1,
+                          width: RoutexStroke.hairline,
                           height: RoutexSpacing.componentPadding,
                           child: ColoredBox(color: colors.borderSubtle),
                         ),

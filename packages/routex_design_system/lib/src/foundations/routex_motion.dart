@@ -24,6 +24,9 @@ abstract final class RoutexMotion {
   static const enterCurve = Curves.easeOutCubic;
   static const exitCurve = Curves.easeInCubic;
 
+  /// disclosure 화살표가 접힘에서 펼침으로 바뀌는 회전량이다.
+  static const disclosureExpandedTurns = 0.5;
+
   /// OS에서 애니메이션 축소를 요청하면 시간 기반 전환을 제거한다.
   static Duration effectiveDuration({
     required bool disableAnimations,
@@ -31,4 +34,11 @@ abstract final class RoutexMotion {
   }) {
     return disableAnimations ? Duration.zero : role.duration;
   }
+}
+
+/// 애니메이션이 아니라 사용자가 결과 문장을 읽을 수 있게 유지하는 시간이다.
+///
+/// motion duration과 분리해 전환 속도를 조정해도 피드백 노출 시간이 흔들리지 않게 한다.
+abstract final class RoutexFeedbackTiming {
+  static const toastVisibility = Duration(milliseconds: 1600);
 }

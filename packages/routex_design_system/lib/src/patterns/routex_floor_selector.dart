@@ -46,7 +46,10 @@ class RoutexFloorSelector extends StatelessWidget {
               if (index > 0)
                 SizedBox(
                   width: RoutexMetrics.minimumTouchTarget,
-                  child: Divider(height: 1, color: colors.borderSubtle),
+                  child: Divider(
+                    height: RoutexStroke.hairline,
+                    color: colors.borderSubtle,
+                  ),
                 ),
               _FloorItem(
                 option: options[index],
