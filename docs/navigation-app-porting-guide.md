@@ -2,13 +2,13 @@
 
 ## 문서 상태와 범위
 
-- 상태: 단계 4 진행 중
+- 상태: 단계 4 진행 중 · 단계 5 착수
 - 공급자: `packages/routex_design_system`
 - 소비자: `Routex-labs/Navigation`의 Flutter 클라이언트
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
 - 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
 - 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
-- 앱이 소비 중인 Runtime Kit release: `v0.2.9`. 앱이 실제로 고정한 전체 SHA는 Navigation
+- 앱이 소비 중인 Runtime Kit release: `v0.2.13`. 앱이 실제로 고정한 전체 SHA는 Navigation
   `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
 
 ### 적용 상태
@@ -20,7 +20,8 @@
 | 2. 저위험 기반 요소 | 적용 | 아래 표 |
 | 3. 하단 시트 | 적용 | 시트 여덟이 `RoutexBottomSheet` 표면을 쓴다. 손잡이 판정은 `client/test/widgets/sheet_handle_test.dart` |
 | 4. 검색과 결과 목록 | 진행 중 | 아래 표 |
-| 5 이후 | 미착수 | — |
+| 5. 장소 상세와 공유 | 진행 중 | 헤더가 `RoutexPlaceHeader`. 공유·딥링크는 미착수 |
+| 6 이후 | 미착수 | — |
 
 전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
 더하며, 그 사실 자체를 `withRoutexTokens`에 대한 테스트가 지킨다.
@@ -78,6 +79,10 @@ SHA는 그럴 수 없다.
 > `RoutexResultStatus.clarify`도 같은 이유로 v0.2.11에서 걷었다 — 되물음의 질문은 선택지 칩 줄과
 > 붙어 있어야 해서 앱 헤더에 남았고, 목록은 그때도 결론 목록이었다.
 > **어댑터로 표현되는지 먼저 확인하고, 그 다음에 계약을 늘린다.**
+>
+> **단계 5에서도 같은 일이 두 번 더 있었다.** 저장할 수 없는 장소에 토글이 남았고(v0.2.12),
+> 헤더의 저장만 타일 배경을 가져 공유와 다른 컨트롤로 읽혔다(v0.2.13). 둘 다 소비 화면을 실제로
+> 조립하면서 드러났다.
 >
 > **그리고 화면은 실기기에서 한 번 열어 본다.** 한 줄짜리 목록 행에서 끝 동작이 제목보다 12
 > 내려가 있던 것(v0.2.10)은 테스트도 Showcase도 잡지 못했고, 소비 앱을 폰에 올려서야 보였다.
@@ -802,6 +807,7 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 | favorites drag | `reorderable`은 손잡이 시각만 소유 | 실제 long-press reorder | semantics와 affordance test 확정 |
 | 도착 권장 구조 | `RoutexArrivalCard`가 도착 문구+행동 소유 | 상단 상태 1회 + 하단 후속 행동 | 둘 중 하나만 쓰는 Showcase 상태 확정 |
 | iPad 공유 anchor | `RoutexPlaceHeader.onShare`만 공개 | 실제 share icon의 non-zero bounds 필요 | header bounds 사용 승인 또는 action key/context 계약 보강 |
+| 저장할 수 없는 장소 | `onSaved`가 필수였다 | 식별자가 없는 항목은 담을 곳이 없다 | **닫힘.** null이면 action을 숨긴다(v0.2.12) |
 | draggable sheet 조합 | `RoutexBottomSheet`는 drag를 소유하지 않고 `expand`만 제공 | 전달 controller, scroll되는 header 여부, keyboard inset | **닫힘.** 드래그·라우트·keyboard inset은 앱이 그대로 소유하고, 표면만 옮겼다(단계 3) |
 | theme font | `RoutexTheme.light`에 명시 font family 없음 | 앱·지도·SVG Pretendard 고정 | 브리지와 최종 theme font 계약 테스트 |
 | route planner focus | `RoutexRoutePlanner`만 `Theme.of(context).focusColor`를 읽는다 | 브리지는 앱의 Material 기본 focus를 유지한다 | 단계 4 착수 전에 semantic focus 입력 보강 또는 국소 `Theme` 결정 |
