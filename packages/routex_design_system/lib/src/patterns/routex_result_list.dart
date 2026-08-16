@@ -4,17 +4,26 @@ import '../foundations/routex_icons.dart';
 import '../foundations/routex_metrics.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
+import '../components/routex_button.dart';
 import '../components/routex_empty_state.dart';
 import '../components/routex_skeleton.dart';
 import '../components/routex_sort_menu.dart';
 import '../layout/routex_stack.dart';
 import '../theme/routex_color_tokens.dart';
+import 'routex_status_banner.dart';
 
 /// 목록이 지금 어느 상태인지다.
 enum RoutexResultStatus {
   /// 아직 답을 기다린다. 자리표시를 그리고, 아는 것이 있으면 무엇을 기다리는지
   /// 한 줄로 말한다.
   loading,
+
+  /// 후보가 넓어 **먼저 되묻는 중**이다.
+  ///
+  /// 행이 하나도 없어도 빈손이 아니다. 이 상태를 [empty]로 그리면 질문을 던져 놓고
+  /// "찾지 못했어요"라고 답하는 화면이 된다. 질문은 상태 문장이 말하고, 선택지 칩은
+  /// 소비 앱이 이 목록 옆에 조합한다.
+  clarify,
 
   /// 찾지 못했고 **더 시도할 경로가 없다.**
   ///
@@ -25,6 +34,18 @@ enum RoutexResultStatus {
 
   /// 결과가 있다.
   ready,
+
+  /// 결과는 있지만 **찾는 경로 하나가 죽었다.**
+  ///
+  /// 조용히 [ready]로 그리면 사용자는 지금 보는 것이 전부라고 읽는다. 남은 결과는
+  /// 그대로 세우고 무엇이 빠졌는지만 위에 알린다.
+  degraded,
+
+  /// 검색 자체를 끝내지 못했다.
+  ///
+  /// **[empty]로 그리면 안 된다.** "찾지 못했어요"는 "그런 곳은 없다"로 읽히고,
+  /// 사용자는 다시 시도할 이유를 잃는다. 여기서 필요한 것은 결론이 아니라 재시도다.
+  error,
 }
 
 /// 검색·분류 결과 목록의 상태, 요약 줄, 정렬 자리를 한 컴포넌트로 고정한다.
@@ -49,6 +70,9 @@ class RoutexResultList extends StatelessWidget {
     this.emptyDescription = '다른 이름이나 분류로 다시 찾아보세요.',
     this.emptyActionLabel,
     this.onEmptyAction,
+    this.statusMessage,
+    this.statusActionLabel,
+    this.onStatusAction,
     super.key,
   });
 
@@ -71,6 +95,21 @@ class RoutexResultList extends StatelessWidget {
   final String emptyDescription;
   final String? emptyActionLabel;
   final VoidCallback? onEmptyAction;
+
+  /// [RoutexResultStatus.clarify]·[RoutexResultStatus.degraded]·
+  /// [RoutexResultStatus.error]가 말할 문장이다. 상태마다 뜻이 다르다 — 되물음에서는
+  /// 질문, 나머지 둘에서는 무엇이 잘못됐는지다.
+  final String? statusMessage;
+
+  /// [RoutexResultStatus.error]에서 다시 시도할 수 있으면 준다.
+  final String? statusActionLabel;
+  final VoidCallback? onStatusAction;
+
+  Widget get _rows => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: children,
+  );
 
   bool get _hasHeader =>
       (summary?.trim().isNotEmpty ?? false) || sortOptions.length > 1;
@@ -127,10 +166,55 @@ class RoutexResultList extends StatelessWidget {
             actionLabel: emptyActionLabel,
             onAction: onEmptyAction,
           ),
-          RoutexResultStatus.ready => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: children,
+          RoutexResultStatus.ready => _rows,
+          // 질문은 결론이 아니다. 행이 없어도 빈손 화면으로 떨어뜨리지 않는다.
+          RoutexResultStatus.clarify => RoutexStack(
+            gap: RoutexStackGap.control,
+            children: [
+              if (statusMessage case final question?)
+                Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                    horizontal: RoutexSpacing.contentGap,
+                  ),
+                  child: Text(
+                    question,
+                    style: RoutexTypography.bodyStrong.copyWith(
+                      color: colors.contentPrimary,
+                    ),
+                  ),
+                ),
+              if (children.isNotEmpty) _rows,
+            ],
+          ),
+          // 남은 결과는 그대로 세우고, 무엇이 빠졌는지만 위에 얹는다.
+          RoutexResultStatus.degraded => RoutexStack(
+            gap: RoutexStackGap.control,
+            children: [
+              RoutexStatusBanner(
+                title: '일부 결과를 못 가져왔어요',
+                detail: statusMessage ?? '지금 보이는 것이 전부가 아닐 수 있어요.',
+                icon: RoutexIcons.warning,
+                tone: RoutexStatusBannerTone.warning,
+              ),
+              if (children.isNotEmpty) _rows,
+            ],
+          ),
+          RoutexResultStatus.error => RoutexStack(
+            gap: RoutexStackGap.control,
+            children: [
+              RoutexStatusBanner(
+                title: '검색하지 못했어요',
+                detail: statusMessage ?? '잠시 뒤에 다시 시도해 주세요.',
+                icon: RoutexIcons.warning,
+                tone: RoutexStatusBannerTone.error,
+              ),
+              if (statusActionLabel case final label?)
+                RoutexButton(
+                  label: label,
+                  onPressed: onStatusAction,
+                  variant: RoutexButtonVariant.secondary,
+                ),
+            ],
           ),
         },
       ],

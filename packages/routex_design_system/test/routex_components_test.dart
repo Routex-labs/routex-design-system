@@ -172,6 +172,26 @@ void main() {
       expect(title.textSpan, isNull);
     });
 
+    // 동작이 하나뿐인 자리에 ⋯를 두면 메뉴가 열릴 줄 알고 누른다.
+    testWidgets('끝 동작의 글리프는 그 동작이 무엇인지 말한다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexListCell(
+              title: '나이키',
+              trailingActionLabel: '나이키 삭제',
+              trailingActionIcon: RoutexIcons.close,
+              onTrailingAction: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(RoutexIcons.close), findsOneWidget);
+      expect(find.byIcon(RoutexIcons.more), findsNothing);
+    });
+
     testWidgets('selected·disabled 상태를 의미와 동작에 함께 반영한다', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -445,6 +465,75 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.byType(Scrollable), findsOneWidget, reason: '뷰포트는 부모 하나뿐이다');
+    });
+
+    // 고른 값이 쌓인 줄에서 무엇을 눌러야 되돌아가는지 보이지 않으면, 사용자는
+    // 필터를 걸고 나서 원래 화면으로 돌아올 길을 잃는다.
+    testWidgets('선택을 푸는 방법을 눈에 보이게 할 수 있다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexChipBar(
+              options: options,
+              selectedId: 'cafe',
+              onSelected: (_) {},
+              dismiss: RoutexChipDismiss.visible,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byIcon(RoutexIcons.close), findsOneWidget, reason: '고른 칩에만');
+    });
+
+    testWidgets('개수는 칩이 같은 서식으로 적는다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexChipBar(
+              options: const [
+                RoutexChipOption(id: 'cafe', label: '카페', count: 12),
+              ],
+              selectedId: null,
+              onSelected: _ignoreSelection,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('카페 (12)'), findsOneWidget);
+    });
+
+    // `전체`처럼 "좁히지 않음"을 뜻하는 칩이 줄에 있으면, 해제는 그 칩의 강조만
+    // 지운다 — 지금 무엇을 보고 있는지가 화면에서 사라진다.
+    testWidgets('늘 하나가 선택된 줄은 다시 눌러도 풀리지 않는다', (tester) async {
+      String? selection = 'cafe';
+      var calls = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexChipBar(
+              options: options,
+              selectedId: 'cafe',
+              selection: RoutexChipSelection.required,
+              onSelected: (value) {
+                calls++;
+                selection = value;
+              },
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('카페'));
+      expect(calls, 0, reason: '바뀌는 것이 없으면 알리지 않는다');
+      expect(selection, 'cafe');
+
+      await tester.tap(find.text('음식'));
+      expect(selection, 'food', reason: '다른 칩으로 옮기는 것은 그대로 된다');
     });
 
     testWidgets('기본값은 스스로 스크롤한다', (tester) async {

@@ -32,6 +32,7 @@ class RoutexListCell extends StatelessWidget {
     this.trailingIcon,
     this.trailingActionLabel,
     this.onTrailingAction,
+    this.trailingActionIcon = RoutexIcons.more,
     this.reorderable = false,
     this.selected = false,
     this.enabled = true,
@@ -71,6 +72,13 @@ class RoutexListCell extends StatelessWidget {
   /// 행 자체와 다른 동작을 하는 끝 버튼이다. 이름 없이는 만들 수 없다.
   final String? trailingActionLabel;
   final VoidCallback? onTrailingAction;
+
+  /// 그 끝 버튼의 글리프다. 기본은 더 보기(⋯)다.
+  ///
+  /// **동작이 하나뿐이면 그것을 그린다.** 최근 검색어의 삭제처럼 누르면 곧장 일어나는
+  /// 동작에 ⋯를 두면, 사용자는 메뉴가 열릴 줄 알고 눌렀다가 줄이 사라지는 것을 겪는다.
+  /// ⋯는 "여기 여러 갈래가 있다"는 뜻이라 그 자리에 쓸 수 없다.
+  final IconData trailingActionIcon;
 
   /// 순서를 바꿀 수 있는 목록의 행이면 손잡이를 보여준다. 드래그 처리는 목록을
   /// 가진 화면이 맡고, 이 컴포넌트는 손잡이의 자리와 이름만 고정한다.
@@ -267,7 +275,7 @@ class RoutexListCell extends StatelessWidget {
                       const SizedBox(width: RoutexSpacing.controlGap),
                       RoutexIconAction(
                         label: actionLabel,
-                        icon: RoutexIcons.more,
+                        icon: trailingActionIcon,
                         tone: RoutexIconActionTone.quiet,
                         onPressed: enabled ? onTrailingAction : null,
                       ),

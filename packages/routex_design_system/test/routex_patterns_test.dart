@@ -572,6 +572,79 @@ void main() {
       );
       expect(find.text('발렌시아가'), findsOneWidget);
     });
+
+    // 질문을 던져 놓고 "찾지 못했어요"라고 답하는 화면이 되면 안 된다. 되물음은
+    // 결론이 아니라 진행 중이다.
+    testWidgets('되물음은 행이 없어도 빈손 화면이 아니다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexResultList(
+              status: RoutexResultStatus.clarify,
+              statusMessage: '어떤 종류를 찾으세요?',
+              children: [],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('어떤 종류를 찾으세요?'), findsOneWidget);
+      expect(find.byType(RoutexEmptyState), findsNothing);
+      expect(find.byType(RoutexSkeletonList), findsNothing);
+    });
+
+    // 조용히 ready로 그리면 사용자는 지금 보는 것이 전부라고 읽는다.
+    testWidgets('일부만 가져왔을 때는 남은 결과를 세우고 무엇이 빠졌는지 알린다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexResultList(
+              status: RoutexResultStatus.degraded,
+              statusMessage: '추천 검색이 응답하지 않았어요.',
+              children: [RoutexListCell(title: '발렌시아가')],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('발렌시아가'), findsOneWidget, reason: '남은 결과는 그대로 선다');
+      final banner = tester.widget<RoutexStatusBanner>(
+        find.byType(RoutexStatusBanner),
+      );
+      expect(banner.tone, RoutexStatusBannerTone.warning);
+    });
+
+    // "찾지 못했어요"는 "그런 곳은 없다"로 읽힌다. 실패한 검색에 그 문장을 쓰면
+    // 사용자는 다시 시도할 이유를 잃는다.
+    testWidgets('검색이 실패하면 빈손이 아니라 다시 시도를 준다', (tester) async {
+      var retried = false;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexResultList(
+              status: RoutexResultStatus.error,
+              statusMessage: '연결이 끊겼어요.',
+              statusActionLabel: '다시 시도',
+              onStatusAction: () => retried = true,
+              children: const [],
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(RoutexEmptyState), findsNothing);
+      expect(find.text('찾지 못했어요'), findsNothing);
+      final banner = tester.widget<RoutexStatusBanner>(
+        find.byType(RoutexStatusBanner),
+      );
+      expect(banner.tone, RoutexStatusBannerTone.error);
+
+      await tester.tap(find.text('다시 시도'));
+      expect(retried, isTrue);
+    });
   });
 
   group('RoutexStepList', () {
