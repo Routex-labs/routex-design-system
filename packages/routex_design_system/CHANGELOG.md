@@ -140,10 +140,8 @@ Navigation 앱과 대조해 **Runtime Kit에 없던 역할**을 채웠다. 기�
 - 시트 위쪽 여백을 handle 유무에 따라 8/16으로 분기
 - 시각 사양(높이·곡률·정렬·상태색)을 수치로 고정하는 `routex_visual_spec_test` 추가
 - 버튼 시각 높이를 44dp로 줄이고 48dp padded tap target을 유지
-- Showcase에 장소 선택부터 도착까지 조작 가능한 19.5:9 제품 UX 목업 추가
 - `IconAction`, `BottomSheet`, `Tabs`, `MapControl`, `PlaceHeader`, `ManeuverBanner`,
   `RouteOption`, `TripProgress` beta 추가
-- Showcase 제품 목업이 임시 UI 복제품 대신 공개 컴포넌트 10종을 사용하도록 교체
 - 핵심 10종을 360/390px와 글자 배율 1.0/1.3/2.0에서 검증하는 component fixture 추가
 - 검색·경로 입력·이동수단·층 선택·결과 알림·정보·빈 상태·상태 배너 제품 패턴 추가
 - 가용 이동수단만 한 줄로 표시하고 선택지가 하나면 숨기는 규칙 추가
