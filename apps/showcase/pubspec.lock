@@ -161,7 +161,7 @@ packages:
       path: "../../packages/routex_design_system"
       relative: true
     source: path
-    version: "0.2.17"
+    version: "0.2.18"
   sky_engine:
     dependency: transitive
     description: flutter

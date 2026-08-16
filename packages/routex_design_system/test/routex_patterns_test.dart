@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:routex_design_system/routex_design_system.dart';
@@ -466,6 +468,42 @@ void main() {
       await tester.tap(find.text('콜드브루'));
       expect(tapped, [0], reason: '막다른 팝업을 여는 대신 누를 수 없게 둔다');
     });
+
+    // 제품 사진은 잘리면 안 된다. 정사각에 맞춰 자르면 컵 위아래가 날아간다.
+    testWidgets('비율을 주면 썸네일을 자르지 않고 높이를 그 비율에 맞춘다', (tester) async {
+      final entry = RoutexMenuEntry(
+        name: '콜드브루',
+        thumbnail: RoutexMediaItem(image: MemoryImage(_transparentPixel)),
+      );
+
+      Future<void> pump(double? ratio) => tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexMenuList(
+              entries: [entry],
+              expanded: true,
+              onExpanded: (_) {},
+              thumbnailAspectRatio: ratio,
+            ),
+          ),
+        ),
+      );
+
+      await pump(null);
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.cover);
+      expect(
+        tester.getSize(find.byType(Image)).height,
+        RoutexMetrics.thumbnail,
+      );
+
+      await pump(300 / 313);
+      expect(tester.widget<Image>(find.byType(Image)).fit, BoxFit.contain);
+      expect(
+        tester.getSize(find.byType(Image)).height,
+        closeTo(RoutexMetrics.thumbnail * 313 / 300, 0.01),
+      );
+    });
   });
 
   group('RoutexLinkList', () {
@@ -859,3 +897,17 @@ void main() {
 }
 
 void _ignoreLink(RoutexLinkItem item) {}
+
+/// 1x1 투명 PNG. 그림 자체가 아니라 **틀의 크기와 fit**을 재는 테스트라 내용이
+/// 필요 없다. asset을 쓰면 이 패키지가 자산을 갖게 되는데 그건 v0.1의 실패 조건이다.
+final _transparentPixel = Uint8List.fromList(const [
+  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, //
+  0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
+  0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
+  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
+  0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
+  0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
+  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00,
+  0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
+  0x42, 0x60, 0x82,
+]);

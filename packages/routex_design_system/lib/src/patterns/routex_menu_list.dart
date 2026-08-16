@@ -59,14 +59,27 @@ class RoutexMenuList extends StatelessWidget {
     required this.expanded,
     required this.onExpanded,
     this.collapsedCount = 5,
+    this.thumbnailAspectRatio,
     this.onSelected,
     super.key,
-  }) : assert(collapsedCount > 0);
+  }) : assert(collapsedCount > 0),
+       assert(thumbnailAspectRatio == null || thumbnailAspectRatio > 0);
 
   final List<RoutexMenuEntry> entries;
 
   /// 접혀 있을 때 보이는 줄 수다. 이보다 적으면 펼침 줄 자체가 없다.
   final int collapsedCount;
+
+  /// 썸네일의 가로÷세로다. null이면 정사각을 채우고, 채우면서 잘린다.
+  ///
+  /// **제품 사진은 잘리면 안 된다.** 정사각에 맞춰 자르면 컵 위아래가 날아가 뭉툭해
+  /// 보이고, 배경색으로 여백을 채우는 방법도 못 쓴다 — 사진마다 배경이 다크그린·크림
+  /// 색으로 갈리고 단색이 아닌 것도 있다. 매장 사진과 다른 점이 여기다. 그쪽은
+  /// 잘려도 무엇을 찍었는지 남지만, 제품은 모양 자체가 정보다.
+  ///
+  /// 비율을 아는 쪽은 사진을 가진 소비 앱이다. 한 목록의 사진은 대개 같은 출처라
+  /// 비율도 같아서 줄마다가 아니라 목록에 한 번 받는다.
+  final double? thumbnailAspectRatio;
 
   final bool expanded;
   final ValueChanged<bool> onExpanded;
@@ -90,6 +103,7 @@ class RoutexMenuList extends StatelessWidget {
         for (var index = 0; index < visibleCount; index++)
           _MenuRow(
             entry: entries[index],
+            thumbnailAspectRatio: thumbnailAspectRatio,
             onPressed: onSelected == null || !entries[index].selectable
                 ? null
                 : () => onSelected!(index),
@@ -106,9 +120,14 @@ class RoutexMenuList extends StatelessWidget {
 }
 
 class _MenuRow extends StatelessWidget {
-  const _MenuRow({required this.entry, required this.onPressed});
+  const _MenuRow({
+    required this.entry,
+    required this.thumbnailAspectRatio,
+    required this.onPressed,
+  });
 
   final RoutexMenuEntry entry;
+  final double? thumbnailAspectRatio;
   final VoidCallback? onPressed;
 
   @override
@@ -165,11 +184,21 @@ class _MenuRow extends StatelessWidget {
           ),
           if (entry.thumbnail case final thumbnail?) ...[
             const SizedBox(width: RoutexSpacing.contentGap),
-            SizedBox.square(
-              dimension: RoutexMetrics.thumbnail,
+            SizedBox(
+              width: RoutexMetrics.thumbnail,
+              // 폭은 고정이고 높이만 비율을 따라간다. 폭이 줄마다 달라지면 이름
+              // 열의 오른쪽 끝이 흔들린다.
+              height: thumbnailAspectRatio == null
+                  ? RoutexMetrics.thumbnail
+                  : RoutexMetrics.thumbnail / thumbnailAspectRatio!,
               child: ClipRRect(
                 borderRadius: RoutexRadii.field,
-                child: Image(image: thumbnail.image, fit: BoxFit.cover),
+                child: Image(
+                  image: thumbnail.image,
+                  fit: thumbnailAspectRatio == null
+                      ? BoxFit.cover
+                      : BoxFit.contain,
+                ),
               ),
             ),
           ],
