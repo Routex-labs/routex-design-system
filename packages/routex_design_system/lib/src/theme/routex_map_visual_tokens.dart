@@ -4,10 +4,10 @@ import 'package:flutter/painting.dart';
 ///
 /// 제품 UI semantic token과 **다른 층**이다. 버튼·시트의 파랑을 바꾼다고 경로선이
 /// 따라 바뀌면 안 되고, 반대도 마찬가지다. 지도 renderer(MapLibre style, CustomPaint,
-/// 목업)는 색 literal을 직접 적지 않고 여기서 읽는다.
+/// 지도 표현 소비자는 색 literal을 직접 적지 않고 여기서 읽는다.
 ///
 /// 값은 Navigation의 `map_route_style.dart`, `location_marker.dart`,
-/// `destination_pin.dart`에서 가져왔다. 실제 앱과 Showcase 목업, 홍보 영상이 같은
+/// `destination_pin.dart`에서 가져왔다. 실제 앱과 홍보 영상이 같은
 /// 경로선·마커를 그리게 하는 것이 이 층의 목적이다. 앱 값을 바꿀 때 여기도 함께
 /// 바꾼다.
 abstract final class RoutexMapVisualTokens {
@@ -62,7 +62,7 @@ abstract final class RoutexMapVisualTokens {
 /// Showcase와 지도 진단 도구가 지도 색 목록을 따로 복사하지 않도록 하는 catalog다.
 ///
 /// 제품 semantic color와 달리 지도 도면·경로·마커가 맡는 시각 역할을 열거한다. 지도
-/// renderer와 목업은 값을 직접 고르지 않고 [RoutexMapVisualTokens]를 읽는다.
+/// renderer는 값을 직접 고르지 않고 [RoutexMapVisualTokens]를 읽는다.
 enum RoutexMapVisualRole {
   routeLine,
   routeCasing,
