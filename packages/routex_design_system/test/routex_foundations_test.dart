@@ -14,6 +14,26 @@ void main() {
       expect(RoutexMetrics.minimumTouchTarget, 48);
     });
 
+    test('stroke·measure·opacity·optical correction 계약이 기존 시각 값을 보존한다', () {
+      expect(RoutexStroke.hairline, 1);
+      expect(RoutexStroke.emphasis, 2);
+      expect(RoutexContentMeasure.scrollableOption, 240);
+      expect(RoutexContentMeasure.dialog, 360);
+      expect(RoutexOpacity.subtleOutline, 0.24);
+      expect(RoutexOpacity.sheetHandle, 0.55);
+      expect(RoutexProportion.shortLine, 0.45);
+      expect(RoutexProportion.longLine, 0.6);
+      expect(RoutexProportion.largeSheet, 0.75);
+      expect(RoutexOpticalCorrection.listTitleGlyphTop, 4);
+      expect(RoutexOpticalCorrection.sheetHeaderGlyph, 2);
+      expect(RoutexTypography.scrollLayoutTextScale, 1.3);
+      expect(RoutexMotion.disclosureExpandedTurns, 0.5);
+      expect(
+        RoutexFeedbackTiming.toastVisibility,
+        const Duration(milliseconds: 1600),
+      );
+    });
+
     test('곡률과 layer는 제한된 위계를 유지한다', () {
       expect(RoutexRadiusRole.values, hasLength(5));
       expect(RoutexRadii.full.topLeft.x, 999);
@@ -129,5 +149,28 @@ void main() {
         reason: value,
       );
     }
+  });
+
+  group('한글 줄바꿈', () {
+    test('어절 안 음절을 word joiner로 묶어 공백에서만 끊기게 한다', () {
+      const joiner = '\u2060';
+      expect(
+        RoutexTypography.keepWordsWhole('여의대로 108'),
+        '여$joiner의$joiner대$joiner로 108',
+      );
+    });
+
+    test('한 줄보다 긴 어절은 손대지 않는다', () {
+      const long = '더현대서울지하일층식품관오설록매장입니다';
+      expect(RoutexTypography.keepWordsWhole(long), long);
+    });
+
+    test('한 글자 어절과 숫자·영문 어절은 손대지 않는다', () {
+      // 보이지 않는 글자를 전화번호에 심으면 복사한 값이 원본과 달라진다.
+      expect(
+        RoutexTypography.keepWordsWhole('B1 층 1522-3232'),
+        'B1 층 1522-3232',
+      );
+    });
   });
 }

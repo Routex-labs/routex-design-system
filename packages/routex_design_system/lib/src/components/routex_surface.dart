@@ -6,9 +6,9 @@ import '../theme/routex_color_tokens.dart';
 
 /// 표면이 화면에서 맡는 역할이다.
 ///
-/// 색·곡률·경계·깊이를 각자 조합하지 않고 이 네 역할 중 하나를 고른다. 같은
-/// 깊이를 어떤 화면은 그림자로, 어떤 화면은 테두리로 표현하면 지도 위 겹침
-/// 순서가 화면마다 달라진다.
+/// 색·경계·깊이를 각자 조합하지 않고 이 네 역할 중 하나를 고른다. 같은 깊이를
+/// 어떤 화면은 그림자로, 어떤 화면은 테두리로 표현하면 지도 위 겹침 순서가
+/// 화면마다 달라진다. 내용 구조에 따른 곡률은 [RoutexSurfaceShape]가 맡는다.
 enum RoutexSurfaceRole {
   /// 목록·시트 안의 평평한 묶음. 그림자 없이 배경색으로만 구분한다.
   flat,
@@ -23,7 +23,14 @@ enum RoutexSurfaceRole {
   chrome,
 }
 
-/// 표면의 색, 곡률, 경계와 깊이를 역할 하나로 고정한다.
+/// 표면의 내용 구조가 요구하는 제한된 곡률이다.
+///
+/// 색·경계·깊이는 [RoutexSurfaceRole]이 소유한다. 검색 줄처럼 한 줄짜리 입력
+/// 표면과 카드형 콘텐츠의 곡률만 이 역할로 구분하며, 임의 `BorderRadius`는 받지
+/// 않는다.
+enum RoutexSurfaceShape { field, card }
+
+/// 표면의 색·경계·깊이와 제한된 곡률을 의미 역할로 고정한다.
 ///
 /// 내부 여백은 소유하지 않는다. 여백은 `RoutexInset`이, 자식 사이 간격은
 /// `RoutexStack`이 맡는다.
@@ -31,22 +38,22 @@ class RoutexSurface extends StatelessWidget {
   const RoutexSurface({
     required this.role,
     required this.child,
-    this.radius = RoutexRadii.card,
-    this.clip = true,
+    this.shape = RoutexSurfaceShape.card,
     super.key,
   });
 
   final RoutexSurfaceRole role;
   final Widget child;
 
-  /// 곡률만 역할별로 다시 고를 수 있다. 값이 아니라 `RoutexRadii`의 역할을 넘긴다.
-  final BorderRadius radius;
-
-  final bool clip;
+  final RoutexSurfaceShape shape;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
+    final radius = switch (shape) {
+      RoutexSurfaceShape.field => RoutexRadii.field,
+      RoutexSurfaceShape.card => RoutexRadii.card,
+    };
 
     // Material은 shape와 borderRadius를 동시에 받지 않는다. outlined는 경계선을
     // 그려야 하므로 shape 하나로 곡률까지 표현한다.
@@ -72,7 +79,7 @@ class RoutexSurface extends StatelessWidget {
               side: BorderSide(color: colors.borderSubtle),
             )
           : null,
-      clipBehavior: clip ? Clip.antiAlias : Clip.none,
+      clipBehavior: Clip.antiAlias,
       child: child,
     );
   }

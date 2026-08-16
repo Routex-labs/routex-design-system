@@ -34,7 +34,7 @@ class RoutexDivider extends StatelessWidget {
         RoutexDividerRole.section => RoutexSpacing.sectionGap + 1,
         RoutexDividerRole.row => 1,
       },
-      thickness: 1,
+      thickness: RoutexStroke.hairline,
       indent: switch (role) {
         RoutexDividerRole.section => 0,
         RoutexDividerRole.row => RoutexMetrics.textKeyline,

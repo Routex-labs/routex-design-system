@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../foundations/routex_icons.dart';
 import '../foundations/routex_metrics.dart';
-import '../foundations/routex_radii.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
 import '../components/routex_surface.dart';
@@ -64,7 +63,7 @@ class RoutexSearchBar extends StatelessWidget {
     final colors = context.routexColors;
     return RoutexSurface(
       role: RoutexSurfaceRole.onMap,
-      radius: RoutexRadii.field,
+      shape: RoutexSurfaceShape.field,
       child: SizedBox(
         height: RoutexMetrics.searchField,
         child: Row(
@@ -174,10 +173,10 @@ class _SearchAction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
-    // 검색 줄 안에서는 아이콘 자리가 leading column과 같은 폭을 쓴다. 44를 쓰면
-    // 글리프와 입력 텍스트 사이가 벌어져 한 줄로 안 읽힌다.
+    // 글리프는 20dp 그대로 두고 투명한 동작 영역만 48dp로 확보한다. 아이콘을
+    // 40dp 박스에 가두면 IconButton의 padded tap target도 함께 잘린다.
     return SizedBox.square(
-      dimension: RoutexMetrics.leadingColumn,
+      dimension: RoutexMetrics.minimumTouchTarget,
       child: IconButton(
         tooltip: label,
         onPressed: onPressed,

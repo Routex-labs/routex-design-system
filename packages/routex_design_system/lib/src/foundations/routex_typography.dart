@@ -27,6 +27,9 @@ extension RoutexTypographyRoleValue on RoutexTypographyRole {
 
 /// v0.1에서 허용하는 타이포그래피 역할이다.
 abstract final class RoutexTypography {
+  /// 이 배율부터 균등 칸보다 가로 스크롤이 읽기 순서를 더 잘 보존한다.
+  static const scrollLayoutTextScale = 1.3;
+
   static const _fontFamily = 'Pretendard';
   static const _fontPackage = 'routex_design_system';
 
@@ -109,19 +112,26 @@ abstract final class RoutexTypography {
   /// 보는 길이다. 제품 폭 390에 본문 16px이면 한 줄에 24자쯤 들어가므로 18자까지는
   /// 묶어도 안전하고, 그보다 긴 어절은 기존 규칙대로 쪼개지게 둔다.
   ///
-  /// 주소·설명처럼 **사람이 읽는 문장**에만 쓴다. 주소(URL)와 수치는 공백이 없어
-  /// 효과가 없고, 오히려 잘려야 할 자리를 막는다.
+  /// **한글이 든 어절만 손댄다.** 숫자·영문은 애초에 낱자 사이에서 끊기지 않으므로
+  /// 묶을 이유가 없고, 보이지 않는 글자를 전화번호나 주소에 심으면 복사한 값이 원본과
+  /// 달라진다.
   static String keepWordsWhole(String text, {int maxJoinLength = 18}) {
     const joiner = '\u2060';
     return text
         .split(' ')
         .map(
-          (word) => word.length > maxJoinLength || word.length < 2
+          (word) =>
+              word.length > maxJoinLength ||
+                  word.length < 2 ||
+                  !_hangul.hasMatch(word)
               ? word
               : word.split('').join(joiner),
         )
         .join(' ');
   }
+
+  /// 완성형 음절과 자모. 한글이 하나라도 있으면 그 어절은 음절 사이에서 끊긴다.
+  static final _hangul = RegExp(r'[가-힣ㄱ-ㅎㅏ-ㅣ]');
 
   /// 한 줄 컨트롤 라벨에서 줄 간격을 없앤다.
   ///

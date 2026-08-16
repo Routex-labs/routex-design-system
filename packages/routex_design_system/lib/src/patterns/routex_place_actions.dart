@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../foundations/routex_spacing.dart';
 import '../components/routex_button.dart';
 
-/// 장소 하나를 경로의 어느 끝으로 쓸지 고르는 한 쌍이다.
+/// 장소를 경로의 어느 끝으로 쓸지 고르는 상세 행동 묶음이다.
 ///
 /// **위계가 고정이다.** 도착이 primary, 출발이 secondary다. 두 버튼을 같은 무게로
 /// 그리면 한 화면에 primary가 둘이 되고(v0.1 실패 조건), 무엇보다 이 시트를 연 사람의
@@ -31,15 +31,17 @@ class RoutexPlaceActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+    // 2배 글자에서 두 버튼을 한 줄에 강제로 넣으면 라벨이 잘릴 수 있다. 순서는
+    // 유지하되 다음 줄로 흐를 수 있게 한다.
+    return Wrap(
+      spacing: RoutexSpacing.controlGap,
+      runSpacing: RoutexSpacing.controlGap,
       children: [
         RoutexButton(
           label: '출발',
           variant: RoutexButtonVariant.secondary,
           onPressed: onOrigin,
         ),
-        const SizedBox(width: RoutexSpacing.controlGap),
         RoutexButton(label: '도착', onPressed: onDestination),
       ],
     );

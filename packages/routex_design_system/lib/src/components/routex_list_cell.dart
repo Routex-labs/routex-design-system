@@ -46,7 +46,7 @@ class RoutexListCell extends StatelessWidget {
 
   /// line box 안에서 글자가 실제로 시작하는 위치다. bodyStrong 16 * 1.5 line box
   /// 기준으로 위아래 4씩 남는다.
-  static const _titleGlyphInset = 4.0;
+  static const _titleGlyphInset = RoutexOpticalCorrection.listTitleGlyphTop;
 
   @override
   Widget build(BuildContext context) {

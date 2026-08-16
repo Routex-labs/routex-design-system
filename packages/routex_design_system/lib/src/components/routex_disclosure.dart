@@ -100,7 +100,9 @@ class RoutexDisclosure extends StatelessWidget {
                       Expanded(child: header),
                       const SizedBox(width: RoutexSpacing.controlGap),
                       AnimatedRotation(
-                        turns: expanded ? 0.5 : 0,
+                        turns: expanded
+                            ? RoutexMotion.disclosureExpandedTurns
+                            : 0,
                         duration: duration,
                         curve: RoutexMotion.standardCurve,
                         child: Icon(
@@ -198,7 +200,7 @@ class RoutexShowMore extends StatelessWidget {
           children: [
             Flexible(child: Text(label, maxLines: 1)),
             AnimatedRotation(
-              turns: expanded ? 0.5 : 0,
+              turns: expanded ? RoutexMotion.disclosureExpandedTurns : 0,
               duration: RoutexMotion.effectiveDuration(
                 disableAnimations: disableAnimations,
                 role: RoutexMotionRole.transition,

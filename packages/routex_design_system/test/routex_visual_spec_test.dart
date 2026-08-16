@@ -105,7 +105,7 @@ void main() {
       );
     });
 
-    testWidgets('검색 바는 52 높이에서 leading column 폭의 아이콘 자리를 쓴다', (tester) async {
+    testWidgets('검색 바는 52 높이 안에서 아이콘 동작의 48 터치 영역을 지킨다', (tester) async {
       await pump(
         tester,
         RoutexSearchBar(
@@ -126,8 +126,49 @@ void main() {
       for (var index = 0; index < 2; index++) {
         expect(
           tester.getSize(actions.at(index)).height,
-          RoutexMetrics.leadingColumn,
-          reason: '검색 바 아이콘 자리는 입력 텍스트와 붙어 한 줄로 읽혀야 한다',
+          RoutexMetrics.minimumTouchTarget,
+          reason: 'IconButton의 padded tap target을 작은 부모가 잘라서는 안 된다',
+        );
+      }
+    });
+
+    testWidgets('경로 입력 줄의 위치와 보조 동작은 모두 48로 눌린다', (tester) async {
+      await pump(
+        tester,
+        RoutexRoutePlanner(
+          originLabel: '현재 위치',
+          destinationLabel: '더현대 서울',
+          travelModes: const [
+            RoutexTravelModeOption(
+              id: 'walk',
+              label: '도보',
+              icon: RoutexIcons.walk,
+            ),
+          ],
+          selectedTravelModeId: 'walk',
+          onTravelModeSelected: (_) {},
+          onOriginPressed: () {},
+          onDestinationPressed: () {},
+          onClose: () {},
+          onDestinationMore: () {},
+        ),
+      );
+
+      for (final label in ['현재 위치', '더현대 서울']) {
+        final target = find.ancestor(
+          of: find.text(label),
+          matching: find.byType(InkWell),
+        );
+        expect(
+          tester.getSize(target.first).height,
+          greaterThanOrEqualTo(RoutexMetrics.minimumTouchTarget),
+          reason: label,
+        );
+      }
+      for (final action in find.byType(IconButton).evaluate()) {
+        expect(
+          tester.getSize(find.byWidget(action.widget)).height,
+          greaterThanOrEqualTo(RoutexMetrics.minimumTouchTarget),
         );
       }
     });
@@ -319,6 +360,20 @@ void main() {
         tester.getTopLeft(find.text('더현대 서울')).dx,
         reason: '머리글이 행의 leading column을 모르면 제목 열이 어긋난다',
       );
+      expect(
+        tester.getRect(find.byIcon(RoutexIcons.back)).center.dx,
+        moreOrLessEquals(
+          tester.getRect(find.byIcon(RoutexIcons.place)).center.dx,
+        ),
+        reason: '폭이 다른 glyph도 왼쪽 아이콘 열의 중심은 같아야 한다',
+      );
+      expect(
+        tester.getRect(find.byIcon(RoutexIcons.close)).center.dx,
+        moreOrLessEquals(
+          tester.getRect(find.byIcon(RoutexIcons.forward)).center.dx,
+        ),
+        reason: '헤더와 목록의 오른쪽 glyph 중심은 같은 끝선을 쓴다',
+      );
     });
 
     testWidgets('구획 머리글의 제목과 액션은 같은 여백을 남긴다', (tester) async {
@@ -352,15 +407,46 @@ void main() {
       }
     });
 
+    testWidgets('표면 곡률은 임의 값 대신 card와 field 역할만 사용한다', (tester) async {
+      for (final shape in RoutexSurfaceShape.values) {
+        await pump(
+          tester,
+          RoutexSurface(
+            role: RoutexSurfaceRole.flat,
+            shape: shape,
+            child: const SizedBox.square(dimension: 40),
+          ),
+        );
+        final surface = tester.widget<Material>(
+          find.descendant(
+            of: find.byType(RoutexSurface),
+            matching: find.byType(Material),
+          ),
+        );
+        expect(
+          surface.borderRadius,
+          shape == RoutexSurfaceShape.field
+              ? RoutexRadii.field
+              : RoutexRadii.card,
+          reason: shape.name,
+        );
+      }
+    });
+
     testWidgets('시트는 handle 유무에 따라 위쪽 여백을 바꾼다', (tester) async {
-      await pump(tester, const RoutexBottomSheet(child: SizedBox(height: 40)));
+      await pump(
+        tester,
+        const RoutexBottomSheet(showHandle: true, child: SizedBox(height: 40)),
+      );
       final withHandle = tester.getRect(find.byType(SizedBox).last).top;
+      expect(find.byKey(RoutexBottomSheet.handleKey), findsOneWidget);
 
       await pump(
         tester,
         const RoutexBottomSheet(showHandle: false, child: SizedBox(height: 40)),
       );
       final withoutHandle = tester.getRect(find.byType(SizedBox).last).top;
+      expect(find.byKey(RoutexBottomSheet.handleKey), findsNothing);
 
       expect(
         withoutHandle,
@@ -376,6 +462,43 @@ void main() {
   });
 
   group('상태 표현', () {
+    testWidgets('focus는 커스텀 링과 Material 상태 레이어 두 계열로 구분한다', (tester) async {
+      late ThemeData theme;
+      await pump(
+        tester,
+        Builder(
+          builder: (context) {
+            theme = Theme.of(context);
+            return RoutexRoutePlanner(
+              originLabel: '현재 위치',
+              destinationLabel: '더현대 서울',
+              travelModes: const [
+                RoutexTravelModeOption(
+                  id: 'walk',
+                  label: '도보',
+                  icon: RoutexIcons.walk,
+                ),
+              ],
+              selectedTravelModeId: 'walk',
+              onTravelModeSelected: (_) {},
+              onOriginPressed: () {},
+              onDestinationPressed: () {},
+            );
+          },
+        ),
+      );
+
+      const colors = RoutexColorTokens.light;
+      expect(theme.focusColor, colors.focusRing.withValues(alpha: 0.12));
+      final locationTarget = tester.widget<InkWell>(
+        find
+            .ancestor(of: find.text('현재 위치'), matching: find.byType(InkWell))
+            .first,
+      );
+      expect(locationTarget.focusColor, theme.focusColor);
+      expect(locationTarget.focusColor, isNot(locationTarget.hoverColor));
+    });
+
     // 선택을 진한 파랑 채움으로 그리면 지도 위 한 줄이 통째로 무거워진다. 옅은
     // 배경 + 하늘색 테두리 + 진한 파랑 글자 세 가지가 함께 있어야 선택으로 읽힌다.
     // 셋 중 하나라도 빠지면 약해지므로 세 값을 다 고정한다.

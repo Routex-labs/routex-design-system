@@ -85,28 +85,38 @@ class RoutexResultList extends StatelessWidget {
     final colors = context.routexColors;
 
     return RoutexStack(
-      gap: RoutexStackGap.content,
+      // 결과 머리 줄과 첫 행은 한 목록이다. 카드 바깥 여백까지 더해지는 자리라
+      // content(12)보다 control(8) 간격으로 묶어 위쪽이 뜨지 않게 한다.
+      gap: RoutexStackGap.control,
       children: [
         if (_hasHeader)
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  summary ?? '',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: RoutexTypography.bodySmall.copyWith(
-                    color: colors.contentSecondary,
+          Padding(
+            // 결과 행은 hover·선택 배경을 행 전체에 그리기 위해 자체 좌우 여백을
+            // 가진다. 머리 줄도 같은 만큼 들여써야 요약은 leading icon과, 정렬
+            // control은 행의 오른쪽 내용선과 맞는다.
+            padding: const EdgeInsetsDirectional.symmetric(
+              horizontal: RoutexSpacing.contentGap,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    summary ?? '',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: RoutexTypography.bodySmall.copyWith(
+                      color: colors.contentSecondary,
+                    ),
                   ),
                 ),
-              ),
-              if (sortOptions.length > 1)
-                RoutexSortMenu(
-                  options: sortOptions,
-                  selectedId: selectedSortId!,
-                  onSelected: onSortSelected!,
-                ),
-            ],
+                if (sortOptions.length > 1)
+                  RoutexSortMenu(
+                    options: sortOptions,
+                    selectedId: selectedSortId!,
+                    onSelected: onSortSelected!,
+                  ),
+              ],
+            ),
           ),
         switch (status) {
           RoutexResultStatus.loading => _Loading(message: loadingMessage),

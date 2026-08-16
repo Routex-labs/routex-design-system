@@ -13,7 +13,7 @@ class RoutexBottomSheet extends StatelessWidget {
     required this.child,
     this.header,
     this.expand = false,
-    this.showHandle = true,
+    this.showHandle = false,
     super.key,
   });
 
@@ -26,7 +26,16 @@ class RoutexBottomSheet extends StatelessWidget {
   final Widget? header;
 
   final bool expand;
+
+  /// 소비 화면에서 실제로 끌어 확장할 수 있을 때만 true로 둔다.
+  ///
+  /// handle은 여백이나 장식이 아니다. 고정형 카드·검색 드롭다운에 표시하면 할 수
+  /// 없는 조작을 약속하게 되므로 기본값은 false다. 이 컴포넌트는 드래그 동작을
+  /// 소유하지 않으며, `DraggableScrollableSheet` 같은 제스처는 소비 화면이 맡는다.
   final bool showHandle;
+
+  /// Showcase와 소비 앱이 handle 적용 대상을 검증할 때 쓰는 안정된 key다.
+  static const handleKey = ValueKey('routex-sheet-handle');
 
   @override
   Widget build(BuildContext context) {
@@ -82,10 +91,13 @@ class _SheetHandle extends StatelessWidget {
     final colors = context.routexColors;
     return Align(
       child: Container(
+        key: RoutexBottomSheet.handleKey,
         width: RoutexMetrics.compactControl,
         height: RoutexSpacing.inlineGap,
         decoration: BoxDecoration(
-          color: colors.borderStrong.withValues(alpha: .55),
+          color: colors.borderStrong.withValues(
+            alpha: RoutexOpacity.sheetHandle,
+          ),
           borderRadius: RoutexRadii.full,
         ),
       ),

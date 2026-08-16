@@ -54,7 +54,7 @@ class RoutexMapControl extends StatelessWidget {
                 enabled: onPressed != null,
                 child: RoutexSurface(
                   role: RoutexSurfaceRole.onMap,
-                  radius: RoutexRadii.field,
+                  shape: RoutexSurfaceShape.field,
                   child: Ink(
                     color: selected
                         ? colors.actionPrimarySubtle

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../foundations/routex_metrics.dart';
 import '../theme/routex_color_tokens.dart';
 
 /// 키보드 focus를 표면 위에 링으로 그린다.
@@ -25,7 +26,7 @@ class RoutexFocusRing extends StatefulWidget {
   /// 누를 수 없는 표면에는 링을 그리지 않는다.
   final bool enabled;
 
-  static const width = 2.0;
+  static const width = RoutexStroke.emphasis;
 
   @override
   State<RoutexFocusRing> createState() => _RoutexFocusRingState();

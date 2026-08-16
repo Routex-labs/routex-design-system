@@ -63,7 +63,7 @@ class RoutexTravelModeBar extends StatelessWidget {
     // 칸은 꽉 차고 어떤 칸은 헐거워져 같은 위계로 읽히지 않는다. 큰 글자에서만
     // 한 줄 폭을 넘기므로 그때 가로 스크롤로 넘긴다.
     final textScale = MediaQuery.textScalerOf(context).scale(1);
-    final scrollable = textScale > 1.3;
+    final scrollable = textScale > RoutexTypography.scrollLayoutTextScale;
 
     final items = Row(
       mainAxisSize: scrollable ? MainAxisSize.min : MainAxisSize.max,
@@ -72,7 +72,9 @@ class RoutexTravelModeBar extends StatelessWidget {
           if (scrollable)
             // 가로 스크롤 안에서는 폭이 무한이므로 한 칸의 최대 폭을 준다.
             ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 240),
+              constraints: const BoxConstraints(
+                maxWidth: RoutexContentMeasure.scrollableOption,
+              ),
               child: _TravelModeItem(
                 option: option,
                 selected: option.id == selectedId,

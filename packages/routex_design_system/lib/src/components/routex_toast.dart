@@ -30,7 +30,7 @@ abstract final class RoutexToast {
   /// `RoutexMotion`의 duration은 전환에 쓰는 값이라 여기 쓰지 않는다. 이 값은
   /// 애니메이션 길이가 아니라 **한 문장을 읽는 데 걸리는 시간**이고, 둘을 같은
   /// 상수로 묶으면 전환을 조정할 때 읽는 시간이 함께 흔들린다.
-  static const visibleDuration = Duration(milliseconds: 1600);
+  static const visibleDuration = RoutexFeedbackTiming.toastVisibility;
 
   static OverlayEntry? _entry;
   static Timer? _timer;

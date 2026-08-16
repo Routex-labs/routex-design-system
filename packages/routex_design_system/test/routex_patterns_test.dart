@@ -114,6 +114,34 @@ void main() {
     );
   });
 
+  testWidgets('장소 공유는 헤더에 있고 길찾기 행동과 분리된다', (tester) async {
+    var shared = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: MediaQuery(
+          data: const MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Scaffold(
+            body: SizedBox(
+              width: 360,
+              child: RoutexPlaceHeader(
+                name: '오설록',
+                metadata: 'B1 · 식음료 · 카페',
+                saved: false,
+                onShare: () => shared = true,
+                onSaved: (_) {},
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.byTooltip('장소 공유'));
+    expect(shared, isTrue);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('이동수단은 지원 항목만 한 줄로 표시하고 하나뿐이면 숨긴다', (tester) async {
     var selected = 'walk';
     const options = [
@@ -316,8 +344,8 @@ void main() {
           expanded: expanded,
           onExpanded: (_) {},
           days: const [
-            RoutexHoursDay(label: '화(8/12)', value: '10:30 - 20:00'),
-            RoutexHoursDay(label: '수(8/13)', value: '휴무', closed: true),
+            RoutexHoursDay(label: '화', value: '10:30 - 20:00'),
+            RoutexHoursDay(label: '수', value: '휴무', closed: true),
           ],
         ),
       ),
@@ -332,14 +360,14 @@ void main() {
         ),
       );
 
-      expect(find.text('10:30 - 20:00'), findsOneWidget);
-      expect(find.text('휴무'), findsNothing);
+      expect(find.text('화 · 10:30 - 20:00'), findsOneWidget);
+      expect(find.text('수 · 휴무'), findsNothing);
 
       await tester.pumpWidget(
         hours(state: RoutexHoursState.open, expanded: true, detail: '20:00 종료'),
       );
       await tester.pumpAndSettle();
-      expect(find.text('휴무'), findsOneWidget);
+      expect(find.text('수 · 휴무'), findsOneWidget);
     });
 
     testWidgets('판정할 수 없으면 닫힘으로 떨어뜨리지 않는다', (tester) async {
@@ -493,7 +521,9 @@ void main() {
               ],
               selectedSortId: 'near',
               onSortSelected: (_) {},
-              children: const [RoutexListCell(title: '발렌시아가')],
+              children: const [
+                RoutexListCell(title: '발렌시아가', leadingIcon: RoutexIcons.place),
+              ],
             ),
           ),
         ),
@@ -502,6 +532,11 @@ void main() {
       expect(
         tester.getRect(find.text('32개 결과')).center.dy,
         moreOrLessEquals(tester.getRect(find.text('가까운 순')).center.dy),
+      );
+      expect(
+        tester.getRect(find.text('32개 결과')).left,
+        moreOrLessEquals(tester.getRect(find.byIcon(RoutexIcons.place)).left),
+        reason: '요약은 첫 결과의 leading 열과 같은 시작선을 쓴다',
       );
       expect(find.text('발렌시아가'), findsOneWidget);
     });
@@ -602,6 +637,7 @@ void main() {
       );
 
       expect(find.text('오후 3:24'), findsOneWidget);
+      expect(find.text('경로 지우기'), findsNothing);
       await tester.tap(find.text('안내 시작'));
       expect(started, isTrue);
 

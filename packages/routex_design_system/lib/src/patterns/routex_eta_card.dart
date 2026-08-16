@@ -24,7 +24,7 @@ class RoutexEtaCard extends StatelessWidget {
     required this.arrivalTime,
     required this.metrics,
     required this.onStart,
-    this.onCancel,
+    this.routeOptions,
     this.title = '도착 예정',
     super.key,
   }) : assert(metrics.length > 0 && metrics.length <= 3);
@@ -38,8 +38,9 @@ class RoutexEtaCard extends StatelessWidget {
 
   final VoidCallback? onStart;
 
-  /// 경로를 지우고 계획을 접는다. null이면 접을 수 없는 자동 경로라는 뜻이다.
-  final VoidCallback? onCancel;
+  /// 복수 경로를 고를 수 있을 때 도착 요약 위에 놓는 선택 영역이다.
+  /// `RoutexRouteOption` 묶음을 넘기며, 단일 경로라면 생략한다.
+  final Widget? routeOptions;
 
   final String title;
 
@@ -52,6 +53,7 @@ class RoutexEtaCard extends StatelessWidget {
       child: RoutexStack(
         gap: RoutexStackGap.content,
         children: [
+          ?routeOptions,
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -75,52 +77,45 @@ class RoutexEtaCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: RoutexSpacing.contentGap),
-              // 시작이 이 표면의 주 행동이다. 취소는 quiet으로 두어 한 화면에
-              // 같은 위계의 버튼이 둘 생기지 않게 한다.
+              // 시작이 이 표면의 유일한 주 행동이다. 계획 취소는 상단 길찾기
+              // 입력의 닫기가 맡아 같은 역할을 두 곳에 만들지 않는다.
               RoutexButton(label: '안내 시작', onPressed: onStart),
             ],
           ),
-          Row(
-            children: [
-              for (final metric in metrics)
-                Expanded(child: _Metric(metric: metric)),
-            ],
-          ),
-          if (onCancel != null)
-            RoutexButton(
-              label: '경로 지우기',
-              variant: RoutexButtonVariant.quiet,
-              onPressed: onCancel,
+          Semantics(
+            container: true,
+            label: [
+              for (final metric in metrics) '${metric.value} ${metric.label}',
+            ].join(', '),
+            excludeSemantics: true,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  for (var index = 0; index < metrics.length; index++) ...[
+                    if (index > 0)
+                      TextSpan(
+                        text: ' · ',
+                        style: RoutexTypography.bodySmall.copyWith(
+                          color: colors.contentSecondary,
+                        ),
+                      ),
+                    TextSpan(
+                      text: metrics[index].value,
+                      style: RoutexTypography.tabular(RoutexTypography.label),
+                    ),
+                    TextSpan(
+                      text: ' ${metrics[index].label}',
+                      style: RoutexTypography.bodySmall.copyWith(
+                        color: colors.contentSecondary,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
             ),
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _Metric extends StatelessWidget {
-  const _Metric({required this.metric});
-
-  final RoutexTripMetric metric;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = context.routexColors;
-
-    return RoutexStack(
-      gap: RoutexStackGap.inline,
-      children: [
-        Text(
-          metric.value,
-          style: RoutexTypography.tabular(RoutexTypography.label),
-        ),
-        Text(
-          metric.label,
-          style: RoutexTypography.caption.copyWith(
-            color: colors.contentSecondary,
-          ),
-        ),
-      ],
     );
   }
 }
