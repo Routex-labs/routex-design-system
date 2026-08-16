@@ -14,8 +14,8 @@ class RoutexPlaceHeader extends StatelessWidget {
   const RoutexPlaceHeader({
     required this.name,
     required this.metadata,
-    required this.saved,
-    required this.onSaved,
+    this.saved = false,
+    this.onSaved,
     this.onShare,
     this.supportingText,
     this.supportingIcon,
@@ -38,11 +38,17 @@ class RoutexPlaceHeader extends StatelessWidget {
 
   final IconData? leadingIcon;
   final bool saved;
-  final ValueChanged<bool> onSaved;
 
   /// 장소 식별 링크를 공유한다. 링크 생성과 플랫폼 공유 시트는 소비 앱이 맡는다.
   /// null이면 공유 계약이 준비되지 않은 화면이라 action을 숨긴다.
   final VoidCallback? onShare;
+
+  /// null이면 **저장할 수 없는 장소**라 action을 숨긴다.
+  ///
+  /// 모든 장소가 저장되는 것은 아니다. 저장은 식별자를 붙잡아 두는 일이라, 그것이
+  /// 없는 항목에는 담을 곳이 없다. 그때 토글만 남겨 두면 눌러도 아무 일이 없는
+  /// 버튼이 되고, 사용자는 저장이 고장 났다고 읽는다.
+  final ValueChanged<bool>? onSaved;
   final bool expanded;
   final VoidCallback? onToggleExpanded;
 
@@ -133,12 +139,13 @@ class RoutexPlaceHeader extends StatelessWidget {
           ),
           const SizedBox(width: RoutexSpacing.inlineGap),
         ],
-        RoutexIconAction(
-          label: saved ? '저장 취소' : '장소 저장',
-          icon: saved ? RoutexIcons.saved : RoutexIcons.save,
-          selected: saved,
-          onPressed: () => onSaved(!saved),
-        ),
+        if (onSaved case final onSaved?)
+          RoutexIconAction(
+            label: saved ? '저장 취소' : '장소 저장',
+            icon: saved ? RoutexIcons.saved : RoutexIcons.save,
+            selected: saved,
+            onPressed: () => onSaved(!saved),
+          ),
         if (onToggleExpanded != null) ...[
           const SizedBox(width: RoutexSpacing.inlineGap),
           RoutexIconAction(
