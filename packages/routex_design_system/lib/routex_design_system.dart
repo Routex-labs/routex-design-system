@@ -26,6 +26,7 @@ export 'src/components/routex_tabs.dart';
 export 'src/components/routex_toast.dart';
 export 'src/foundations/routex_icons.dart';
 export 'src/foundations/routex_layer.dart';
+export 'src/foundations/routex_glyph.dart';
 export 'src/foundations/routex_metrics.dart';
 export 'src/foundations/routex_motion.dart';
 export 'src/foundations/routex_radii.dart';

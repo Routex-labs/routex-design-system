@@ -1,3 +1,18 @@
+## 0.2.19
+
+- **파괴적:** `RoutexMapControl.selected`를 `RoutexMapControlTone {neutral, accent, active}`로
+  바꿨다. 노브 하나가 두 뜻을 지고 있었다 — 늘 강조돼야 하는 버튼(내 위치로 되돌리기)이 강조색을
+  얻으려면 `selected: true`를 줘야 했고 그러면 낭독기가 "선택됨"까지 읽었다. 반대로 선택 개념이
+  없는 버튼들이 전부 "선택 안 됨"을 선언하고 있었다. 이제 `active`만 선택을 선언하며, 채운 강조면 +
+  반전 글리프 + 한 단계 승격된 깊이를 함께 가진다.
+- `RoutexMapControl.glyphBuilder`와 `RoutexGlyphBuilder` 추가. 소비 앱 자산(SVG)을 쓰는 자리다 —
+  **경로가 아니라 그리는 함수**를 받는 것은 `RoutexMediaItem`이 ImageProvider를 받는 것과 같은
+  이유이고, SVG는 ImageProvider가 아니라 그쪽 문법으로는 표현되지 않았다. 색·크기는 컴포넌트가
+  상태에서 정해 넘긴다. `icon`은 선택 입력이 됐고 셋 중 정확히 하나만 준다.
+- `RoutexEtaCard.onStart`가 null이면 **버튼을 그리지 않는다.** 시작이라는 동작이 없는 경로(건물
+  입구까지 자동으로 그려진 것)에서 눌리지 않는 버튼만 남기면 왜 안 되는지 알 수 없다.
+  `RoutexPlaceHeader.onSaved`와 같은 규칙이다. **앱 영향:** 동작을 주면 이전과 같다.
+
 ## 0.2.18
 
 - `RoutexMenuList.thumbnailAspectRatio` 추가. 썸네일을 늘 정사각으로 **채우고 있었다**(`cover`).

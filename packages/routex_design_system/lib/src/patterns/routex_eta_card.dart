@@ -36,6 +36,10 @@ class RoutexEtaCard extends StatelessWidget {
   /// 소요·거리·환승처럼 판단에 쓰는 값들이다.
   final List<RoutexTripMetric> metrics;
 
+  /// 안내를 시작한다. **null이면 버튼 자체를 그리지 않는다** — 시작이라는 동작이
+  /// 없는 경로(건물 입구까지 자동으로 그려진 경로)에서 눌리지 않는 버튼만 남기면,
+  /// 사용자는 그것이 왜 안 되는지 알 수 없다. `RoutexPlaceHeader.onSaved`와 같은
+  /// 규칙이다.
   final VoidCallback? onStart;
 
   /// 복수 경로를 고를 수 있을 때 도착 요약 위에 놓는 선택 영역이다.
@@ -76,10 +80,12 @@ class RoutexEtaCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: RoutexSpacing.contentGap),
               // 시작이 이 표면의 유일한 주 행동이다. 계획 취소는 상단 길찾기
               // 입력의 닫기가 맡아 같은 역할을 두 곳에 만들지 않는다.
-              RoutexButton(label: '안내 시작', onPressed: onStart),
+              if (onStart case final onStart?) ...[
+                const SizedBox(width: RoutexSpacing.contentGap),
+                RoutexButton(label: '안내 시작', onPressed: onStart),
+              ],
             ],
           ),
           Semantics(

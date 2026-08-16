@@ -20,7 +20,7 @@ void main() {
               RoutexMapControl(
                 label: '현재 위치 추적 중',
                 icon: Icons.navigation_rounded,
-                selected: true,
+                tone: RoutexMapControlTone.active,
                 onPressed: () {},
               ),
             ],
@@ -50,6 +50,100 @@ void main() {
         isSelected: true,
       ),
     );
+  });
+
+  // 강조와 선택은 다른 뜻이다. 늘 강조되는 버튼이 강조색을 얻으려고 선택을
+  // 선언하면 낭독기가 "선택됨"을 읽고, 선택 개념이 없는 버튼들은 "선택 안 됨"을
+  // 읽어 고를 수 있는 것처럼 들린다.
+  testWidgets('지도 컨트롤의 강조는 선택을 선언하지 않는다', (tester) async {
+    Future<void> pump(RoutexMapControlTone tone) => tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexMapControl(
+            label: '내 위치',
+            icon: Icons.my_location_rounded,
+            tone: tone,
+            onPressed: () {},
+          ),
+        ),
+      ),
+    );
+
+    await pump(RoutexMapControlTone.accent);
+    expect(
+      tester.getSemantics(find.byType(RoutexMapControl)),
+      matchesSemantics(
+        label: '내 위치',
+        isButton: true,
+        hasEnabledState: true,
+        isEnabled: true,
+      ),
+    );
+
+    await pump(RoutexMapControlTone.active);
+    expect(
+      tester.getSemantics(find.byType(RoutexMapControl)),
+      matchesSemantics(
+        label: '내 위치',
+        isButton: true,
+        hasEnabledState: true,
+        isEnabled: true,
+        hasSelectedState: true,
+        isSelected: true,
+      ),
+    );
+  });
+
+  // 이 패키지는 자산을 갖지 않는다. 앱 자산을 쓰되 **색은 컴포넌트가 정한다** —
+  // 앱이 색을 따로 고르면 활성·비활성 판정이 두 벌이 된다.
+  testWidgets('glyphBuilder는 상태에서 정한 색과 크기를 받는다', (tester) async {
+    late Color received;
+    late double size;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexMapControl(
+            label: '위치 지정',
+            tone: RoutexMapControlTone.active,
+            glyphBuilder: (context, color, glyphSize) {
+              received = color;
+              size = glyphSize;
+              return SizedBox.square(dimension: glyphSize);
+            },
+            onPressed: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(received, RoutexColorTokens.light.contentInverse);
+    expect(size, RoutexMetrics.iconMedium);
+  });
+
+  // 시작이라는 동작이 없는 경로(건물 입구까지 자동으로 그려진 것)에서 눌리지 않는
+  // 버튼만 남기면, 사용자는 그것이 왜 안 되는지 알 수 없다.
+  testWidgets('시작 동작이 없으면 계획 카드에 버튼을 두지 않는다', (tester) async {
+    Future<void> pump(VoidCallback? onStart) => tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexEtaCard(
+            arrivalTime: '오후 3:24',
+            metrics: const [RoutexTripMetric(value: '22분', label: '소요')],
+            onStart: onStart,
+          ),
+        ),
+      ),
+    );
+
+    await pump(() {});
+    expect(find.text('안내 시작'), findsOneWidget);
+
+    await pump(null);
+    expect(find.text('안내 시작'), findsNothing);
+    expect(find.text('오후 3:24'), findsOneWidget, reason: '요약은 그대로 남는다');
   });
 
   testWidgets('장소·경로·안내 패턴은 상태와 callback을 분리하지 않는다', (tester) async {
