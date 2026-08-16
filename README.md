@@ -7,7 +7,7 @@ Flutter Showcase가 렌더링하며, Promo Studio는 촬영 전용 표현을 별
 
 | 경로 | 역할 | 현재 상태 |
 |---|---|---|
-| `packages/routex_design_system/` | semantic foundation, 공통 컴포넌트, Navigation 제품 패턴 | `0.2.9` (`v0.2.9` tag), 공개 위젯 beta |
+| `packages/routex_design_system/` | semantic foundation, 공통 컴포넌트, Navigation 제품 패턴 | `0.2.10` (`v0.2.10` tag), 공개 위젯 beta |
 | `apps/showcase/` | 실제 Runtime Kit을 검수하는 Flutter Web 카탈로그 | 사용 가능 |
 | `apps/promo_studio/` | 결정론적 Flutter 프로모션 영상 스튜디오 | 사용 가능 |
 | `docs/` | 시스템 계약, 제품 결정, Navigation 포팅 가이드 | [문서 안내](docs/README.md) |

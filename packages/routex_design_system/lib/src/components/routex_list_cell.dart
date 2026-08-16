@@ -125,6 +125,14 @@ class RoutexListCell extends StatelessWidget {
   /// 기준으로 위아래 4씩 남는다.
   static const _titleGlyphInset = RoutexOpticalCorrection.listTitleGlyphTop;
 
+  /// 한 줄짜리 행인가.
+  ///
+  /// **줄 수가 정렬 기준을 바꾼다.** 여러 줄이면 아이콘은 첫 줄 윗면에 맞춰야
+  /// 한다 — 가운데에 두면 본문이 길어질수록 아이콘이 아래로 내려가 어느 줄에
+  /// 붙은 것인지 알 수 없다. 반대로 한 줄일 때 윗면에 맞추면, 48 터치 영역을 가진
+  /// 끝 동작이 24 제목보다 상자가 길어서 글리프만 12 아래로 떨어진다.
+  bool get _singleLine => !_hasSubtitle && !_hasMetric;
+
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
@@ -177,7 +185,9 @@ class RoutexListCell extends StatelessWidget {
                   vertical: RoutexSpacing.controlGap,
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: _singleLine
+                      ? CrossAxisAlignment.center
+                      : CrossAxisAlignment.start,
                   children: [
                     SizedBox(
                       width: RoutexMetrics.leadingColumn,
@@ -187,11 +197,13 @@ class RoutexListCell extends StatelessWidget {
                           // 글자보다 위아래로 여유가 있어 세로 중앙에 두면 아이콘이
                           // 글자보다 떠 보인다.
                           : Padding(
-                              padding: const EdgeInsetsDirectional.only(
-                                top: _titleGlyphInset,
+                              padding: EdgeInsetsDirectional.only(
+                                top: _singleLine ? 0 : _titleGlyphInset,
                               ),
                               child: Align(
-                                alignment: AlignmentDirectional.topStart,
+                                alignment: _singleLine
+                                    ? AlignmentDirectional.centerStart
+                                    : AlignmentDirectional.topStart,
                                 child: Icon(
                                   leadingIcon,
                                   size: RoutexMetrics.iconMedium,
@@ -259,8 +271,8 @@ class RoutexListCell extends StatelessWidget {
                     if (trailingIcon case final icon?) ...[
                       const SizedBox(width: RoutexSpacing.contentGap),
                       Padding(
-                        padding: const EdgeInsetsDirectional.only(
-                          top: _titleGlyphInset,
+                        padding: EdgeInsetsDirectional.only(
+                          top: _singleLine ? 0 : _titleGlyphInset,
                         ),
                         child: Icon(
                           icon,

@@ -205,6 +205,39 @@ void main() {
       );
     });
 
+    // 실기기에서 최근 검색 줄의 × 가 제목보다 한 단계 아래로 보였다. 끝 동작은 48
+    // 터치 영역을 갖는데 제목 줄은 24라, 여러 줄 기준(첫 줄 윗면)을 한 줄 행에도
+    // 그대로 쓰면 글리프만 12 내려간다. `trailingIcon`만 보정을 받고 있었다.
+    testWidgets('한 줄 행에서는 끝 동작의 글리프도 제목과 같은 중심에 선다', (tester) async {
+      await pump(
+        tester,
+        RoutexListCell(
+          title: '나이키',
+          leadingIcon: RoutexIcons.place,
+          trailingActionLabel: '나이키 삭제',
+          trailingActionIcon: RoutexIcons.close,
+          onTrailingAction: () {},
+        ),
+      );
+
+      final title = tester.getRect(find.text('나이키')).center.dy;
+      expect(
+        tester.getRect(find.byIcon(RoutexIcons.close)).center.dy,
+        moreOrLessEquals(title, epsilon: 1),
+        reason: '끝 동작',
+      );
+      expect(
+        tester.getRect(find.byIcon(RoutexIcons.place)).center.dy,
+        moreOrLessEquals(title, epsilon: 1),
+        reason: 'leading 아이콘',
+      );
+      expect(
+        tester.getSize(find.byType(RoutexIconAction)).height,
+        greaterThanOrEqualTo(RoutexMetrics.minimumTouchTarget),
+        reason: '가운데로 옮겨도 터치 영역은 48을 지킨다',
+      );
+    });
+
     testWidgets('목록 행은 선택 배경 안에서 좌우 여백이 대칭이다', (tester) async {
       await pump(
         tester,
