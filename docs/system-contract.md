@@ -3,7 +3,7 @@
 ## 현재 상태
 
 이 저장소는 Flutter Runtime Kit, Flutter Showcase, Promo Studio를 함께 관리한다. package 버전
-`0.2.15`(`v0.2.15` tag)가 Navigation이 소비하는 release다. 그 앞의 `0.0.1`은 공급 구조 검증용
+`0.2.16`(`v0.2.16` tag)가 Navigation이 소비하는 release다. 그 앞의 `0.0.1`은 공급 구조 검증용
 bootstrap이었다. 공개 위젯은 별도 표시가 없으면 v1 전까지 `beta`다. foundation과 layout
 primitive는 `proposal`이다.
 

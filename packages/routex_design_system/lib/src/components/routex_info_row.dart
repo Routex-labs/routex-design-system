@@ -30,6 +30,7 @@ class RoutexInfoRow extends StatelessWidget {
     this.keepLabel = false,
     this.caption,
     this.copyText,
+    this.onCopied,
     super.key,
   });
 
@@ -56,6 +57,15 @@ class RoutexInfoRow extends StatelessWidget {
   /// 값 전체가 아니라 **복사할 만한 토막**만 받는다. `1522-3232 (평일 09:00–18:00)`을
   /// 통째로 복사하면 전화 앱에 붙여 넣을 수 없다.
   final String? copyText;
+
+  /// 복사에 성공했을 때 부른다. 주면 **성공 알림 자리를 소비 앱이 가져간다.**
+  ///
+  /// 기본은 이 컴포넌트가 `복사했습니다`를 띄우는 것이다. 그런데 어떤 플랫폼은
+  /// 시스템이 복사 확인을 스스로 띄워서, 그 위에 하나 더 얹으면 같은 말이 두 번
+  /// 뜬다. 기기 버전을 조회해야 아는 사실이라 이 패키지는 판정할 수 없다.
+  ///
+  /// 실패는 이 값과 무관하게 늘 이 컴포넌트가 알린다 — 시스템 확인은 성공에만 뜬다.
+  final VoidCallback? onCopied;
 
   bool get _showLabel => icon == null || keepLabel;
 
@@ -115,7 +125,11 @@ class RoutexInfoRow extends StatelessWidget {
                     // 복사 버튼은 값 **바로 옆**이다. 줄 오른쪽 끝에 붙이면 값이
                     // 짧을 때 무엇을 복사하는 버튼인지가 멀어진다.
                     if (copyText case final copyText?)
-                      _CopyAction(text: copyText, label: label),
+                      _CopyAction(
+                        text: copyText,
+                        label: label,
+                        onCopied: onCopied,
+                      ),
                   ],
                 ),
                 if (caption?.trim().isNotEmpty ?? false)
@@ -139,10 +153,15 @@ class RoutexInfoRow extends StatelessWidget {
 /// **아이콘이 아니라 글자다.** 전화번호 옆의 겹친 사각형 글리프는 "저장"·"공유"로도
 /// 읽힌다. 잘못 눌러도 잃는 것이 없는 동작에 아이콘 수수께끼를 낼 이유가 없다.
 class _CopyAction extends StatelessWidget {
-  const _CopyAction({required this.text, required this.label});
+  const _CopyAction({
+    required this.text,
+    required this.label,
+    required this.onCopied,
+  });
 
   final String text;
   final String label;
+  final VoidCallback? onCopied;
 
   /// 클립보드는 실패할 수 있다. 웹은 브라우저 권한을, 리눅스는 클립보드 매니저를
   /// 타고, 둘 다 없으면 플랫폼 채널이 예외를 던진다. 조용히 삼키면 사용자는 복사된
@@ -154,6 +173,7 @@ class _CopyAction extends StatelessWidget {
     } catch (_) {
       copied = false;
     }
+    if (copied && onCopied != null) return onCopied!();
     if (!context.mounted) return;
     RoutexToast.show(context, copied ? '복사했습니다' : '복사하지 못했습니다');
   }

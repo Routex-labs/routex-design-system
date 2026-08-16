@@ -729,6 +729,92 @@ void main() {
 
       await tester.pump(RoutexToast.visibleDuration);
     });
+
+    testWidgets('onCopied를 주면 성공 알림을 소비 앱이 가져간다', (tester) async {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        (call) async => null,
+      );
+      addTearDown(() {
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        );
+        RoutexToast.dismiss();
+      });
+
+      var copied = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexInfoRow(
+              label: '고객센터',
+              value: '1522-3232',
+              icon: Icons.support_agent_outlined,
+              keepLabel: true,
+              copyText: '1522-3232',
+              onCopied: () => copied++,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.widgetWithText(TextButton, '복사'));
+      await tester.pump();
+      await tester.pump();
+
+      expect(copied, 1);
+      expect(
+        find.text('복사했습니다'),
+        findsNothing,
+        reason: '같은 말이 두 번 뜨지 않도록 기본 알림은 물러난다',
+      );
+    });
+
+    testWidgets('onCopied를 줘도 실패는 이 컴포넌트가 알린다', (tester) async {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        // 클립보드만 실패시킨다. 이 채널에는 버튼 클릭음(SystemSound.play)도
+        // 함께 실려서, 전부 던지면 테스트가 끝난 뒤 그 호출이 예외로 남는다.
+        (call) async => call.method == 'Clipboard.setData'
+            ? throw PlatformException(code: 'no-clipboard')
+            : null,
+      );
+      addTearDown(() {
+        tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          SystemChannels.platform,
+          null,
+        );
+        RoutexToast.dismiss();
+      });
+
+      var copied = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexInfoRow(
+              label: '고객센터',
+              value: '1522-3232',
+              icon: Icons.support_agent_outlined,
+              keepLabel: true,
+              copyText: '1522-3232',
+              onCopied: () => copied++,
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.widgetWithText(TextButton, '복사'));
+      await tester.pump();
+      await tester.pump();
+
+      expect(copied, 0);
+      expect(find.text('복사하지 못했습니다'), findsOneWidget);
+
+      await tester.pump(RoutexToast.visibleDuration);
+    });
   });
 
   group('RoutexSortMenu', () {
