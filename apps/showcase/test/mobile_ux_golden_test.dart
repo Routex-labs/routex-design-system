@@ -1,3 +1,6 @@
+@TestOn('linux')
+library;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:routex_design_system/routex_design_system.dart';
