@@ -2,13 +2,13 @@
 
 ## 문서 상태와 범위
 
-- 상태: 단계 1까지 적용, 단계 2부터는 계획
+- 상태: 단계 2 진행 중
 - 공급자: `packages/routex_design_system`
 - 소비자: `Routex-labs/Navigation`의 Flutter 클라이언트
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
 - 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
 - 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
-- 앱이 소비 중인 Runtime Kit release: `v0.2.0`. 앱이 실제로 고정한 전체 SHA는 Navigation
+- 앱이 소비 중인 Runtime Kit release: `v0.2.2`. 앱이 실제로 고정한 전체 SHA는 Navigation
   `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
 
 ### 적용 상태
@@ -17,16 +17,28 @@
 |---|---|---|
 | 0. 기준선과 release 고정 | 적용 | 적용 직전 Navigation `flutter test` 1457개 전부 통과, `flutter analyze` 무결 |
 | 1. 의존성과 테마 브리지 | 적용 | `client/pubspec.yaml`·`client/pubspec.lock`의 고정 ref, `AppTheme.withRoutexTokens`, `client/test/theme/routex_theme_bridge_test.dart` |
-| 2 이후 | 미착수 | — |
+| 2. 저위험 기반 요소 | 진행 중 | 아래 표 |
+| 3 이후 | 미착수 | — |
 
-단계 1 적용 뒤 Navigation은 테스트 1465개(기준선 1457 + 신규 8)가 통과하고 analyze가 무결하다.
 전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
 더하며, 그 사실 자체를 `withRoutexTokens`에 대한 테스트가 지킨다.
 
-공급은 `v0.2.0`으로 끊었다. 4.3의 게이트 항목은 모두 닫혔다 — package·Showcase의 analyze·test가
-통과하고, 골든은 CI(ubuntu-latest)가 검증하며, CHANGELOG에 앱 영향과 breaking 여부가 적혀 있다.
 tag는 사람이 읽는 이름이고 **앱이 고정하는 것은 그 tag가 가리키는 전체 SHA**다. tag는 옮길 수 있지만
 SHA는 그럴 수 없다.
+
+#### 단계 2 안쪽
+
+| 항목 | 상태 | 증거 |
+|---|---|---|
+| Badge·Chip·status banner 의미 분리 | 지도 위 표시만 적용 | `parts/ui.dart`의 `RoutexBadge`·`RoutexInlineNotice`, `client/test/app_test.dart` |
+| 공통 list cell | 미착수 | 목록이 전부 시트·검색 안이라 단계 3~5에서 그 표면과 함께 옮긴다 |
+| 영업시간 접힘·펼침 | 적용 | `place_detail_hours_section.dart`(`RoutexHours`) |
+| 저장 피드백 단일 notice | 적용 | `place_detail_sheet.dart`(`RoutexInlineNotice`) |
+| toast·skeleton 중복 제한 | 적용 | `place_detail_rich_sections.dart`(`RoutexToast`). skeleton은 앱에 아직 없다 |
+
+**칩은 지도 위 대분류 줄까지만 이 단계에서 옮긴다.** 시트 안 소분류 줄과 검색 되물음 줄은 계약이
+아직 모자라고(7.4), 그 표면 자체가 단계 3·4에서 옮겨간다 — 먼저 칩만 바꾸면 같은 파일을 두 번
+건드리게 된다.
 
 이 문서는 **어떻게 옮길지**를 설명한다. 장소 상세·공유·안내 화면의 제품 결정은
 [`place-detail-guidance-decisions.md`](place-detail-guidance-decisions.md), 현재 픽셀을 바꾸지 않고
@@ -756,6 +768,9 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 | theme font | `RoutexTheme.light`에 명시 font family 없음 | 앱·지도·SVG Pretendard 고정 | 브리지와 최종 theme font 계약 테스트 |
 | route planner focus | `RoutexRoutePlanner`만 `Theme.of(context).focusColor`를 읽는다 | 브리지는 앱의 Material 기본 focus를 유지한다 | 단계 4 착수 전에 semantic focus 입력 보강 또는 국소 `Theme` 결정 |
 | map overlay | semantic slot 중심 | shell의 동적 Column, keyboard inset, GlobalKey hit exclusion | 기존 pointer/key 계약을 표현할 수 있는지 proof |
+| 칩 줄의 스크롤 소유권 | `RoutexChipBar`가 제 가로 뷰포트를 소유 | 지도 오버레이가 스크롤·휠·잠금을 이미 소유 | **닫힘.** `RoutexChipBarOverflow.deferToParent`(v0.2.3) |
+| 선택 없음을 뜻하는 칩 | `selectedId: null`이면 강조된 칩이 없다 | 카테고리 시트가 `전체` 칩을 그리고 늘 하나가 선택돼 있다 | 단계 3 착수 전에 "반드시 하나 선택" 모드 결정 |
+| 칩의 해제 어포던스와 개수 | 라벨만 | 고른 값에 `×`, 선택지에 `(개수)`, 조작 칩과 구분선 | 단계 4 착수 전에 검색 되물음 줄의 정보 순서 확정 |
 
 이 표의 항목은 “나중에 개선” 목록이 아니다. 해당 기능을 포팅하려면 먼저 결정하고 공급자 release에
 포함하거나, 원본 앱의 정보·동작을 의도적으로 폐기한다는 별도 제품 승인이 있어야 한다.
