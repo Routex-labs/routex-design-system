@@ -64,7 +64,7 @@ private primitive → semantic token → core component → product pattern → 
 1. Runtime Kit analyze/test 통과
 2. Showcase analyze/test/web build 통과
 3. source contract, visual spec, viewport, contrast 테스트 통과
-4. 대표 golden의 의도된 변경 여부를 사람이 확인
+4. Ubuntu CI가 생성한 대표 golden의 의도된 변경 여부를 사람이 확인
 5. 문서 링크 검사와 README의 상태·명령이 실제 구조와 일치
 6. 변경으로 불필요해진 코드·문서·fixture가 남지 않음
 
@@ -86,3 +86,7 @@ flutter build web
 현재 디자인 보존의 세부 자동 경계는 [0002](decisions/0002-visual-source-contract.md), 제품별
 결정은 [제품 결정](place-detail-guidance-decisions.md), 앱 이관은
 [포팅 가이드](navigation-app-porting-guide.md)를 따른다.
+
+Showcase 자체와 기능·레이아웃 테스트는 Windows·macOS·Linux에서 동작해야 한다. 픽셀 골든만
+Flutter 3.44.8 Ubuntu CI를 canonical renderer로 사용한다. 다른 운영체제의 렌더링을 Linux
+PNG와 직접 비교하거나 플랫폼별 기준선을 여러 벌 관리하지 않는다.

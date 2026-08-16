@@ -21,6 +21,13 @@ flutter build web
 
 asset 목록을 바꾸면 hot reload가 아니라 앱을 다시 실행한다.
 
+일반 기능·레이아웃 테스트는 Windows·macOS·Linux에서 실행한다. 픽셀 골든은 운영체제와 Flutter
+버전에 따라 글꼴 rasterization이 달라지므로 Flutter 3.44.8을 설치한 Ubuntu CI만 기준으로
+판정한다. 골든 suite에는 `@TestOn('linux')`가 있어 Windows와 macOS의 `flutter test`에서는
+자동 제외된다. CI에서 골든이 실패하면 actual·diff 이미지를 7일간 artifact로 남긴다. 의도된
+변경은 artifact를 육안 검수한 뒤 Ubuntu actual 이미지만 새 기준선으로 커밋한다. 픽셀 허용
+오차를 넓혀 운영체제 차이나 실제 회귀를 숨기지 않는다.
+
 ## 페이지 역할
 
 - `한눈에`: 390px 제품 카드 네 열을 유지하고 좁은 창에서는 전체를 비율 축소한다.
