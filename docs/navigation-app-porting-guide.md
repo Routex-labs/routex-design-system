@@ -2,13 +2,13 @@
 
 ## 문서 상태와 범위
 
-- 상태: 단계 3까지 적용
+- 상태: 단계 4 진행 중
 - 공급자: `packages/routex_design_system`
 - 소비자: `Routex-labs/Navigation`의 Flutter 클라이언트
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
 - 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
 - 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
-- 앱이 소비 중인 Runtime Kit release: `v0.2.5`. 앱이 실제로 고정한 전체 SHA는 Navigation
+- 앱이 소비 중인 Runtime Kit release: `v0.2.9`. 앱이 실제로 고정한 전체 SHA는 Navigation
   `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
 
 ### 적용 상태
@@ -19,7 +19,8 @@
 | 1. 의존성과 테마 브리지 | 적용 | `client/pubspec.yaml`·`client/pubspec.lock`의 고정 ref, `AppTheme.withRoutexTokens`, `client/test/theme/routex_theme_bridge_test.dart` |
 | 2. 저위험 기반 요소 | 적용 | 아래 표 |
 | 3. 하단 시트 | 적용 | 시트 여덟이 `RoutexBottomSheet` 표면을 쓴다. 손잡이 판정은 `client/test/widgets/sheet_handle_test.dart` |
-| 4 이후 | 미착수 | — |
+| 4. 검색과 결과 목록 | 진행 중 | 아래 표 |
+| 5 이후 | 미착수 | — |
 
 전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
 더하며, 그 사실 자체를 `withRoutexTokens`에 대한 테스트가 지킨다.
@@ -58,6 +59,23 @@ SHA는 그럴 수 없다.
 직접 값을 계약으로 승격하는 기준은
 [`0002-visual-source-contract.md`](decisions/0002-visual-source-contract.md)를 단일 출처로 사용한다.
 두 문서와 충돌하면 해당 주제의 단일 출처가 우선한다.
+
+#### 단계 4 안쪽
+
+| 항목 | 상태 |
+|---|---|
+| 결과·후보·건물·야외 장소 행 | 적용 (`RoutexListCell`) |
+| 최근 검색 행 | 적용. 삭제는 갈래가 하나뿐이라 ⋯가 아니라 × |
+| 소분류 필터 줄, 되물음 선택지 줄 | 적용 (`RoutexChipBar`) |
+| 검색 실패·반쪽 결과 | 적용 (`RoutexResultStatus.error`·`degraded`) |
+| 결과 목록 전체(요약·정렬·되물음 헤더) | 미착수 — `RoutexResultList`로 감싸는 일이 남았다 |
+| 고른 값이 쌓이는 줄, 분류 둘러보기 줄 | 미착수 — 아래 7.4 참고 |
+
+> **계약을 화면보다 먼저 설계했다가 두 개를 걷었다.** v0.2.8에서 칩 줄에 `dismiss`(선택 해제 ×)와
+> `selection: required`(늘 하나 선택)를 냈는데, 실제로 옮겨 보니 **어댑터가 이미 풀고 있었다** —
+> 카테고리 시트는 `전체` 칩의 id와 "선택 없음"을 이어 주면 그만이었고, `required`는 오히려
+> "고른 소분류를 다시 눌러 전체로 돌아오는" 길을 막아 회귀를 냈다. v0.2.9에서 되걷었다.
+> **어댑터로 표현되는지 먼저 확인하고, 그 다음에 계약을 늘린다.**
 
 ### 조사에서 확인한 현재 조건
 
@@ -772,8 +790,10 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 
 | 간극 | 현재 Runtime Kit | 원본 앱 요구 | 착수 게이트 |
 |---|---|---|---|
-| 검색 오류 상태 | `RoutexResultStatus`는 loading/empty/ready | degraded/error/clarify가 별도 | 공개 조합 예제와 golden 또는 의미형 상태 보강 |
-| 검색 행 정보 | plain title/subtitle | 강조 span, 업종, 이유, 거리의 복수 위계 | 승인된 정보 순서와 API 확정 |
+| 검색 오류 상태 | `RoutexResultStatus`는 loading/empty/ready | degraded/error/clarify가 별도 | **닫힘.** 셋을 상태로 추가(v0.2.8) |
+| 검색 행 정보 | plain title/subtitle | 강조 span, 업종, 이유, 거리의 복수 위계 | **닫힘.** `titleHighlights`·`metric`·`leadingIconTone`(v0.2.6·v0.2.7). 업종은 맥락 줄로 흡수 |
+| 여러 조건이 동시에 걸린 칩 줄 | `RoutexChipBar`는 선택이 없거나 하나 | 되물음의 고른 값은 **축마다 하나씩** 여럿이 걸린다 | 다중 선택을 이 줄의 역할로 볼지 결정 |
+| 여러 줄로 접히는 칩 | 한 줄 가로 스크롤 | 분류 둘러보기는 결과가 없어 세로가 남으므로 `Wrap`으로 한눈에 | 접히는 칩 줄을 낼지, 그 화면만 다른 표현을 쓸지 결정 |
 | favorites drag | `reorderable`은 손잡이 시각만 소유 | 실제 long-press reorder | semantics와 affordance test 확정 |
 | 도착 권장 구조 | `RoutexArrivalCard`가 도착 문구+행동 소유 | 상단 상태 1회 + 하단 후속 행동 | 둘 중 하나만 쓰는 Showcase 상태 확정 |
 | iPad 공유 anchor | `RoutexPlaceHeader.onShare`만 공개 | 실제 share icon의 non-zero bounds 필요 | header bounds 사용 승인 또는 action key/context 계약 보강 |
