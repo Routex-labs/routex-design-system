@@ -2,7 +2,7 @@ import 'package:flutter/painting.dart';
 
 /// 지도 위에 그리는 데이터 표현의 색과 굵기다.
 ///
-/// 제품 UI semantic token과 **다른 층**이다. 버튼·시트의 파랑을 바꾼다고 경로선이
+/// 제품 UI semantic token과 **다른 층**이다. 버튼·시트의 포인트 색을 바꾼다고 경로선이
 /// 따라 바뀌면 안 되고, 반대도 마찬가지다. 지도 renderer(MapLibre style, CustomPaint,
 /// 지도 표현 소비자는 색 literal을 직접 적지 않고 여기서 읽는다.
 ///
@@ -12,6 +12,7 @@ import 'package:flutter/painting.dart';
 /// 바꾼다.
 abstract final class RoutexMapVisualTokens {
   /// 경로 본선. 제품 `actionPrimary`와 값이 다르며 서로 독립적으로 관리한다.
+  /// 제품 포인트 색이 초록으로 바뀐 뒤에도 이 값은 Navigation 앱과 같은 파랑이다.
   static const routeLine = Color(0xFF4A87F1);
 
   /// 본선 아래 진한 casing. 밝은 도면 위에서 본선 경계를 만든다.

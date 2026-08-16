@@ -39,7 +39,7 @@ class RoutexTabs extends StatelessWidget {
                       border: Border(
                         bottom: BorderSide(
                           // 표시줄은 선이라 accentBrand, 라벨은 글자라
-                          // actionPrimary다. 같은 파랑 계열이되 역할이 다르다.
+                          // actionPrimary다. 같은 포인트 계열이되 역할이 다르다.
                           color: selectedIndex == index
                               ? colors.accentBrand
                               : colors.borderSubtle,

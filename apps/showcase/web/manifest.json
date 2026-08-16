@@ -3,8 +3,8 @@
     "short_name": "Routex DS",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#EEF4FE",
-    "theme_color": "#4A87F1",
+    "background_color": "#E6F2EE",
+    "theme_color": "#0F5A46",
     "description": "Routex Runtime Kit Showcase",
     "prefer_related_applications": false,
     "icons": [
