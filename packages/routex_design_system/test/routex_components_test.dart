@@ -83,6 +83,44 @@ void main() {
       expect(pressed, isTrue);
     });
 
+    // 검색 결과는 "왜 이 줄이 걸렸는지"를 색으로 말한다. 무엇이 걸렸는지 정하는
+    // 일은 소비 앱이 하고, 여기서는 받은 구간만 다른 색으로 그린다.
+    testWidgets('강조 구간만 다른 색으로 갈린다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexListCell(
+              title: '스타벅스 리저브',
+              titleHighlights: [TextRange(start: 0, end: 4)],
+            ),
+          ),
+        ),
+      );
+
+      final rich = tester.widget<Text>(find.byType(Text).first);
+      final spans =
+          (rich.textSpan! as TextSpan).children!.cast<TextSpan>().toList();
+      expect(spans.map((span) => span.text), ['스타벅스', ' 리저브']);
+      expect(spans.first.style?.color, RoutexColorTokens.light.actionPrimary);
+      expect(spans.last.style?.color, isNull, reason: '나머지는 제목 색 그대로다');
+    });
+
+    // 하나도 안 걸리는 것이 정상이다 — 의미 검색은 이름에 검색어가 없는 결과를
+    // 주는 것이 목적이다. 그때 제목은 조각나지 않은 한 줄이어야 한다.
+    testWidgets('강조가 없으면 제목을 조각내지 않는다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(body: RoutexListCell(title: '스타벅스 리저브')),
+        ),
+      );
+
+      final title = tester.widget<Text>(find.byType(Text).first);
+      expect(title.data, '스타벅스 리저브');
+      expect(title.textSpan, isNull);
+    });
+
     testWidgets('selected·disabled 상태를 의미와 동작에 함께 반영한다', (tester) async {
       await tester.pumpWidget(
         MaterialApp(

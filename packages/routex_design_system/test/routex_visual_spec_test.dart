@@ -494,6 +494,27 @@ void main() {
       expect(body.right, sheet.right);
     });
 
+    // 목록을 훑는 눈은 "지금 갈까"를 정하는 값에서 멈춰야 한다. 맥락과 같은 무게로
+    // 그리면 짚을 곳이 없어지고, 한 줄로 합치면 그 값이 문장 속에 묻힌다.
+    testWidgets('행의 값 줄은 맥락 줄보다 진하다', (tester) async {
+      await pump(
+        tester,
+        const RoutexListCell(
+          title: '스타벅스 리저브',
+          subtitle: '카페 · 더현대 서울 · B2',
+          metric: '180m · 도보 3분',
+        ),
+      );
+
+      final context = tester.widget<Text>(find.text('카페 · 더현대 서울 · B2')).style!;
+      final value = tester.widget<Text>(find.text('180m · 도보 3분')).style!;
+
+      expect(value.fontSize, context.fontSize, reason: '크기는 같다');
+      expect(value.fontWeight!.value, greaterThan(context.fontWeight!.value));
+      expect(value.color, RoutexColorTokens.light.contentPrimary);
+      expect(context.color, RoutexColorTokens.light.contentSecondary);
+    });
+
     // 시트 본문은 누를 수 있는 줄로 차 있다. 그 줄들은 배경과 물결을 가장 가까운
     // Material에 칠하는데, 표면이 잉크 면을 주지 않으면 칠할 자리가 시트 색 아래로
     // 내려간다. `ListTile`은 그 상황을 단언으로 잡으므로 여기서 먼저 걸린다.

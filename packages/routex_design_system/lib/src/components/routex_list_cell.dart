@@ -13,7 +13,9 @@ import 'routex_icon_action.dart';
 class RoutexListCell extends StatelessWidget {
   const RoutexListCell({
     required this.title,
+    this.titleHighlights = const [],
     this.subtitle,
+    this.metric,
     this.leadingIcon,
     this.trailingIcon,
     this.trailingActionLabel,
@@ -26,7 +28,28 @@ class RoutexListCell extends StatelessWidget {
   });
 
   final String title;
+
+  /// [title] 안에서 강조할 구간이다. 검색 결과에서 **왜 이 줄이 걸렸는지**를
+  /// 색으로 설명한다.
+  ///
+  /// 무엇이 걸렸는지 정하는 일은 소비 앱이 한다 — 대소문자·공백 정규화와 의미
+  /// 검색의 판정은 도메인이고, 여기서 흉내 내면 서버 판정과 어긋난다. 이 컴포넌트는
+  /// **강조가 어떻게 보이는지**만 소유한다.
+  ///
+  /// 비어 있는 것이 정상 상태다. 의미 검색은 이름에 검색어가 없는 결과를 주는 것이
+  /// 목적이라, 하나도 안 걸리는 것을 실패로 다루지 않는다.
+  final List<TextRange> titleHighlights;
+
+  /// 이 줄이 무엇이고 어디에 있는지. 분류·건물·층처럼 **자리를 말하는** 값이다.
   final String? subtitle;
+
+  /// 이 줄을 고를지 정하는 값이다. 거리·소요 시간처럼 재어서 나온 것을 둔다.
+  ///
+  /// [subtitle]이 "어디에 있는가"라면 이쪽은 "지금 갈까"에 답한다. 둘을 한 줄에
+  /// 합치면 결정에 쓰는 값이 맥락과 같은 무게가 되어, 목록을 훑는 눈이 짚을 곳을
+  /// 잃는다. 그래서 줄과 굵기를 나눈다.
+  final String? metric;
+
   final IconData? leadingIcon;
   final IconData? trailingIcon;
 
@@ -43,6 +66,37 @@ class RoutexListCell extends StatelessWidget {
   final VoidCallback? onPressed;
 
   bool get _hasSubtitle => subtitle?.trim().isNotEmpty ?? false;
+
+  bool get _hasMetric => metric?.trim().isNotEmpty ?? false;
+
+  /// 강조 구간을 색이 다른 span으로 가른다. 구간이 없으면 원문 하나다.
+  List<TextSpan> _titleSpans(Color emphasis) {
+    assert(
+      titleHighlights.every(
+        (range) => range.start >= 0 && range.end <= title.length,
+      ),
+      '강조 구간이 제목 밖을 가리킨다',
+    );
+    final spans = <TextSpan>[];
+    var cursor = 0;
+    for (final range in titleHighlights) {
+      if (range.start < cursor || range.end <= range.start) continue;
+      if (range.start > cursor) {
+        spans.add(TextSpan(text: title.substring(cursor, range.start)));
+      }
+      spans.add(
+        TextSpan(
+          text: title.substring(range.start, range.end),
+          style: TextStyle(color: emphasis),
+        ),
+      );
+      cursor = range.end;
+    }
+    if (cursor < title.length) {
+      spans.add(TextSpan(text: title.substring(cursor)));
+    }
+    return spans;
+  }
 
   /// line box 안에서 글자가 실제로 시작하는 위치다. bodyStrong 16 * 1.5 line box
   /// 기준으로 위아래 4씩 남는다.
@@ -62,7 +116,12 @@ class RoutexListCell extends StatelessWidget {
       button: interactive,
       enabled: interactive ? enabled : null,
       selected: selected,
-      label: _hasSubtitle ? '$title, $subtitle' : title,
+      // 강조는 색이라 읽어 주지 않는다. 값은 읽어 준다 — 보이는 것과 같은 순서다.
+      label: [
+        title,
+        if (_hasSubtitle) subtitle!,
+        if (_hasMetric) metric!,
+      ].join(', '),
       excludeSemantics: true,
       child: RoutexFocusRing(
         radius: RoutexRadii.field,
@@ -126,18 +185,43 @@ class RoutexListCell extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Text(
-                            title,
-                            style: RoutexTypography.bodyStrong.copyWith(
-                              color: foreground,
+                          if (titleHighlights.isEmpty)
+                            Text(
+                              title,
+                              style: RoutexTypography.bodyStrong.copyWith(
+                                color: foreground,
+                              ),
+                            )
+                          else
+                            Text.rich(
+                              TextSpan(
+                                children: _titleSpans(
+                                  enabled
+                                      ? colors.actionPrimary
+                                      : colors.contentDisabled,
+                                ),
+                              ),
+                              style: RoutexTypography.bodyStrong.copyWith(
+                                color: foreground,
+                              ),
                             ),
-                          ),
                           if (_hasSubtitle) ...[
                             const SizedBox(height: RoutexSpacing.inlineGap),
                             Text(
                               subtitle!,
                               style: RoutexTypography.bodySmall.copyWith(
                                 color: secondaryForeground,
+                              ),
+                            ),
+                          ],
+                          if (_hasMetric) ...[
+                            const SizedBox(height: RoutexSpacing.inlineGap),
+                            Text(
+                              metric!,
+                              // 맥락보다 한 단계 진하다. 크기는 같고 굵기와 색만
+                              // 올려, 훑는 눈이 값에서 멈추게 한다.
+                              style: RoutexTypography.label.copyWith(
+                                color: foreground,
                               ),
                             ),
                           ],
