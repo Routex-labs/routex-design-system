@@ -459,6 +459,57 @@ void main() {
         reason: 'handle이 있으면 handle 자체가 위쪽 여백을 만든다',
       );
     });
+
+    // 본문이 스크롤하는 시트는 handle을 표면 위가 아니라 스크롤 콘텐츠 안에 둬야
+    // 실제로 끌린다. 그러려면 handle이 표면과 따로 설 수 있어야 한다.
+    testWidgets('handle은 표면 밖 본문 안에서도 같은 표시를 그린다', (tester) async {
+      await pump(
+        tester,
+        const RoutexBottomSheet(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [RoutexSheetHandle(), SizedBox(height: 40)],
+          ),
+        ),
+      );
+
+      expect(find.byKey(RoutexBottomSheet.handleKey), findsOneWidget);
+    });
+
+    // 대표 사진처럼 가장자리까지 닿아야 하는 조각이 있는 시트가 있다. 표면이 여백을
+    // 강제하면 그 조각을 표현할 수 없어 소비 앱이 표면을 사설로 다시 그리게 된다.
+    testWidgets('본문이 여백을 소유하면 표면은 여백을 넣지 않는다', (tester) async {
+      await pump(
+        tester,
+        const RoutexBottomSheet(
+          contentInset: RoutexBottomSheetContentInset.content,
+          child: SizedBox(height: 40, width: double.infinity),
+        ),
+      );
+
+      final sheet = tester.getRect(find.byType(RoutexBottomSheet));
+      final body = tester.getRect(find.byType(SizedBox).last);
+      expect(body.top, sheet.top);
+      expect(body.left, sheet.left);
+      expect(body.right, sheet.right);
+    });
+
+    // 스크롤하는 본문은 둥근 모서리를 지나 올라간다. 자르지 않으면 그 자리에서
+    // 사각으로 튀어나와, 표면이 아니라 본문이 모서리를 그리는 것처럼 보인다.
+    testWidgets('본문은 표면의 곡률로 잘린다', (tester) async {
+      await pump(
+        tester,
+        const RoutexBottomSheet(child: SizedBox(height: 40)),
+      );
+
+      final clip = tester.widget<ClipRRect>(
+        find.descendant(
+          of: find.byType(RoutexBottomSheet),
+          matching: find.byType(ClipRRect),
+        ),
+      );
+      expect(clip.borderRadius, RoutexRadii.sheet);
+    });
   });
 
   group('상태 표현', () {
