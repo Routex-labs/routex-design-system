@@ -58,7 +58,10 @@ class RoutexBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
-    final leading = <Widget>[if (showHandle) const RoutexSheetHandle(), ?header];
+    final leading = <Widget>[
+      if (showHandle) const RoutexSheetHandle(),
+      ?header,
+    ];
 
     final content = leading.isEmpty
         ? child
@@ -88,24 +91,33 @@ class RoutexBottomSheet extends StatelessWidget {
       // 지나는데, 자르지 않으면 그 자리에서 사각으로 튀어나온다.
       child: ClipRRect(
         borderRadius: RoutexRadii.sheet,
-        child: Padding(
-          // handle은 그 자체가 위쪽 여백처럼 읽히므로 8, handle 없이 header나 본문이
-          // 바로 오면 컴포넌트 여백 16을 쓴다.
-          padding: switch (contentInset) {
-            RoutexBottomSheetContentInset.surface =>
-              EdgeInsetsDirectional.fromSTEB(
-                RoutexSpacing.componentPadding,
-                showHandle
-                    ? RoutexSpacing.controlGap
-                    : RoutexSpacing.componentPadding,
-                RoutexSpacing.componentPadding,
-                RoutexSpacing.sectionGap,
-              ),
-            // 여백은 본문 조각들이 저마다 갖는다. 표면이 넣으면 가장자리까지 닿아야
-            // 하는 사진을 표현할 수 없다.
-            RoutexBottomSheetContentInset.content => EdgeInsetsDirectional.zero,
-          },
-          child: content,
+        // **표면은 잉크가 앉을 자리이기도 하다.** 시트 안의 누를 수 있는 줄은 배경과
+        // 물결을 가장 가까운 Material에 칠하는데, 그 사이에 색을 칠한 상자가 있으면
+        // 그 아래로 가려진다(`ListTile`은 그 상황을 단언으로 잡는다). 색과 그림자는
+        // 위의 DecoratedBox가 계속 그리고, 여기서는 투명한 잉크 면만 얹는다 —
+        // 그리는 것이 없으므로 픽셀은 그대로다.
+        child: Material(
+          type: MaterialType.transparency,
+          child: Padding(
+            // handle은 그 자체가 위쪽 여백처럼 읽히므로 8, handle 없이 header나 본문이
+            // 바로 오면 컴포넌트 여백 16을 쓴다.
+            padding: switch (contentInset) {
+              RoutexBottomSheetContentInset.surface =>
+                EdgeInsetsDirectional.fromSTEB(
+                  RoutexSpacing.componentPadding,
+                  showHandle
+                      ? RoutexSpacing.controlGap
+                      : RoutexSpacing.componentPadding,
+                  RoutexSpacing.componentPadding,
+                  RoutexSpacing.sectionGap,
+                ),
+              // 여백은 본문 조각들이 저마다 갖는다. 표면이 넣으면 가장자리까지 닿아야
+              // 하는 사진을 표현할 수 없다.
+              RoutexBottomSheetContentInset.content =>
+                EdgeInsetsDirectional.zero,
+            },
+            child: content,
+          ),
         ),
       ),
     );

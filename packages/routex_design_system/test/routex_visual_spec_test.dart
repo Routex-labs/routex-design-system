@@ -494,6 +494,18 @@ void main() {
       expect(body.right, sheet.right);
     });
 
+    // 시트 본문은 누를 수 있는 줄로 차 있다. 그 줄들은 배경과 물결을 가장 가까운
+    // Material에 칠하는데, 표면이 잉크 면을 주지 않으면 칠할 자리가 시트 색 아래로
+    // 내려간다. `ListTile`은 그 상황을 단언으로 잡으므로 여기서 먼저 걸린다.
+    testWidgets('시트 안의 누를 수 있는 줄이 표면에 잉크를 칠할 수 있다', (tester) async {
+      await pump(
+        tester,
+        const RoutexBottomSheet(child: ListTile(title: Text('매장'))),
+      );
+
+      expect(tester.takeException(), isNull);
+    });
+
     // 스크롤하는 본문은 둥근 모서리를 지나 올라간다. 자르지 않으면 그 자리에서
     // 사각으로 튀어나와, 표면이 아니라 본문이 모서리를 그리는 것처럼 보인다.
     testWidgets('본문은 표면의 곡률로 잘린다', (tester) async {
