@@ -9,6 +9,17 @@ import '../theme/routex_color_tokens.dart';
 import 'routex_focus_ring.dart';
 import 'routex_icon_action.dart';
 
+/// 목록 행의 leading 아이콘이 색으로도 정보를 전하는가.
+///
+/// [accent]는 종류가 하나인 목록이다. 아이콘이 "여기는 장소다"만 말하므로 강조색이
+/// 다른 것과 다투지 않는다.
+///
+/// [quiet]는 **종류가 섞인 목록**이다. 검색 결과처럼 매장·건물·후보가 번갈아 오는
+/// 자리에서 아이콘까지 강조색을 쓰면 목록이 색 점으로 칸칸이 나뉘어 보이고, 강조색이
+/// 무엇을 뜻하는지 흐려진다. 그런 목록에서 색은 제목의 일치 구간
+/// ([RoutexListCell.titleHighlights]) 몫이고 종류는 글리프 모양이 가른다.
+enum RoutexListIconTone { accent, quiet }
+
 /// 장소·검색 결과에서 텍스트 열과 상태 위계를 고정하는 v0.1 beta cell이다.
 class RoutexListCell extends StatelessWidget {
   const RoutexListCell({
@@ -17,6 +28,7 @@ class RoutexListCell extends StatelessWidget {
     this.subtitle,
     this.metric,
     this.leadingIcon,
+    this.leadingIconTone = RoutexListIconTone.accent,
     this.trailingIcon,
     this.trailingActionLabel,
     this.onTrailingAction,
@@ -51,6 +63,9 @@ class RoutexListCell extends StatelessWidget {
   final String? metric;
 
   final IconData? leadingIcon;
+
+  final RoutexListIconTone leadingIconTone;
+
   final IconData? trailingIcon;
 
   /// 행 자체와 다른 동작을 하는 끝 버튼이다. 이름 없이는 만들 수 없다.
@@ -173,7 +188,12 @@ class RoutexListCell extends StatelessWidget {
                                   leadingIcon,
                                   size: RoutexMetrics.iconMedium,
                                   color: enabled
-                                      ? colors.actionPrimary
+                                      ? switch (leadingIconTone) {
+                                          RoutexListIconTone.accent =>
+                                            colors.actionPrimary,
+                                          RoutexListIconTone.quiet =>
+                                            colors.contentSecondary,
+                                        }
                                       : colors.contentDisabled,
                                 ),
                               ),

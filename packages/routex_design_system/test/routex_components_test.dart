@@ -99,11 +99,62 @@ void main() {
       );
 
       final rich = tester.widget<Text>(find.byType(Text).first);
-      final spans =
-          (rich.textSpan! as TextSpan).children!.cast<TextSpan>().toList();
+      final spans = (rich.textSpan! as TextSpan).children!
+          .cast<TextSpan>()
+          .toList();
       expect(spans.map((span) => span.text), ['스타벅스', ' 리저브']);
       expect(spans.first.style?.color, RoutexColorTokens.light.actionPrimary);
       expect(spans.last.style?.color, isNull, reason: '나머지는 제목 색 그대로다');
+    });
+
+    // 종류가 섞인 목록에서 아이콘까지 강조색을 쓰면, 강조색이 "왜 이 줄이 걸렸나"를
+    // 말하는지 "이건 장소다"를 말하는지 흐려진다. 그런 목록은 모양으로만 가른다.
+    testWidgets('조용한 아이콘은 강조색을 제목의 일치 구간에 넘긴다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexListCell(
+              title: '스타벅스 리저브',
+              titleHighlights: [TextRange(start: 0, end: 4)],
+              leadingIcon: RoutexIcons.search,
+              leadingIconTone: RoutexListIconTone.quiet,
+            ),
+          ),
+        ),
+      );
+
+      final icon = tester.widget<Icon>(find.byIcon(RoutexIcons.search));
+      expect(icon.color, RoutexColorTokens.light.contentSecondary);
+
+      final spans =
+          (tester.widget<Text>(find.byType(Text).first).textSpan! as TextSpan)
+              .children!
+              .cast<TextSpan>();
+      expect(
+        spans.first.style?.color,
+        RoutexColorTokens.light.actionPrimary,
+        reason: '강조색은 일치 구간 몫이다',
+      );
+    });
+
+    testWidgets('기본 아이콘은 강조색이다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexListCell(
+              title: '저장한 장소',
+              leadingIcon: RoutexIcons.place,
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.widget<Icon>(find.byIcon(RoutexIcons.place)).color,
+        RoutexColorTokens.light.actionPrimary,
+      );
     });
 
     // 하나도 안 걸리는 것이 정상이다 — 의미 검색은 이름에 검색어가 없는 결과를
