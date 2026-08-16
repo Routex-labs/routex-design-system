@@ -14,7 +14,7 @@ import 'package:showcase/src/data/showcase_place_detail_data.dart';
 import 'support/golden_fonts.dart';
 
 /// 갤러리·컴포넌트 탭은 지금까지 눈으로만 회귀를 확인했다. 이 두 탭이 카탈로그의
-/// 실제 표면이라, 여기서 어긋나면 제품 목업이 멀쩡해도 시스템이 어긋난 것이다.
+/// 실제 표면이라, 여기서 어긋나면 Runtime Kit의 시스템 계약이 어긋난 것이다.
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 

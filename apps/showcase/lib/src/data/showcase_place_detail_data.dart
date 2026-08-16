@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:routex_design_system/routex_design_system.dart';
 
-import 'showcase_navigation_data.dart';
+enum ShowcaseDataSource { backend, snapshot }
 
 /// Navigation의 `GET /buildings/{id}/places/{place_id}` 응답 중 Showcase가 쓰는
 /// 섹션만 읽는 app-local adapter다. Runtime Kit package는 이 모델과 API를 알지 않는다.

@@ -4,14 +4,12 @@ import 'package:routex_design_system/routex_design_system.dart';
 import '../pages/components_page.dart';
 import '../pages/foundations_page.dart';
 import '../pages/gallery_page.dart';
-import '../pages/product_page.dart';
 import '../pages/quality_page.dart';
 
-enum ShowcasePage { product, gallery, components, foundations, quality }
+enum ShowcasePage { gallery, components, foundations, quality }
 
 extension ShowcasePageLabel on ShowcasePage {
   String get label => switch (this) {
-    ShowcasePage.product => '제품 UX',
     ShowcasePage.gallery => '한눈에',
     ShowcasePage.components => '컴포넌트',
     ShowcasePage.foundations => '기초',
@@ -62,7 +60,7 @@ class _ShowcaseHomeState extends State<ShowcaseHome> {
                           ),
                         ),
                         Text(
-                          'Runtime Kit의 토큰, 컴포넌트, 모바일 UX 동작을 실제 Flutter 위젯으로 확인합니다.',
+                          'Runtime Kit의 토큰과 컴포넌트를 실제 Flutter 위젯으로 확인합니다.',
                           style: RoutexTypography.body.copyWith(
                             color: colors.contentSecondary,
                           ),
@@ -88,7 +86,6 @@ class _ShowcaseHomeState extends State<ShowcaseHome> {
                       child: KeyedSubtree(
                         key: ValueKey(_page),
                         child: switch (_page) {
-                          ShowcasePage.product => const ProductPage(),
                           ShowcasePage.gallery => const GalleryPage(),
                           ShowcasePage.components => const ComponentsPage(),
                           ShowcasePage.foundations => const FoundationsPage(),
