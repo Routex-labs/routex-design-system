@@ -39,7 +39,8 @@ class RoutexKeyValueRows extends StatelessWidget {
         for (var index = 0; index < rows.length; index++) ...[
           // 표는 줄 사이에 선을 긋는다. 목록과 달리 같은 성격의 값이 세로로
           // 이어지므로, 여백만으로는 어느 값이 어느 라벨의 것인지 흐려진다.
-          if (index > 0) const RoutexDivider(role: RoutexDividerRole.row),
+          // 들여쓰지 않는 이유는 비울 아이콘 열이 없어서다.
+          if (index > 0) const RoutexDivider(role: RoutexDividerRole.tableRow),
           _KeyValueRow(row: rows[index]),
         ],
       ],

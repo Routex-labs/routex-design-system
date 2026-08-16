@@ -659,6 +659,28 @@ void main() {
     });
   });
 
+  group('RoutexKeyValueRows', () {
+    // 표에는 비울 아이콘 열이 없다. 목록용 들여쓰기를 그대로 쓰면 선이 아무것도
+    // 아닌 자리에서 시작해 떠 보인다.
+    testWidgets('줄 사이 선은 표 폭을 그대로 가로지른다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexKeyValueRows(
+              rows: [
+                RoutexKeyValue(label: '용량', value: '355ml'),
+                RoutexKeyValue(label: '칼로리', value: '145kcal'),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      expect(tester.widget<Divider>(find.byType(Divider)).indent, 0);
+    });
+  });
+
   group('RoutexInfoRow', () {
     testWidgets('아이콘이 라벨을 대신하고, keepLabel이면 라벨을 남긴다', (tester) async {
       await tester.pumpWidget(

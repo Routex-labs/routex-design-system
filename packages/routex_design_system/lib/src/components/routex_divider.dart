@@ -9,7 +9,11 @@ import '../theme/routex_color_tokens.dart';
 /// `section`은 성격이 다른 묶음 사이의 경계라 표면 폭을 가로지르고 위아래로
 /// 여백을 가진다. `row`는 같은 목록 안 항목 사이라 제목이 시작하는 자리부터
 /// 그어 leading 아이콘 열을 비운다 — 아이콘 열까지 가로지르면 목록이 표가 된다.
-enum RoutexDividerRole { section, row }
+///
+/// `tableRow`는 그 반대다. **표에는 비울 아이콘 열이 없어서**, 들여쓰면 선이 아무
+/// 것도 아닌 자리에서 시작해 떠 보인다. 표는 선이 값 열까지 가로질러야 어느 값이
+/// 어느 라벨의 것인지가 눈으로 닫힌다.
+enum RoutexDividerRole { section, row, tableRow }
 
 /// 구분선의 색·두께·들여쓰기와 앞뒤 여백을 역할 하나로 고정한다.
 ///
@@ -32,11 +36,11 @@ class RoutexDivider extends StatelessWidget {
       height: switch (role) {
         // 앞뒤로 한 구획씩. 선 자체보다 여백이 경계를 만든다.
         RoutexDividerRole.section => RoutexSpacing.sectionGap + 1,
-        RoutexDividerRole.row => 1,
+        RoutexDividerRole.row || RoutexDividerRole.tableRow => 1,
       },
       thickness: RoutexStroke.hairline,
       indent: switch (role) {
-        RoutexDividerRole.section => 0,
+        RoutexDividerRole.section || RoutexDividerRole.tableRow => 0,
         RoutexDividerRole.row => RoutexMetrics.textKeyline,
       },
       color: colors.borderSubtle,
