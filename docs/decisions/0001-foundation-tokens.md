@@ -1,12 +1,12 @@
-# 0001. v0.1 foundation token 계약
+# 0001. Foundation token 계약
 
-- 상태: proposal
+- 상태: 채택
 - 결정일: 2026-08-14
-- 근거: [Navigation UI inventory](../inventory/navigation-ui-inventory.md)
+- 근거: [Navigation UI 조사](../inventory/navigation-ui-inventory.md)
 
 ## 완료 판정
 
-v0.1 foundation token은 다음 조건을 모두 만족해야 한다.
+Foundation token은 다음 조건을 모두 만족해야 한다.
 
 1. 제품 코드는 색상값·폰트 크기·간격·곡률·그림자·duration을 직접 고르지 않고 semantic
    role을 사용한다.
@@ -50,13 +50,13 @@ private primitive
 - core component는 외부에서 임의 padding, radius, text style을 받지 않는다.
 - product pattern과 Navigation screen은 업무 상태와 지도 동작을 소유한다.
 
-## v0.1 범위
+## 현재 범위
 
 - light theme 한 개
 - semantic color, typography, spacing, radius, metric, layer, product motion
 - Runtime Kit을 실제 import하는 Alignment & Rhythm Showcase fixture
 - 기존 `RoutexButton`이 새 token 계약을 소비하는지 확인하는 회귀 테스트
 
-dark theme, 지도 visual token, 전체 컴포넌트 8개 구현, Navigation migration과 Promo Studio 장면은
-각각 후속 작업이다. dark theme을 임의 반전으로 먼저 만들면 의미 검증 없이 색 조합만 두 배가
-되므로 v0.1 foundation 완료 조건에 포함하지 않는다.
+지도 visual token과 제품 motion은 이후 같은 계층 원칙으로 추가됐다. dark theme은 아직 범위
+밖이다. 임의 반전으로 먼저 만들면 의미 검증 없이 색 조합만 두 배가 되므로 별도 대비·상태
+매트릭스와 제품 검증 전에는 제공하지 않는다.

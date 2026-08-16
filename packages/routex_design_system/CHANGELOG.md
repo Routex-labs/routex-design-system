@@ -1,10 +1,41 @@
 ## Unreleased
 
+- 문서 구조를 현재 계약·제품 결정·원본 앱 포팅 가이드 중심으로 정리하고 정적 HTML Showcase와
+  완료된 계획·중복 문서를 제거했다.
+
 ### v0.2 — 매장 상세·목록·안내 역할 보강
 
 Navigation 앱과 대조해 **Runtime Kit에 없던 역할**을 채웠다. 기준은 "앱이 그 역할을 사설
 위젯으로 다시 그리고 있는가"다. 지도 painter·마커·상태 머신처럼 앱 계층에 남는 것은
 그대로 뒀다.
+
+- `RoutexSearchBar`와 `RoutexRoutePlanner` 내부 아이콘 동작이 작은 부모에 잘려 실제 40/44dp로
+  눌리던 문제를 수정했다. 글리프 크기는 유지하고 투명한 터치 영역만 48dp로 확보한다
+- focus를 모든 컴포넌트의 동일한 링으로 강제하지 않는다. 커스텀 표면은 2dp 링, Material
+  기본 컨트롤은 `focusRing`에서 파생한 12% 상태 레이어를 쓰며 hover와 다른 값으로 고정한다
+- `RoutexSurface`의 임의 `BorderRadius`·clip 주입을 제거하고 `field/card` 의미형 shape만
+  허용한다. `overlay`는 Surface variant가 아니라 `RoutexLayer.overlay`를 쓰는 앱 조합이다.
+  **Migration:** `radius: RoutexRadii.field`는 `shape: RoutexSurfaceShape.field`로 바꾼다.
+  `clip`은 실제 소비처가 없어 제거했으며, 임의 clipping이 필요하면 Surface 밖의 앱 조합이
+  소유한다
+- v1 전 공개 위젯은 기본 beta, foundation/layout은 proposal로 정한다. 51종에 같은 상태를
+  반복하지 않고 stable·deprecated 예외와 실제 migration이 생길 때만 기록한다
+- 장소 상세에서 주소 복사와 보행 시간 반복을 제거하고 `RoutexPlaceHeader`의 저장 옆에 선택적 공유
+  icon action을 추가했다. `RoutexEtaCard`의 공통 `경로 지우기` action은 제거하고 복수 경로용 `routeOptions`
+  slot을 추가했다
+- `RoutexBottomSheet.showHandle` 기본값을 false로 바꿨다. 실제 확장 gesture가 있는 소비 화면만
+  명시적으로 켠다. **Migration:** 확장형 시트는 `showHandle: true`, 고정형 시트는 변경하지 않는다
+- Showcase 메뉴에 `신상품` 속성 필터를 추가했다. 신상품은 원래 분류에도 남고, 신상품 필터에서는
+  NEW 배지를 행마다 반복하지 않는다
+- 검색 결과·최근 검색 카드의 위쪽 간격과 결과 머리 줄의 좌우 keyline을 줄에 맞췄다. 시트 헤더의
+  좌우 glyph 중심도 목록 아이콘 열과 일치시켰다
+- 영업시간은 반복 날짜를 제거하고 `요일 · 시간` 한 줄로 묶었다. GPS 약함은 작은 상태 badge로
+  낮추고, 경로 이탈은 자동 재탐색을 알리는 상단 error banner로 분리했다
+- Showcase의 저장 피드백과 검색 중 skeleton 중복 예시를 제거했다
+- 기존 골든을 바꾸지 않고 stroke·opacity·content measure·optical correction·feedback timing을
+  foundation 계약으로 승격했다. 제품 컴포넌트에 직접 시각 값이 다시 들어오지 않도록 source contract
+  test와 문서화된 optical-correction allowlist를 추가했다. **Migration:** `RoutexSkeleton.widthFactor`
+  대신 `width: RoutexSkeletonWidth.long/short`를 사용한다
 
 - `RoutexToast`/`RoutexToastSurface` 추가. 저장·복사·열기 실패의 결과를 말하는 자리가
   없어서, 앱은 시트에 가려 보이지 않는 SnackBar를 쓰고 있었다. 루트 Overlay에 한 개만
@@ -27,8 +58,8 @@ Navigation 앱과 대조해 **Runtime Kit에 없던 역할**을 채웠다. 기�
   화면마다 다시 만들어지던 자리다
 - `RoutexEtaCard`, `RoutexStepList`, `RoutexArrivalCard`, `RoutexTransitItinerary`,
   `RoutexTransitLegStrip` 추가. 계획·단계·도착·대중교통 후보는 안내 축에서 통째로 비어 있었다
-- `RoutexPlaceHeader`에 `supportingIcon` 추가. "어디인가" 다음 줄인 "어떻게 닿는가"(도보 4분)를
-  글리프와 함께 적는다
+- `RoutexPlaceHeader`에 `supportingIcon` 추가. 검색 결과·장소 요약의 "어떻게 닿는가"(도보 4분)를
+  글리프와 함께 적는다. 선택 뒤 상세 헤더에서는 이 줄을 반복하지 않는다
 - `RoutexMetrics`에 `thumbnail`(72)과 `mediaBand`(200) 추가. 행 안 사진과 상세 대표 사진이
   화면마다 다른 크기로 그려지던 값이다
 - `RoutexIcons`에 영업시간·링크·사진·정렬·대중교통 수단 의미 추가

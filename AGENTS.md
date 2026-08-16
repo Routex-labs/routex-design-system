@@ -8,8 +8,8 @@
 
 ## 디자인 시스템
 
-- 3인 팀에서 한 명이 디자인 시스템과 Promo Studio를 주로 운영한다는 전제로, v0.1은
-  토큰·핵심 컴포넌트 6~10개·Showcase·대표 적용 화면에만 집중한다.
+- 3인 팀에서 한 명이 디자인 시스템과 Promo Studio를 주로 운영한다는 전제로, 새 컴포넌트 수를
+  늘리기보다 현재 공개 API의 계약·검증과 Navigation의 수직 기능 단위 포팅을 우선한다.
 - 모든 기존 화면과 컴포넌트를 한 번에 재작성하거나 대규모 플랫폼을 먼저 만들지 않는다.
 - Runtime Kit과 Showcase는 같은 토큰과 실제 Flutter 컴포넌트를 사용한다.
 - primitive 값은 package 밖에 노출하지 않고 semantic token으로 소비한다.
@@ -21,13 +21,17 @@
 - 소비 앱은 release tag 또는 commit을 고정하고 `main` branch나 개인 로컬 경로에 의존하지 않는다.
 - WCAG 2.2 AA, focus·semantics, 2배 글자, 긴 한글, 빈 값, 로딩, 오류 상태를 컴포넌트
   완료 조건에 포함한다. APCA는 보조 진단으로만 사용한다.
-- 컴포넌트는 `proposal → beta → stable → deprecated → removed` 상태와 migration 경로를 갖는다.
-- 기존 UI는 사용량과 일관성을 기준으로 `stable / beta / deprecated / app-local`로 분류하고,
+- v1 전 공개 컴포넌트는 별도 예외가 없으면 모두 `beta`다. `stable`·`deprecated` 같은 예외만
+  상태 문서에 기록하고, migration은 breaking change나 deprecated API가 생길 때 작성한다.
+- 기존 UI는 사용량과 일관성을 기준으로 `proposal / beta / stable / deprecated / app-local`로 분류하고,
   호환 wrapper를 거쳐 점진적으로 교체한다.
 - 같은 역할의 텍스트·아이콘·콘텐츠는 화면이 달라도 같은 시작선, baseline, 내부 간격을
   사용한다. 임의 `EdgeInsets`, `SizedBox`와 화면별 `TextStyle`로 정렬을 보정하지 않는다.
 - 2px optical correction은 토큰으로 해결할 수 없는 시각 중심 보정에만 허용하고, 적용 대상과
   이유를 컴포넌트 문서 및 테스트에 남긴다.
+- 정적 HTML Showcase를 만들지 않는다. Flutter Showcase가 Runtime Kit 시각 검수의 단일 출처다.
+- 완료된 계획서와 중복 문서를 보관하지 않는다. 현재 계약은 `docs/README.md`가 지정한 단일
+  출처에만 기록하고 이력은 Git에서 확인한다.
 
 ## 프로모션 스튜디오
 
