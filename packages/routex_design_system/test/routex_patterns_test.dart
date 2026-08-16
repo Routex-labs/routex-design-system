@@ -502,6 +502,30 @@ void main() {
     });
   });
 
+  // 헤더 안 두 동작이 같은 평면에 있어야 한다. 하나만 타일 배경을 가지면 사용자는
+  // 둘을 서로 다른 종류의 컨트롤로 읽는다.
+  testWidgets('저장과 공유는 같은 평면에 선다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexPlaceHeader(
+            name: '스타벅스 리저브',
+            metadata: 'B2 · 카페',
+            onSaved: (_) {},
+            onShare: () {},
+          ),
+        ),
+      ),
+    );
+
+    final tones = tester
+        .widgetList<RoutexIconAction>(find.byType(RoutexIconAction))
+        .map((action) => action.tone)
+        .toSet();
+    expect(tones, {RoutexIconActionTone.quiet});
+  });
+
   // 모든 장소가 저장되는 것은 아니다. 저장은 식별자를 붙잡아 두는 일이라, 그것이
   // 없는 항목에는 담을 곳이 없다. 토글만 남겨 두면 눌러도 아무 일이 없는 버튼이 된다.
   testWidgets('저장할 수 없는 장소에는 저장 action을 두지 않는다', (tester) async {

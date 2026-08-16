@@ -143,6 +143,10 @@ class RoutexPlaceHeader extends StatelessWidget {
           RoutexIconAction(
             label: saved ? '저장 취소' : '장소 저장',
             icon: saved ? RoutexIcons.saved : RoutexIcons.save,
+            // 옆의 공유와 **같은 평면**이다. 헤더는 이미 배경을 가진 자리라 둘 다
+            // 타일을 두지 않는다. 하나만 타일을 가지면 서로 다른 컨트롤로 읽힌다.
+            // 저장 여부는 선택 상태가 그대로 드러낸다(틴트 배경 + 강조색 글리프).
+            tone: RoutexIconActionTone.quiet,
             selected: saved,
             onPressed: () => onSaved(!saved),
           ),
