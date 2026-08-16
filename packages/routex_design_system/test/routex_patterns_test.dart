@@ -573,27 +573,6 @@ void main() {
       expect(find.text('발렌시아가'), findsOneWidget);
     });
 
-    // 질문을 던져 놓고 "찾지 못했어요"라고 답하는 화면이 되면 안 된다. 되물음은
-    // 결론이 아니라 진행 중이다.
-    testWidgets('되물음은 행이 없어도 빈손 화면이 아니다', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          theme: RoutexTheme.light,
-          home: const Scaffold(
-            body: RoutexResultList(
-              status: RoutexResultStatus.clarify,
-              statusMessage: '어떤 종류를 찾으세요?',
-              children: [],
-            ),
-          ),
-        ),
-      );
-
-      expect(find.text('어떤 종류를 찾으세요?'), findsOneWidget);
-      expect(find.byType(RoutexEmptyState), findsNothing);
-      expect(find.byType(RoutexSkeletonList), findsNothing);
-    });
-
     // 조용히 ready로 그리면 사용자는 지금 보는 것이 전부라고 읽는다.
     testWidgets('일부만 가져왔을 때는 남은 결과를 세우고 무엇이 빠졌는지 알린다', (tester) async {
       await tester.pumpWidget(

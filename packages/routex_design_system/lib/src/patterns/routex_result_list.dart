@@ -18,13 +18,6 @@ enum RoutexResultStatus {
   /// 한 줄로 말한다.
   loading,
 
-  /// 후보가 넓어 **먼저 되묻는 중**이다.
-  ///
-  /// 행이 하나도 없어도 빈손이 아니다. 이 상태를 [empty]로 그리면 질문을 던져 놓고
-  /// "찾지 못했어요"라고 답하는 화면이 된다. 질문은 상태 문장이 말하고, 선택지 칩은
-  /// 소비 앱이 이 목록 옆에 조합한다.
-  clarify,
-
   /// 찾지 못했고 **더 시도할 경로가 없다.**
   ///
   /// 이 상태를 너무 일찍 쓰면 안 된다. 1차 검색이 빈손이지만 2차가 남아 있는
@@ -96,9 +89,8 @@ class RoutexResultList extends StatelessWidget {
   final String? emptyActionLabel;
   final VoidCallback? onEmptyAction;
 
-  /// [RoutexResultStatus.clarify]·[RoutexResultStatus.degraded]·
-  /// [RoutexResultStatus.error]가 말할 문장이다. 상태마다 뜻이 다르다 — 되물음에서는
-  /// 질문, 나머지 둘에서는 무엇이 잘못됐는지다.
+  /// [RoutexResultStatus.degraded]·[RoutexResultStatus.error]가 말할 문장이다.
+  /// 무엇이 잘못됐는지를 적는다.
   final String? statusMessage;
 
   /// [RoutexResultStatus.error]에서 다시 시도할 수 있으면 준다.
@@ -167,25 +159,6 @@ class RoutexResultList extends StatelessWidget {
             onAction: onEmptyAction,
           ),
           RoutexResultStatus.ready => _rows,
-          // 질문은 결론이 아니다. 행이 없어도 빈손 화면으로 떨어뜨리지 않는다.
-          RoutexResultStatus.clarify => RoutexStack(
-            gap: RoutexStackGap.control,
-            children: [
-              if (statusMessage case final question?)
-                Padding(
-                  padding: const EdgeInsetsDirectional.symmetric(
-                    horizontal: RoutexSpacing.contentGap,
-                  ),
-                  child: Text(
-                    question,
-                    style: RoutexTypography.bodyStrong.copyWith(
-                      color: colors.contentPrimary,
-                    ),
-                  ),
-                ),
-              if (children.isNotEmpty) _rows,
-            ],
-          ),
           // 남은 결과는 그대로 세우고, 무엇이 빠졌는지만 위에 얹는다.
           RoutexResultStatus.degraded => RoutexStack(
             gap: RoutexStackGap.control,
