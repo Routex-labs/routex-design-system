@@ -23,8 +23,9 @@ final _rawVisualRules = <String, RegExp>{
   '직접 Material 색상': RegExp(r'\bColors\.(?!transparent\b)'),
   '직접 글자 크기': RegExp(r'\bfontSize:\s*-?(?:\d|\.\d)'),
   '직접 시각 크기': RegExp(
-    r'\b(?:width|height|size|minWidth|maxWidth|minHeight|maxHeight|thickness|blurRadius|spreadRadius|elevation):\s*-?(?:\d|\.\d)',
+    r'\b(?:width|strokeWidth|height|size|minWidth|maxWidth|minHeight|maxHeight|thickness|blurRadius|spreadRadius|elevation):\s*-?(?:\d|\.\d)',
   ),
+  '직접 Size 위치 인자': RegExp(r'\bSize\(\s*-?(?:\d|\.\d)'),
   '직접 투명도': RegExp(r'\b(?:alpha|opacity):\s*-?(?:\d|\.\d)'),
   '직접 inset': RegExp(
     r'\bEdgeInsets(?:Directional)?\.[^(]+\([^\n)]*(?<![A-Za-z0-9_])(?:\d|\.\d)',
@@ -40,6 +41,92 @@ final _rawVisualRules = <String, RegExp>{
   '직접 비율': RegExp(r'(?<![A-Za-z0-9_])(?:0?\.\d+)'),
 };
 
+/// 주석과 문자열을 공백으로 바꿔 원래 줄 번호를 유지한 실행 코드만 남긴다.
+String _codeOnly(String source) {
+  final output = StringBuffer();
+  var index = 0;
+  var blockDepth = 0;
+  String? quote;
+  var triple = false;
+
+  while (index < source.length) {
+    final char = source[index];
+    final next = index + 1 < source.length ? source[index + 1] : '';
+
+    if (blockDepth > 0) {
+      if (char == '/' && next == '*') {
+        blockDepth++;
+        output.write('  ');
+        index += 2;
+      } else if (char == '*' && next == '/') {
+        blockDepth--;
+        output.write('  ');
+        index += 2;
+      } else {
+        output.write(char == '\n' ? '\n' : ' ');
+        index++;
+      }
+      continue;
+    }
+
+    if (quote != null) {
+      final closesTriple =
+          triple && source.startsWith('$quote$quote$quote', index);
+      if (closesTriple) {
+        output.write('   ');
+        index += 3;
+        quote = null;
+        triple = false;
+      } else if (!triple && char == quote) {
+        output.write(' ');
+        index++;
+        quote = null;
+      } else if (char == r'\' && index + 1 < source.length) {
+        output.write('  ');
+        index += 2;
+      } else {
+        output.write(char == '\n' ? '\n' : ' ');
+        index++;
+      }
+      continue;
+    }
+
+    if (char == '/' && next == '/') {
+      while (index < source.length && source[index] != '\n') {
+        output.write(' ');
+        index++;
+      }
+    } else if (char == '/' && next == '*') {
+      blockDepth = 1;
+      output.write('  ');
+      index += 2;
+    } else if (char == "'" || char == '"') {
+      quote = char;
+      triple = source.startsWith('$char$char$char', index);
+      final length = triple ? 3 : 1;
+      output.write(List.filled(length, ' ').join());
+      index += length;
+    } else {
+      output.write(char);
+      index++;
+    }
+  }
+  return output.toString();
+}
+
+List<File> _guardedFiles() => <File>[
+  for (final directory in const [
+    'lib/src/components',
+    'lib/src/patterns',
+    'lib/src/layout',
+  ])
+    ...Directory(directory)
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((file) => file.path.endsWith('.dart')),
+  File('lib/src/theme/routex_theme.dart'),
+];
+
 void main() {
   test('source guard 규칙 자체가 대표 직접 값을 모두 거부한다', () {
     final samples = <String, String>{
@@ -47,6 +134,7 @@ void main() {
       '직접 Material 색상': 'color: Colors.red',
       '직접 글자 크기': 'fontSize: 15',
       '직접 시각 크기': 'maxWidth: 333',
+      '직접 Size 위치 인자': 'Size(64, tokenHeight)',
       '직접 투명도': 'alpha: 0.4',
       '직접 inset': 'padding: EdgeInsets.all(7)',
       '직접 radius': 'radius: Radius.circular(7)',
@@ -70,22 +158,12 @@ void main() {
     );
   });
 
-  test('components·patterns·layout은 foundation 밖의 직접 시각 값을 만들지 않는다', () {
-    final files = <File>[
-      for (final directory in const [
-        'lib/src/components',
-        'lib/src/patterns',
-        'lib/src/layout',
-      ])
-        ...Directory(directory)
-            .listSync(recursive: true)
-            .whereType<File>()
-            .where((file) => file.path.endsWith('.dart')),
-    ];
+  test('runtime UI와 theme은 foundation 밖의 직접 시각 값을 만들지 않는다', () {
+    final files = _guardedFiles();
 
     final violations = <String>[];
     for (final file in files) {
-      final source = file.readAsStringSync();
+      final source = _codeOnly(file.readAsStringSync());
       for (final entry in _rawVisualRules.entries) {
         for (final match in entry.value.allMatches(source)) {
           final line =
@@ -102,18 +180,16 @@ void main() {
     );
   });
 
+  test('주석·문자열에 적힌 수치는 source guard 대상이 아니다', () {
+    final source = _codeOnly("// width: 7\nfinal note = 'Size(64, 48)';\n");
+    expect(
+      _rawVisualRules.values.any((rule) => rule.hasMatch(source)),
+      isFalse,
+    );
+  });
+
   test('Transform 기반 optical correction은 이유와 제거 조건이 있는 파일만 쓴다', () {
-    final files = <File>[
-      for (final directory in const [
-        'lib/src/components',
-        'lib/src/patterns',
-        'lib/src/layout',
-      ])
-        ...Directory(directory)
-            .listSync(recursive: true)
-            .whereType<File>()
-            .where((file) => file.path.endsWith('.dart')),
-    ];
+    final files = _guardedFiles();
 
     final actual = <String, int>{};
     for (final file in files) {

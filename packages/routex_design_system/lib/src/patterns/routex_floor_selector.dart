@@ -162,7 +162,9 @@ class _FloorItem extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
+      focusable: true,
       label: option.label,
+      onTap: onPressed,
       excludeSemantics: true,
       child: DecoratedBox(
         decoration: BoxDecoration(

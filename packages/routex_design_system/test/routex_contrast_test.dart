@@ -4,6 +4,38 @@ import 'package:routex_design_system/routex_design_system.dart';
 
 import 'support/wcag_contrast.dart';
 
+const _rolesWithContrastContract = <RoutexColorRole>{
+  RoutexColorRole.surfaceCanvas,
+  RoutexColorRole.surfaceBase,
+  RoutexColorRole.surfaceRaised,
+  RoutexColorRole.contentPrimary,
+  RoutexColorRole.contentSecondary,
+  RoutexColorRole.contentDisabled,
+  RoutexColorRole.contentInverse,
+  RoutexColorRole.actionPrimary,
+  RoutexColorRole.actionPrimaryPressed,
+  RoutexColorRole.actionPrimarySubtle,
+  RoutexColorRole.accentBrand,
+  RoutexColorRole.borderSubtle,
+  RoutexColorRole.borderStrong,
+  RoutexColorRole.statusInfo,
+  RoutexColorRole.statusSuccess,
+  RoutexColorRole.statusWarning,
+  RoutexColorRole.statusError,
+  RoutexColorRole.statusInfoSubtle,
+  RoutexColorRole.statusSuccessSubtle,
+  RoutexColorRole.statusWarningSubtle,
+  RoutexColorRole.statusErrorSubtle,
+  RoutexColorRole.focusRing,
+};
+
+const _contrastExemptRoles = <RoutexColorRole>{
+  RoutexColorRole.actionDisabled,
+  RoutexColorRole.shadow,
+  RoutexColorRole.shadowStrong,
+  RoutexColorRole.scrim,
+};
+
 /// 색 역할이 늘어날 때 제일 먼저 조용히 어긋나는 것이 대비다.
 ///
 /// 색을 고를 때는 나란히 놓고 보지만, 실제로 겹치는 조합은 컴포넌트 안에서 정해진다.
@@ -19,6 +51,18 @@ import 'support/wcag_contrast.dart';
 ///   비활성·장식   면제
 void main() {
   const colors = RoutexColorTokens.light;
+
+  test('색 역할은 대비 계약 또는 면제 중 하나에 전수 등록된다', () {
+    expect(
+      _rolesWithContrastContract.intersection(_contrastExemptRoles),
+      isEmpty,
+    );
+    expect(
+      _rolesWithContrastContract.union(_contrastExemptRoles),
+      RoutexColorRole.values.toSet(),
+      reason: '새 color role은 대비 계약에 추가하거나 면제 근거를 적어야 한다',
+    );
+  });
 
   // 글자가 실제로 올라가는 자리다. 배경은 그 글자가 놓이는 표면이고, 겹치는 조합만
   // 적는다. 예를 들어 contentPrimary는 선택된 목록·경로 카드에서 actionPrimarySubtle

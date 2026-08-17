@@ -80,7 +80,9 @@ class RoutexSearchBar extends StatelessWidget {
                   ? Semantics(
                       button: true,
                       enabled: onSearchPressed != null,
+                      focusable: onSearchPressed != null,
                       label: placeholder,
+                      onTap: onSearchPressed,
                       excludeSemantics: true,
                       child: InkWell(
                         onTap: onSearchPressed,
@@ -121,7 +123,7 @@ class RoutexSearchBar extends StatelessWidget {
               SizedBox.square(
                 dimension: RoutexMetrics.iconMedium,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: RoutexStroke.emphasis,
                   color: colors.actionPrimary,
                 ),
               ),

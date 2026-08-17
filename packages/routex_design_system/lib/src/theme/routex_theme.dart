@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../foundations/routex_metrics.dart';
 import '../foundations/routex_typography.dart';
 import 'routex_color_tokens.dart';
 
@@ -43,7 +44,9 @@ abstract final class RoutexTheme {
       // Material 기본 컨트롤은 선택 채움과 구분되는 옅은 focus state layer를
       // 사용한다. 경계가 있는 커스텀 표면은 RoutexFocusRing이 같은 token의
       // 불투명한 2dp 링을 그린다.
-      focusColor: colors.focusRing.withValues(alpha: 0.12),
+      focusColor: colors.focusRing.withValues(
+        alpha: RoutexOpacity.focusStateLayer,
+      ),
       dividerColor: colors.borderSubtle,
       disabledColor: colors.contentDisabled,
     );

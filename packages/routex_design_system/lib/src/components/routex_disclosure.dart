@@ -180,7 +180,9 @@ class RoutexShowMore extends StatelessWidget {
     return Semantics(
       button: true,
       expanded: expanded,
+      focusable: true,
       label: label,
+      onTap: () => onExpanded(!expanded),
       excludeSemantics: true,
       child: TextButton(
         onPressed: () => onExpanded(!expanded),
@@ -198,7 +200,9 @@ class RoutexShowMore extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Flexible(child: Text(label, maxLines: 1)),
+            Flexible(
+              child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
             AnimatedRotation(
               turns: expanded ? RoutexMotion.disclosureExpandedTurns : 0,
               duration: RoutexMotion.effectiveDuration(

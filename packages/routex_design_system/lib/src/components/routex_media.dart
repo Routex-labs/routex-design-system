@@ -43,6 +43,16 @@ class _RoutexMediaCarouselState extends State<RoutexMediaCarousel> {
   int _index = 0;
 
   @override
+  void didUpdateWidget(covariant RoutexMediaCarousel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.items.isEmpty) {
+      _index = 0;
+    } else if (_index >= widget.items.length) {
+      _index = widget.items.length - 1;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.items.isEmpty) return const SizedBox.shrink();
     final colors = context.routexColors;
@@ -139,7 +149,9 @@ class RoutexPhotoGrid extends StatelessWidget {
         if (onSelected == null) return frame;
         return Semantics(
           button: true,
+          focusable: true,
           label: items[index].semanticLabel ?? '사진 ${index + 1}',
+          onTap: () => onSelected!(index),
           excludeSemantics: true,
           child: InkWell(
             onTap: () => onSelected!(index),

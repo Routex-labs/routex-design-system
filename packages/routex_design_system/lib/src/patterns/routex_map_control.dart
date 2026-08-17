@@ -82,7 +82,9 @@ class RoutexMapControl extends StatelessWidget {
       // neutral·accent는 선택이라는 개념이 없는 자리다. false를 선언하면 낭독기가
       // "선택 안 됨"을 읽어, 고를 수 있는 것처럼 들린다.
       selected: filled ? true : null,
+      focusable: enabled,
       label: label,
+      onTap: enabled ? onPressed : null,
       excludeSemantics: true,
       child: Tooltip(
         message: label,

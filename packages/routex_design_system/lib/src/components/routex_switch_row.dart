@@ -48,7 +48,9 @@ class RoutexSwitchRow extends StatelessWidget {
       container: true,
       toggled: value,
       enabled: enabled,
+      focusable: enabled,
       label: _hasDescription ? '$title, $description' : title,
+      onTap: enabled ? () => onChanged!(!value) : null,
       excludeSemantics: true,
       child: RoutexFocusRing(
         radius: RoutexRadii.field,

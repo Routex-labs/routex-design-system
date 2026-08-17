@@ -184,7 +184,9 @@ class _CopyAction extends StatelessWidget {
 
     return Semantics(
       button: true,
+      focusable: true,
       label: '$label 복사',
+      onTap: () => _copy(context),
       excludeSemantics: true,
       child: TextButton(
         onPressed: () => _copy(context),

@@ -21,6 +21,8 @@ enum RoutexMetricRole {
 
 /// 컴포넌트가 임의 높이와 아이콘 크기를 만들지 않게 하는 공통 metric이다.
 abstract final class RoutexMetrics {
+  static const minimumInlineActionWidth = 0.0;
+  static const minimumButtonWidth = 64.0;
   static const compactControl = 32.0;
   static const standardControl = 44.0;
   static const minimumTouchTarget = 48.0;
@@ -84,6 +86,7 @@ abstract final class RoutexOpticalCorrection {
 ///
 /// 색 자체는 color token이 정하고, 이 값은 어떤 역할로 겹쳐 보이는지만 정한다.
 abstract final class RoutexOpacity {
+  static const focusStateLayer = 0.12;
   static const subtleOutline = 0.24;
   static const sheetHandle = 0.55;
 }

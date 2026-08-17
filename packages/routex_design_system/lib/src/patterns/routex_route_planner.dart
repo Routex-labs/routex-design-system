@@ -116,7 +116,9 @@ class _RouteLocationField extends StatelessWidget {
           child: Semantics(
             button: true,
             enabled: onPressed != null,
+            focusable: onPressed != null,
             label: label,
+            onTap: onPressed,
             excludeSemantics: true,
             child: InkWell(
               onTap: onPressed,
