@@ -488,17 +488,38 @@ void main() {
       );
       expect(
         withHandle,
-        greaterThan(withoutHandle),
-        reason: 'handle이 있으면 handle 자체가 위쪽 여백을 만든다',
+        RoutexSpacing.controlGap * 2 + RoutexSpacing.inlineGap,
+        reason: 'handle이 있으면 handle 자체가 위아래 여백을 만든다',
       );
     });
 
     // 본문이 스크롤하는 시트는 handle을 표면 위가 아니라 스크롤 콘텐츠 안에 둬야
     // 실제로 끌린다. 그러려면 handle이 표면과 따로 설 수 있어야 한다.
-    testWidgets('handle은 표면 밖 본문 안에서도 같은 표시를 그린다', (tester) async {
-      await pump(
+    //
+    // 표시만 따라 나오면 모자란다. 표면이 여백을 소유하던 시절에는 본문 안으로
+    // 옮기는 순간 위쪽 여백이 0이 되어 handle이 시트 맨 윗줄에 붙었다. 두 경로가
+    // 같은 자리를 그린다는 것이 이 위젯을 나눈 이유이므로 좌표로 고정한다.
+    testWidgets('handle은 표면이 그리든 본문이 그리든 같은 자리에 선다', (tester) async {
+      Future<double> handleTop(WidgetTester tester, Widget sheet) async {
+        await pump(tester, sheet);
+        final surface = tester.getRect(find.byType(RoutexBottomSheet));
+        final handle = tester.getRect(
+          find.byKey(RoutexBottomSheet.handleKey),
+        );
+        return handle.top - surface.top;
+      }
+
+      final bySurface = await handleTop(
+        tester,
+        const RoutexBottomSheet(showHandle: true, child: SizedBox(height: 40)),
+      );
+
+      // 스크롤하는 시트의 실제 조합이다. 표면은 여백을 내주고 본문 조각이 저마다
+      // 갖는다.
+      final byContent = await handleTop(
         tester,
         const RoutexBottomSheet(
+          contentInset: RoutexBottomSheetContentInset.content,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [RoutexSheetHandle(), SizedBox(height: 40)],
@@ -506,7 +527,12 @@ void main() {
         ),
       );
 
-      expect(find.byKey(RoutexBottomSheet.handleKey), findsOneWidget);
+      expect(bySurface, RoutexSpacing.controlGap);
+      expect(
+        byContent,
+        bySurface,
+        reason: 'handle 위 여백은 누가 그리든 같아야 한다',
+      );
     });
 
     // 대표 사진처럼 가장자리까지 닿아야 하는 조각이 있는 시트가 있다. 표면이 여백을

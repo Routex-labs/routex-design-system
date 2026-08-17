@@ -58,28 +58,35 @@ class RoutexBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
-    final leading = <Widget>[
-      if (showHandle) const RoutexSheetHandle(),
-      ?header,
-    ];
 
-    final content = leading.isEmpty
-        ? child
-        : expand
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final widget in leading) ...[
-                widget,
-                const SizedBox(height: RoutexSpacing.controlGap),
-              ],
-              Expanded(child: child),
-            ],
-          )
-        : RoutexStack(
-            gap: RoutexStackGap.control,
-            children: [...leading, child],
-          );
+    var content = switch (header) {
+      null => child,
+      final header when expand => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          header,
+          const SizedBox(height: RoutexSpacing.controlGap),
+          Expanded(child: child),
+        ],
+      ),
+      final header => RoutexStack(
+        gap: RoutexStackGap.control,
+        children: [header, child],
+      ),
+    };
+
+    if (showHandle) {
+      // handle 위아래 여백은 표면이 아니라 handle이 갖는다. 표면이 얹으면 본문이
+      // handle을 소유할 때(스크롤하는 시트)와 자리가 달라진다.
+      content = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
+        children: [
+          const RoutexSheetHandle(),
+          if (expand) Expanded(child: content) else content,
+        ],
+      );
+    }
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -99,15 +106,13 @@ class RoutexBottomSheet extends StatelessWidget {
         child: Material(
           type: MaterialType.transparency,
           child: Padding(
-            // handle은 그 자체가 위쪽 여백처럼 읽히므로 8, handle 없이 header나 본문이
-            // 바로 오면 컴포넌트 여백 16을 쓴다.
+            // handle이 있으면 위쪽 여백은 handle이 가져가므로 표면은 0, handle 없이
+            // header나 본문이 바로 오면 컴포넌트 여백 16을 쓴다.
             padding: switch (contentInset) {
               RoutexBottomSheetContentInset.surface =>
                 EdgeInsetsDirectional.fromSTEB(
                   RoutexSpacing.componentPadding,
-                  showHandle
-                      ? RoutexSpacing.controlGap
-                      : RoutexSpacing.componentPadding,
+                  showHandle ? 0 : RoutexSpacing.componentPadding,
                   RoutexSpacing.componentPadding,
                   RoutexSpacing.sectionGap,
                 ),
@@ -133,22 +138,30 @@ class RoutexBottomSheet extends StatelessWidget {
 ///
 /// 본문이 스크롤하지 않는 시트라면 `RoutexBottomSheet.showHandle`이 같은 것을
 /// 같은 자리에 그린다. 어느 쪽이든 **끌 수 있는 시트에만** 둔다.
+///
+/// **위아래 여백은 이 위젯이 갖는다.** 표면이 여백을 대신 넣으면 표면 위에 그릴
+/// 때와 본문 안에 그릴 때 자리가 달라진다. 실제로 처음 나뉘었을 때 본문이 소유한
+/// handle이 표면 맨 윗줄에 붙었던 것이 그 차이였다. 그래서 본문이 소유하는
+/// 시트는 이 위젯만 두면 되고, 앞뒤에 `SizedBox`나 `Padding`을 덧대지 않는다.
 class RoutexSheetHandle extends StatelessWidget {
   const RoutexSheetHandle({super.key});
 
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
-    return Align(
-      child: Container(
-        key: RoutexBottomSheet.handleKey,
-        width: RoutexMetrics.compactControl,
-        height: RoutexSpacing.inlineGap,
-        decoration: BoxDecoration(
-          color: colors.borderStrong.withValues(
-            alpha: RoutexOpacity.sheetHandle,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: RoutexSpacing.controlGap),
+      child: Align(
+        child: Container(
+          key: RoutexBottomSheet.handleKey,
+          width: RoutexMetrics.compactControl,
+          height: RoutexSpacing.inlineGap,
+          decoration: BoxDecoration(
+            color: colors.borderStrong.withValues(
+              alpha: RoutexOpacity.sheetHandle,
+            ),
+            borderRadius: RoutexRadii.full,
           ),
-          borderRadius: RoutexRadii.full,
         ),
       ),
     );
