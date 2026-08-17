@@ -298,6 +298,50 @@ class _ComponentsPageState extends State<ComponentsPage> {
                   ),
                 ),
               ),
+              // 본문이 스크롤하는 시트는 handle을 표면 위가 아니라 스크롤 콘텐츠
+              // 안에 둬야 실제로 끌린다. 그 경로가 여기 없던 동안, 본문이 소유한
+              // handle이 표면 맨 윗줄에 붙는 것을 카탈로그에서 볼 수 없었다.
+              // 왼쪽 두 틀과 handle 자리가 같은지가 이 틀의 판정 기준이다.
+              MobileFrame(
+                label: '본문이 handle을 소유하는 시트',
+                surface: MobileFrameSurface.map,
+                child: RoutexBottomSheet(
+                  contentInset: RoutexBottomSheetContentInset.content,
+                  child: SizedBox(
+                    height: _scrollingSheetHeight,
+                    child: ListView(
+                      padding: const EdgeInsetsDirectional.only(
+                        bottom: RoutexSpacing.sectionGap,
+                      ),
+                      children: [
+                        const RoutexSheetHandle(),
+                        Padding(
+                          padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: RoutexSpacing.componentPadding,
+                          ),
+                          child: RoutexSheetHeader(
+                            title: '뷰티',
+                            onBack: () {},
+                            onClose: () {},
+                          ),
+                        ),
+                        const SizedBox(height: RoutexSpacing.controlGap),
+                        const Padding(
+                          padding: EdgeInsetsDirectional.symmetric(
+                            horizontal: RoutexSpacing.componentPadding,
+                          ),
+                          child: RoutexListCell(
+                            title: 'MAC',
+                            subtitle: '1F · 화장품·향수',
+                            leadingIcon: RoutexIcons.saved,
+                            onPressed: _noop,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -666,6 +710,12 @@ class _ComponentsPageState extends State<ComponentsPage> {
 }
 
 void _noop() {}
+
+/// 스크롤하는 시트 틀의 높이다.
+///
+/// 카탈로그 틀은 내용만큼 늘어나므로, 잘라 두지 않으면 스크롤이 생기지 않아 그
+/// 경로의 handle을 보여 주는 뜻이 없어진다.
+const _scrollingSheetHeight = 180.0;
 
 /// 제품 폭 틀을 가로 공간이 허용하는 만큼 나란히 흘린다.
 ///
