@@ -17,6 +17,7 @@ class RoutexPlaceHeader extends StatelessWidget {
     this.saved = false,
     this.onSaved,
     this.onShare,
+    this.onClose,
     this.supportingText,
     this.supportingIcon,
     this.leadingIcon,
@@ -42,6 +43,9 @@ class RoutexPlaceHeader extends StatelessWidget {
   /// 장소 식별 링크를 공유한다. 링크 생성과 플랫폼 공유 시트는 소비 앱이 맡는다.
   /// null이면 공유 계약이 준비되지 않은 화면이라 action을 숨긴다.
   final VoidCallback? onShare;
+
+  /// 상세 표면을 닫는다. 상세의 X는 이름과 같은 줄 끝에 둔다.
+  final VoidCallback? onClose;
 
   /// null이면 **저장할 수 없는 장소**라 action을 숨긴다.
   ///
@@ -156,6 +160,24 @@ class RoutexPlaceHeader extends StatelessWidget {
             label: expanded ? '상세 닫기' : '상세 열기',
             icon: expanded ? RoutexIcons.expand : RoutexIcons.collapse,
             onPressed: onToggleExpanded,
+          ),
+        ],
+        if (onClose != null) ...[
+          if (onShare != null || onSaved != null || onToggleExpanded != null)
+            const SizedBox(width: RoutexSpacing.inlineGap),
+          Transform.translate(
+            offset: Offset(
+              Directionality.of(context) == TextDirection.ltr
+                  ? RoutexOpticalCorrection.placeTrailingActionEnd
+                  : -RoutexOpticalCorrection.placeTrailingActionEnd,
+              0,
+            ),
+            child: RoutexIconAction(
+              label: '닫기',
+              icon: RoutexIcons.close,
+              tone: RoutexIconActionTone.quiet,
+              onPressed: onClose,
+            ),
           ),
         ],
       ],

@@ -9,6 +9,8 @@ import '../components/routex_surface.dart';
 import '../theme/routex_color_tokens.dart';
 import 'routex_travel_mode_bar.dart';
 
+enum RoutexRouteField { origin, destination }
+
 /// 출발지 → 목적지 → 가능한 이동수단 순서를 고정하는 경로 계획 패턴이다.
 class RoutexRoutePlanner extends StatelessWidget {
   const RoutexRoutePlanner({
@@ -21,8 +23,17 @@ class RoutexRoutePlanner extends StatelessWidget {
     this.onDestinationPressed,
     this.onClose,
     this.onDestinationMore,
+    this.editingField,
+    this.editingController,
+    this.editingFocusNode,
+    this.editingFieldKey,
+    this.onEditingChanged,
+    this.onEditingSubmitted,
     super.key,
-  });
+  }) : assert(
+         editingField == null || editingController != null,
+         '편집 행은 controller가 필요하다',
+       );
 
   final String originLabel;
   final String destinationLabel;
@@ -33,6 +44,12 @@ class RoutexRoutePlanner extends StatelessWidget {
   final VoidCallback? onDestinationPressed;
   final VoidCallback? onClose;
   final VoidCallback? onDestinationMore;
+  final RoutexRouteField? editingField;
+  final TextEditingController? editingController;
+  final FocusNode? editingFocusNode;
+  final Key? editingFieldKey;
+  final ValueChanged<String>? onEditingChanged;
+  final ValueChanged<String>? onEditingSubmitted;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +69,18 @@ class RoutexRoutePlanner extends StatelessWidget {
             _RouteLocationField(
               label: originLabel,
               destination: false,
+              editing: editingField == RoutexRouteField.origin,
+              controller: editingField == RoutexRouteField.origin
+                  ? editingController
+                  : null,
+              focusNode: editingField == RoutexRouteField.origin
+                  ? editingFocusNode
+                  : null,
+              editingKey: editingField == RoutexRouteField.origin
+                  ? editingFieldKey
+                  : null,
+              onChanged: onEditingChanged,
+              onSubmitted: onEditingSubmitted,
               onPressed: onOriginPressed,
               actionLabel: '경로 계획 닫기',
               actionIcon: RoutexIcons.close,
@@ -61,13 +90,25 @@ class RoutexRoutePlanner extends StatelessWidget {
             _RouteLocationField(
               label: destinationLabel,
               destination: true,
+              editing: editingField == RoutexRouteField.destination,
+              controller: editingField == RoutexRouteField.destination
+                  ? editingController
+                  : null,
+              focusNode: editingField == RoutexRouteField.destination
+                  ? editingFocusNode
+                  : null,
+              editingKey: editingField == RoutexRouteField.destination
+                  ? editingFieldKey
+                  : null,
+              onChanged: onEditingChanged,
+              onSubmitted: onEditingSubmitted,
               onPressed: onDestinationPressed,
               actionLabel: '목적지 더보기',
               actionIcon: RoutexIcons.more,
               onAction: onDestinationMore,
             ),
             if (travelModes.isNotEmpty) ...[
-              const SizedBox(height: RoutexSpacing.controlGap),
+              const SizedBox(height: RoutexSpacing.inlineGap),
               RoutexTravelModeBar(
                 options: travelModes,
                 selectedId: selectedTravelModeId,
@@ -85,6 +126,12 @@ class _RouteLocationField extends StatelessWidget {
   const _RouteLocationField({
     required this.label,
     required this.destination,
+    required this.editing,
+    required this.controller,
+    required this.focusNode,
+    required this.editingKey,
+    required this.onChanged,
+    required this.onSubmitted,
     required this.onPressed,
     required this.actionLabel,
     required this.actionIcon,
@@ -93,6 +140,12 @@ class _RouteLocationField extends StatelessWidget {
 
   final String label;
   final bool destination;
+  final bool editing;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final Key? editingKey;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final VoidCallback? onPressed;
   final String actionLabel;
   final IconData actionIcon;
@@ -120,54 +173,92 @@ class _RouteLocationField extends StatelessWidget {
         ),
         const SizedBox(width: RoutexSpacing.contentGap),
         Expanded(
-          child: Semantics(
-            button: true,
-            enabled: onPressed != null,
-            focusable: onPressed != null,
-            label: label,
-            onTap: onPressed,
-            excludeSemantics: true,
-            child: InkWell(
-              onTap: onPressed,
-              borderRadius: RoutexRadii.control,
-              // focus는 theme의 focus state layer를, hover는 중립적인 제품 tint를
-              // 쓴다. 둘을 같은 채움으로 두면 키보드 초점을 구분할 수 없다.
-              focusColor: Theme.of(context).focusColor,
-              hoverColor: colors.actionPrimarySubtle,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  minHeight: RoutexMetrics.minimumTouchTarget,
-                ),
-                child: Padding(
-                  // 두 칸의 강조 영역이 같은 여백을 갖도록 텍스트 열 안쪽에서
-                  // 여백을 준다. 칸마다 다르면 hover·focus 폭이 달라 보인다.
-                  padding: const EdgeInsetsDirectional.symmetric(
-                    horizontal: RoutexSpacing.controlGap,
+          child: editing
+              ? KeyedSubtree(
+                  key: editingKey,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                      minHeight: RoutexMetrics.minimumTouchTarget,
+                    ),
+                    child: Center(
+                      child: TextField(
+                        controller: controller,
+                        focusNode: focusNode,
+                        autofocus: true,
+                        onChanged: onChanged,
+                        onSubmitted: onSubmitted,
+                        textInputAction: TextInputAction.search,
+                        maxLines: 1,
+                        style: RoutexTypography.label,
+                        decoration: InputDecoration(
+                          hintText: destination ? '도착지를 입력하세요' : '출발지를 입력하세요',
+                          hintStyle: RoutexTypography.label.copyWith(
+                            color: colors.contentSecondary,
+                          ),
+                          filled: false,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          isDense: true,
+                          contentPadding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: RoutexSpacing.controlGap,
+                            vertical: RoutexSpacing.contentGap,
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Text(
-                      label,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: RoutexTypography.label,
+                )
+              : Semantics(
+                  button: true,
+                  enabled: onPressed != null,
+                  focusable: onPressed != null,
+                  label: label,
+                  onTap: onPressed,
+                  excludeSemantics: true,
+                  child: InkWell(
+                    onTap: onPressed,
+                    borderRadius: RoutexRadii.control,
+                    // focus는 theme의 focus state layer를, hover는 중립적인 제품 tint를
+                    // 쓴다. 둘을 같은 채움으로 두면 키보드 초점을 구분할 수 없다.
+                    focusColor: Theme.of(context).focusColor,
+                    hoverColor: colors.actionPrimarySubtle,
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minHeight: RoutexMetrics.minimumTouchTarget,
+                      ),
+                      child: Padding(
+                        // 두 칸의 강조 영역이 같은 여백을 갖도록 텍스트 열 안쪽에서
+                        // 여백을 준다. 칸마다 다르면 hover·focus 폭이 달라 보인다.
+                        padding: const EdgeInsetsDirectional.symmetric(
+                          horizontal: RoutexSpacing.controlGap,
+                        ),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            label,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: RoutexTypography.label,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
         ),
         SizedBox.square(
           dimension: RoutexMetrics.minimumTouchTarget,
-          child: IconButton(
-            tooltip: actionLabel,
-            onPressed: onAction,
-            padding: EdgeInsets.zero,
-            iconSize: RoutexMetrics.iconMedium,
-            color: colors.contentSecondary,
-            icon: Icon(actionIcon),
-          ),
+          child: onAction == null
+              ? null
+              : IconButton(
+                  tooltip: actionLabel,
+                  onPressed: onAction,
+                  padding: EdgeInsets.zero,
+                  iconSize: RoutexMetrics.iconMedium,
+                  color: colors.contentSecondary,
+                  icon: Icon(actionIcon),
+                ),
         ),
       ],
     );

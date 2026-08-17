@@ -186,9 +186,11 @@ class RoutexListCell extends StatelessWidget {
               child: Padding(
                 // 선택·hover 배경이 행 전체를 덮으므로 좌우 여백도 행이 가진다.
                 // 세로 여백만 주면 배경 안에서 텍스트가 한쪽으로 붙어 보인다.
-                padding: const EdgeInsetsDirectional.symmetric(
+                padding: EdgeInsetsDirectional.symmetric(
                   horizontal: RoutexSpacing.contentGap,
-                  vertical: RoutexSpacing.controlGap,
+                  // 한 줄 행은 48dp 보조 동작 자체가 행 높이를 만든다. 그 밖에
+                  // padding을 더하면 최근 검색 한 칸이 64dp로 불어난다.
+                  vertical: _singleLine ? 0 : RoutexSpacing.controlGap,
                 ),
                 child: Row(
                   crossAxisAlignment: _singleLine

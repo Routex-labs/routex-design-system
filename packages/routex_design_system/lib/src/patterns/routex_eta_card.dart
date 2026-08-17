@@ -54,6 +54,7 @@ class RoutexEtaCard extends StatelessWidget {
 
     return RoutexBottomSheet(
       showHandle: false,
+      includeBottomSafeArea: true,
       child: RoutexStack(
         gap: RoutexStackGap.content,
         children: [

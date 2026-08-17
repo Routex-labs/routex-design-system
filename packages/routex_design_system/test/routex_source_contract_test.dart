@@ -16,6 +16,16 @@ const _transformExceptions = <String, _SourceException>{
     reason: '뒤로·닫기 glyph의 live area를 RoutexListCell 좌우 glyph 중심과 맞춘다.',
     removeWhen: '아이콘 세트가 정규화된 live area를 제공하거나 두 컴포넌트가 같은 glyph frame을 공유한다.',
   ),
+  'lib/src/patterns/routex_place_header.dart': (
+    occurrences: 1,
+    reason: '48dp 터치 박스 안의 닫기 glyph를 제목의 보이는 끝선과 광학적으로 맞춘다.',
+    removeWhen: 'quiet IconAction이 보이는 glyph 끝선과 터치 박스를 별도 geometry로 제공한다.',
+  ),
+  'lib/src/patterns/routex_place_overview.dart': (
+    occurrences: 1,
+    reason: '공유·저장 glyph를 위 줄의 닫기와 같은 보이는 끝선에 둔다.',
+    removeWhen: 'quiet IconAction이 보이는 glyph 끝선과 터치 박스를 별도 geometry로 제공한다.',
+  ),
 };
 
 final _rawVisualRules = <String, RegExp>{

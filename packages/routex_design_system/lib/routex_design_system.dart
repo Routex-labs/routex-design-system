@@ -47,6 +47,7 @@ export 'src/patterns/routex_menu_list.dart';
 export 'src/patterns/routex_place_actions.dart';
 export 'src/patterns/routex_place_header.dart';
 export 'src/patterns/routex_place_overview.dart';
+export 'src/patterns/routex_recent_list.dart';
 export 'src/patterns/routex_result_list.dart';
 export 'src/patterns/routex_route_option.dart';
 export 'src/patterns/routex_route_planner.dart';
