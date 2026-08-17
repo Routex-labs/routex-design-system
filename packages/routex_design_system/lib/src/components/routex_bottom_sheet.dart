@@ -119,15 +119,23 @@ class RoutexBottomSheet extends StatelessWidget {
             bottom: includeBottomSafeArea,
             child: Padding(
               // handle이 있으면 위쪽 여백은 handle이 가져가므로 표면은 0, handle 없이
-              // header나 본문이 바로 오면 컴포넌트 여백 16을 쓴다.
+              // header나 본문이 바로 오면 컴포넌트 여백 16을 쓴다. 화면 아래 고정
+              // 표면은 SafeArea가 홈 인디케이터 자리만 보장하므로, sectionGap을 또
+              // 더하지 않는다.
               padding: switch (contentInset) {
                 RoutexBottomSheetContentInset.surface =>
-                  EdgeInsetsDirectional.fromSTEB(
-                    RoutexSpacing.componentPadding,
-                    showHandle ? 0 : RoutexSpacing.componentPadding,
-                    RoutexSpacing.componentPadding,
-                    RoutexSpacing.sectionGap,
-                  ),
+                  includeBottomSafeArea
+                      ? EdgeInsetsDirectional.only(
+                          start: RoutexSpacing.componentPadding,
+                          top: RoutexSpacing.componentPadding,
+                          end: RoutexSpacing.componentPadding,
+                        )
+                      : EdgeInsetsDirectional.fromSTEB(
+                          RoutexSpacing.componentPadding,
+                          showHandle ? 0 : RoutexSpacing.componentPadding,
+                          RoutexSpacing.componentPadding,
+                          RoutexSpacing.sectionGap,
+                        ),
                 // 여백은 본문 조각들이 저마다 갖는다. 표면이 넣으면 가장자리까지 닿아야
                 // 하는 사진을 표현할 수 없다.
                 RoutexBottomSheetContentInset.content =>

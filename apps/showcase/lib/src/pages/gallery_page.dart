@@ -72,6 +72,7 @@ class _GalleryGridState extends State<GalleryGrid> {
   int _route = 0;
   bool _saved = false;
   String _travelMode = 'walk';
+  bool _routeLocationsSwapped = false;
   String? _category = '음식점';
   String _floor = '1F';
   String _sort = 'name';
@@ -154,8 +155,12 @@ class _GalleryGridState extends State<GalleryGrid> {
             _Card(
               surface: _CardSurface.map,
               child: RoutexRoutePlanner(
-                originLabel: '현재 위치',
-                destinationLabel: '더현대 서울 1F · 발렌시아가',
+                originLabel: _routeLocationsSwapped
+                    ? '더현대 서울 1F · 발렌시아가'
+                    : '현재 위치',
+                destinationLabel: _routeLocationsSwapped
+                    ? '현재 위치'
+                    : '더현대 서울 1F · 발렌시아가',
                 travelModes: const [
                   RoutexTravelModeOption(
                     id: 'car',
@@ -179,7 +184,9 @@ class _GalleryGridState extends State<GalleryGrid> {
                 onOriginPressed: () {},
                 onDestinationPressed: () {},
                 onClose: () {},
-                onDestinationMore: () {},
+                onDestinationMore: () => setState(
+                  () => _routeLocationsSwapped = !_routeLocationsSwapped,
+                ),
               ),
             ),
             // 목록은 상태가 셋이고, 그 셋이 서로 다른 화면이라는 것이 이 카드들의
@@ -187,6 +194,7 @@ class _GalleryGridState extends State<GalleryGrid> {
             _Card(
               surface: _CardSurface.sheet,
               compact: true,
+              searchAttached: true,
               child: RoutexResultList(
                 status: RoutexResultStatus.ready,
                 summary: '32개 결과',
@@ -363,6 +371,7 @@ class _GalleryGridState extends State<GalleryGrid> {
             // 유지하고, 카드 사이의 차이가 곧 두 목록의 차이가 된다.
             _Card(
               surface: _CardSurface.sheet,
+              searchAttached: true,
               child: RoutexStack(
                 gap: RoutexStackGap.control,
                 children: [
@@ -394,10 +403,17 @@ class _GalleryGridState extends State<GalleryGrid> {
               child: RoutexStack(
                 gap: RoutexStackGap.control,
                 children: [
-                  RoutexSectionHeader(
-                    title: '저장한 장소',
-                    actionLabel: '편집',
-                    onAction: () {},
+                  Padding(
+                    // 최근 검색의 header와 행이 같은 한 겹의 목록 inset을 쓴다.
+                    // 이걸 빼면 제목·편집만 카드 가장자리에 붙어 보인다.
+                    padding: const EdgeInsetsDirectional.symmetric(
+                      horizontal: RoutexSpacing.contentGap,
+                    ),
+                    child: RoutexSectionHeader(
+                      title: '저장한 장소',
+                      actionLabel: '편집',
+                      onAction: () {},
+                    ),
                   ),
                   RoutexListCell(
                     title: '발렌시아가',
@@ -562,6 +578,7 @@ class _GalleryGridState extends State<GalleryGrid> {
             ),
             _Card(
               surface: _CardSurface.sheet,
+              searchAttached: true,
               child: const RoutexResultList(
                 status: RoutexResultStatus.loading,
                 loadingMessage: '실내 매장을 찾는 중',
@@ -570,6 +587,7 @@ class _GalleryGridState extends State<GalleryGrid> {
             ),
             _Card(
               surface: _CardSurface.sheet,
+              searchAttached: true,
               child: const RoutexResultList(
                 status: RoutexResultStatus.empty,
                 children: [],
@@ -729,11 +747,13 @@ class _Card extends StatelessWidget {
     required this.surface,
     required this.child,
     this.compact = false,
+    this.searchAttached = false,
   });
 
   final _CardSurface surface;
   final Widget child;
   final bool compact;
+  final bool searchAttached;
 
   @override
   Widget build(BuildContext context) {
@@ -748,7 +768,14 @@ class _Card extends StatelessWidget {
         border: Border.all(color: colors.borderSubtle),
       ),
       child: Padding(
-        padding: EdgeInsetsDirectional.all(
+        padding: EdgeInsetsDirectional.fromSTEB(
+          compact ? RoutexSpacing.controlGap : RoutexSpacing.componentPadding,
+          searchAttached
+              ? RoutexSpacing.controlGap
+              : (compact
+                    ? RoutexSpacing.controlGap
+                    : RoutexSpacing.componentPadding),
+          compact ? RoutexSpacing.controlGap : RoutexSpacing.componentPadding,
           compact ? RoutexSpacing.controlGap : RoutexSpacing.componentPadding,
         ),
         child: child,

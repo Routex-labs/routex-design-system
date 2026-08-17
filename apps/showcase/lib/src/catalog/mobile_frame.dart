@@ -19,6 +19,9 @@ enum MobileFrameSurface {
   sheet,
 }
 
+/// 검색창 바로 아래에 붙는 목록은 독립 카드보다 위쪽 inset을 한 단계 낮춘다.
+enum MobileFrameContentInset { standard, searchAttached }
+
 class MobileFrame extends StatelessWidget {
   const MobileFrame({
     required this.child,
@@ -26,6 +29,7 @@ class MobileFrame extends StatelessWidget {
     this.label,
     this.width = 390,
     this.fitContent = false,
+    this.contentInset = MobileFrameContentInset.standard,
     super.key,
   });
 
@@ -41,6 +45,8 @@ class MobileFrame extends StatelessWidget {
   /// 세로 컨트롤처럼 폭이 좁은 컴포넌트는 제품 폭을 다 쓰지 않는다. 이때 틀이
   /// 내용 폭까지 줄어들어야 빈 공간이 생기지 않는다.
   final bool fitContent;
+
+  final MobileFrameContentInset contentInset;
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +77,17 @@ class MobileFrame extends StatelessWidget {
               border: Border.all(color: colors.borderSubtle),
             ),
             child: Padding(
-              padding: const EdgeInsetsDirectional.all(
-                RoutexSpacing.screenGutter,
-              ),
+              padding: switch (contentInset) {
+                MobileFrameContentInset.standard =>
+                  const EdgeInsetsDirectional.all(RoutexSpacing.screenGutter),
+                MobileFrameContentInset.searchAttached =>
+                  const EdgeInsetsDirectional.fromSTEB(
+                    RoutexSpacing.screenGutter,
+                    RoutexSpacing.controlGap,
+                    RoutexSpacing.screenGutter,
+                    RoutexSpacing.screenGutter,
+                  ),
+              },
               child: child,
             ),
           ),

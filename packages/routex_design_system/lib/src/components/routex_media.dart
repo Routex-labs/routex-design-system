@@ -47,9 +47,10 @@ class _RoutexMediaCarouselState extends State<RoutexMediaCarousel> {
     super.didUpdateWidget(oldWidget);
     if (widget.items.isEmpty) {
       _index = 0;
-    } else if (_index >= widget.items.length) {
-      _index = widget.items.length - 1;
+      return;
     }
+    final lastIndex = widget.items.length - 1;
+    if (_index > lastIndex) _index = lastIndex;
   }
 
   @override
@@ -75,7 +76,10 @@ class _RoutexMediaCarouselState extends State<RoutexMediaCarousel> {
                 ),
                 child: _MediaFrame(
                   item: widget.items[index],
-                  radius: RoutexRadii.card,
+                  // 바깥 card에서 content padding만큼 들어온 사진은 같은 card
+                  // 곡률을 다시 쓰지 않는다. 그러면 두 곡선의 중심이 달라 사진만
+                  // 과하게 둥글어 보인다. 안쪽 콘텐츠 면은 control 곡률을 쓴다.
+                  radius: RoutexRadii.control,
                 ),
               ),
             ),
@@ -144,7 +148,9 @@ class RoutexPhotoGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final frame = _MediaFrame(
           item: items[index],
-          radius: RoutexRadii.field,
+          // 바깥 card의 padding 안에 놓이는 사진이 같은 곡률을 다시 쓰면 두
+          // 곡선의 중심이 달라 보인다. 안쪽 콘텐츠 면은 control 곡률을 쓴다.
+          radius: RoutexRadii.control,
         );
         if (onSelected == null) return frame;
         return Semantics(
@@ -155,7 +161,7 @@ class RoutexPhotoGrid extends StatelessWidget {
           excludeSemantics: true,
           child: InkWell(
             onTap: () => onSelected!(index),
-            borderRadius: RoutexRadii.field,
+            borderRadius: RoutexRadii.control,
             child: frame,
           ),
         );

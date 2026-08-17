@@ -137,7 +137,7 @@ void main() {
       );
     });
 
-    testWidgets('검색 바는 52 높이 안에서 아이콘 동작의 48 터치 영역을 지킨다', (tester) async {
+    testWidgets('검색 바는 44로 보이되 아이콘 동작의 48 터치 영역을 지킨다', (tester) async {
       await pump(
         tester,
         RoutexSearchBar(
@@ -151,7 +151,12 @@ void main() {
 
       expect(
         tester.getSize(find.byType(RoutexSearchBar)).height,
+        RoutexMetrics.minimumTouchTarget,
+      );
+      expect(
+        tester.getSize(find.byType(RoutexSurface)).height,
         RoutexMetrics.searchField,
+        reason: '지도 위 검색 표면만 44dp로 얇게 보인다',
       );
       final actions = find.byType(IconButton);
       expect(actions, findsNWidgets(2), reason: '메뉴와 길찾기');
@@ -210,15 +215,33 @@ void main() {
       }
       expect(
         tester.getSize(find.byType(RoutexRoutePlanner)).height,
-        RoutexMetrics.minimumTouchTarget * 3 +
-            RoutexStroke.hairline +
-            RoutexSpacing.inlineGap * 3,
-        reason: '두 위치 행과 이동수단 사이에는 4dp만 두고 바깥 위아래도 4dp씩 둔다',
+        RoutexMetrics.minimumTouchTarget * 3 + RoutexStroke.hairline,
+        reason: '트랙 내부의 투명한 8dp가 카드의 아래 시각 여백을 맡는다',
       );
     });
   });
 
   group('정렬', () {
+    testWidgets('정보 행 아이콘은 한 줄 값의 글리프 중심에 선다', (tester) async {
+      await pump(
+        tester,
+        const RoutexInfoRow(
+          label: '주소',
+          value: '108',
+          icon: RoutexIcons.placeLocation,
+        ),
+      );
+
+      expect(
+        tester.getRect(find.byIcon(RoutexIcons.placeLocation)).center.dy,
+        moreOrLessEquals(
+          tester.getRect(find.text('108')).center.dy,
+          epsilon: 1,
+        ),
+        reason: '본문이 아이콘보다 위로 떠 보이면 같은 정보 행으로 읽히지 않는다',
+      );
+    });
+
     testWidgets('목록 셀의 leading·trailing 아이콘은 제목 첫 줄 중심에 선다', (tester) async {
       await pump(
         tester,
@@ -348,12 +371,47 @@ void main() {
       expect(
         tester.getSize(hitTargets.first).height,
         RoutexMetrics.minimumTouchTarget,
-        reason: '투명한 여백을 포함한 터치 영역은 48dp다',
+        reason: '이동수단 터치 영역은 48dp다',
+      );
+      final track = find
+          .descendant(
+            of: find.byType(RoutexTravelModeBar),
+            matching: find.byType(DecoratedBox),
+          )
+          .first;
+      expect(
+        tester.getSize(track).height,
+        RoutexMetrics.minimumTouchTarget - RoutexSpacing.controlGap,
+        reason: '회색 트랙은 8dp 얇게 보이되, 터치 영역은 48dp를 유지한다',
+      );
+      expect(
+        tester.getRect(track).top,
+        tester.getRect(find.byType(RoutexTravelModeBar)).top,
+        reason: '줄인 8dp의 절반만큼 트랙을 위로 올린다',
+      );
+      expect(
+        tester.getRect(find.byType(RoutexTravelModeBar)).bottom -
+            tester.getRect(track).bottom,
+        RoutexSpacing.controlGap,
+        reason: '줄인 8dp는 트랙 밖의 하단 시각 여백으로만 남긴다',
+      );
+      expect(
+        tester.getRect(find.byType(RoutexFocusRing).last).center.dy,
+        moreOrLessEquals(tester.getRect(track).center.dy, epsilon: 1),
+        reason: '선택 면의 위아래 회색 여백을 같게 해 아이콘과 텍스트도 트랙 중앙에 둔다',
       );
       expect(
         tester.getSize(find.byType(RoutexFocusRing).first).height,
         RoutexMetrics.compactControl,
         reason: '선택·hover·focus가 칠해지는 시각 영역은 32dp다',
+      );
+      expect(
+        tester.getRect(find.text('도보')).center.dy,
+        moreOrLessEquals(
+          tester.getRect(find.byType(RoutexFocusRing).last).center.dy,
+          epsilon: 1,
+        ),
+        reason: '이동수단 icon·label은 선택 면의 수학적 중심에 선다',
       );
     });
   });
@@ -412,7 +470,7 @@ void main() {
       );
       expect(
         tester.widget<Icon>(find.byIcon(RoutexIcons.reorder)).color,
-        RoutexColorTokens.light.borderStrong,
+        RoutexColorTokens.light.contentDisabled,
         reason: '손잡이는 장식이라 보조 동작보다 연하게 둔다',
       );
     });
@@ -464,10 +522,54 @@ void main() {
       );
 
       const width = 390.0;
+      final action = find.byType(TextButton);
       expect(
-        width - tester.getTopRight(find.text('편집')).dx,
-        tester.getTopLeft(find.text('저장한 장소')).dx,
-        reason: '터치 여백이 정렬선 안으로 들어오면 좌우 여백이 달라진다',
+        tester.getRect(action).right,
+        width,
+        reason: '카드의 오른쪽 끝선은 글리프가 아니라 48dp 터치 상자가 맡는다',
+      );
+      expect(
+        tester.getRect(find.text('편집')).center.dx,
+        tester.getRect(action).center.dx,
+        reason: '짧은 보조 라벨은 눌림 배경의 수평 중심에 선다',
+      );
+      expect(
+        tester.getRect(find.text('편집')).center.dy,
+        moreOrLessEquals(
+          tester.getRect(find.byType(TextButton)).center.dy -
+              RoutexOpticalCorrection.sectionHeaderActionLabelTop,
+          epsilon: 1,
+        ),
+        reason: '편집 glyph는 48dp 버튼의 실제 중심에 선다',
+      );
+    });
+
+    testWidgets('화면 아래 고정 시트는 안전 영역 외의 아래 여백을 만들지 않는다', (tester) async {
+      const childKey = ValueKey('bottom-sheet-child');
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: MediaQuery(
+            data: const MediaQueryData(padding: EdgeInsets.only(bottom: 34)),
+            child: const Scaffold(
+              body: Align(
+                alignment: Alignment.bottomCenter,
+                child: RoutexBottomSheet(
+                  includeBottomSafeArea: true,
+                  child: SizedBox(key: childKey, height: 40),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final sheet = tester.getRect(find.byType(RoutexBottomSheet));
+      final child = tester.getRect(find.byKey(childKey));
+      expect(
+        sheet.bottom - child.bottom,
+        34,
+        reason: '고정 패널 아래에는 SafeArea만 남기고 sectionGap을 중복하지 않는다',
       );
     });
 

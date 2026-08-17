@@ -16,9 +16,9 @@ import 'routex_trip_progress.dart';
 /// 그리자마자 위치로 확대해 버리면 사용자는 전체 경로를 한 번도 못 보고 안내에
 /// 들어간다.
 ///
-/// **도착 시각이 가장 큰 글자다.** 소요 시간(`22분`)은 언제 나가야 하는지를 스스로
-/// 계산하게 만들지만 도착 시각(`오후 3:24`)은 약속과 바로 견줄 수 있다. 소요와 거리는
-/// 그 아래 수치 줄로 내린다.
+/// **첫 번째 경로 metric이 가장 큰 글자다.** 안내를 시작할지 판단할 때는 도착 시각보다
+/// `22분 소요`처럼 지금부터 필요한 시간이 먼저 읽혀야 한다. 도착 예정 시각은 그 시간의
+/// 결과이므로 아래 보조 줄로 내린다. 소비 앱은 [metrics]의 첫 항목에 총 소요를 준다.
 class RoutexEtaCard extends StatelessWidget {
   const RoutexEtaCard({
     required this.arrivalTime,
@@ -34,6 +34,9 @@ class RoutexEtaCard extends StatelessWidget {
   final String arrivalTime;
 
   /// 소요·거리·환승처럼 판단에 쓰는 값들이다.
+  ///
+  /// 첫 항목은 계획을 시작할지 고르는 주 정보다. 보통 `22분 소요`를 주고, 나머지는
+  /// 도착 시각과 같은 보조 줄에 둔다.
   final List<RoutexTripMetric> metrics;
 
   /// 안내를 시작한다. **null이면 버튼 자체를 그리지 않는다** — 시작이라는 동작이
@@ -51,6 +54,8 @@ class RoutexEtaCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.routexColors;
+    final primaryMetric = metrics.first;
+    final secondaryMetrics = metrics.skip(1).toList(growable: false);
 
     return RoutexBottomSheet(
       showHandle: false,
@@ -66,16 +71,62 @@ class RoutexEtaCard extends StatelessWidget {
                 child: RoutexStack(
                   gap: RoutexStackGap.inline,
                   children: [
-                    Text(
-                      title,
-                      style: RoutexTypography.caption.copyWith(
-                        color: colors.contentSecondary,
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: primaryMetric.value,
+                            style: RoutexTypography.tabular(
+                              RoutexTypography.headline,
+                            ),
+                          ),
+                          TextSpan(
+                            text: ' ${primaryMetric.label}',
+                            style: RoutexTypography.body.copyWith(
+                              color: colors.contentSecondary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      arrivalTime,
-                      style: RoutexTypography.tabular(
-                        RoutexTypography.headline,
+                    Semantics(
+                      label: [
+                        '$title $arrivalTime',
+                        for (final metric in secondaryMetrics)
+                          '${metric.value} ${metric.label}',
+                      ].join(', '),
+                      excludeSemantics: true,
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '$title $arrivalTime',
+                              style: RoutexTypography.bodySmall.copyWith(
+                                color: colors.contentSecondary,
+                              ),
+                            ),
+                            for (final metric in secondaryMetrics) ...[
+                              TextSpan(
+                                text: ' · ',
+                                style: RoutexTypography.bodySmall.copyWith(
+                                  color: colors.contentSecondary,
+                                ),
+                              ),
+                              TextSpan(
+                                text: metric.value,
+                                style: RoutexTypography.tabular(
+                                  RoutexTypography.bodySmall,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' ${metric.label}',
+                                style: RoutexTypography.bodySmall.copyWith(
+                                  color: colors.contentSecondary,
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -88,38 +139,6 @@ class RoutexEtaCard extends StatelessWidget {
                 RoutexButton(label: '안내 시작', onPressed: onStart),
               ],
             ],
-          ),
-          Semantics(
-            container: true,
-            label: [
-              for (final metric in metrics) '${metric.value} ${metric.label}',
-            ].join(', '),
-            excludeSemantics: true,
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  for (var index = 0; index < metrics.length; index++) ...[
-                    if (index > 0)
-                      TextSpan(
-                        text: ' · ',
-                        style: RoutexTypography.bodySmall.copyWith(
-                          color: colors.contentSecondary,
-                        ),
-                      ),
-                    TextSpan(
-                      text: metrics[index].value,
-                      style: RoutexTypography.tabular(RoutexTypography.label),
-                    ),
-                    TextSpan(
-                      text: ' ${metrics[index].label}',
-                      style: RoutexTypography.bodySmall.copyWith(
-                        color: colors.contentSecondary,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
           ),
         ],
       ),

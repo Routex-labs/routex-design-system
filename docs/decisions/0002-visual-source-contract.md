@@ -27,10 +27,21 @@ Runtime Kit의 현재 골든을 시각 기준선으로 유지한다. `components
 필요하면 테스트를 우회하지 않고 foundation 또는 이름 있는 component geometry 계약을 먼저 만든다.
 데이터가 전달하는 브랜드 accent는 `RoutexBadgeAccent`처럼 명시된 입력 계약을 사용한다.
 
-`Transform.translate`는 일반 정렬 수단으로 금지한다. 현재 허용된 예외는 `RoutexSheetHeader`의
-좌우 glyph 2dp optical correction 하나다. 수학적 상자 중심이 아니라 `RoutexListCell` glyph의
-live-area 중심을 맞추며, 좌표 테스트로 고정한다. 아이콘 세트가 정규화된 live area를 제공하거나
-두 컴포넌트가 같은 glyph frame을 공유하면 이 예외와 allowlist를 함께 제거한다.
+`Transform.translate`는 일반 정렬 수단으로 금지한다. 허용된 예외는 `RoutexSheetHeader`와 장소
+상세의 right glyph뿐이다. 수학적 상자 중심이 아니라 glyph의 보이는 중심을 맞추며, 좌표 테스트로
+고정한다. 아이콘 세트·글꼴이 정규화된 live area를 제공하거나 공통 glyph frame을 공유하면 각 예외와
+allowlist를 함께 제거한다.
+
+`RoutexInfoRow`는 16/24 본문 줄과 20dp 아이콘을 한 줄로 놓을 때 아이콘이 낮게 보이는
+차이를 `RoutexOpticalCorrection.infoRowIconTop` 2dp로 보정한다. `routex_visual_spec_test.dart`가
+값 글리프와 아이콘 중심을 함께 검증하며, 글꼴 또는 아이콘 세트가 바뀌면 이 값을 다시 재고
+불필요해지면 제거한다.
+
+`RoutexSectionHeader`는 48dp 보조 action 버튼에서 한글 glyph가 아래로 쏠려 보이는 차이를
+`RoutexOpticalCorrection.sectionHeaderActionLabelTop` 2dp로 보정한다. `routex_visual_spec_test.dart`가
+label line box와 버튼의 상대 위치를 검증한다. 짧은 label은 hover·pressed 배경의 수평 중심에 두고,
+카드 끝선은 글리프가 아니라 48dp 터치 상자가 맡는다. 글꼴 또는 버튼의 glyph frame이 바뀌면 이 값을
+다시 재고 불필요해지면 제거한다.
 
 ## 결과
 

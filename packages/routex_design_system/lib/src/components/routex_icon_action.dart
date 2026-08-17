@@ -43,8 +43,9 @@ class RoutexIconAction extends StatelessWidget {
     final background = switch (tone) {
       RoutexIconActionTone.danger => colors.statusErrorSubtle,
       RoutexIconActionTone.primary => colors.actionPrimarySubtle,
-      RoutexIconActionTone.quiet =>
-        selected ? colors.actionPrimarySubtle : Colors.transparent,
+      // quiet action은 이미 표면 안에 있다. 저장 상태는 채워진 bookmark와 전경색만
+      // 바꿔 알리고, action 하나만 타일처럼 떠 보이게 하는 tint는 두지 않는다.
+      RoutexIconActionTone.quiet => Colors.transparent,
       RoutexIconActionTone.neutral =>
         selected ? colors.actionPrimarySubtle : colors.surfaceCanvas,
     };

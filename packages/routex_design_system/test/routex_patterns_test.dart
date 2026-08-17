@@ -149,7 +149,34 @@ void main() {
 
     await pump(null);
     expect(find.text('안내 시작'), findsNothing);
-    expect(find.text('오후 3:24'), findsOneWidget, reason: '요약은 그대로 남는다');
+    expect(
+      find.text('도착 예정 오후 3:24'),
+      findsOneWidget,
+      reason: '도착 예정 시각은 보조 요약으로 남는다',
+    );
+  });
+
+  testWidgets('계획 카드에서는 소요 시간이 도착 예정 시각보다 먼저 읽힌다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexEtaCard(
+            arrivalTime: '오후 3:24',
+            metrics: const [
+              RoutexTripMetric(value: '22분', label: '소요'),
+              RoutexTripMetric(value: '1.4km', label: '거리'),
+            ],
+            onStart: () {},
+          ),
+        ),
+      ),
+    );
+
+    final duration = tester.getRect(find.text('22분 소요'));
+    final arrival = tester.getRect(find.text('도착 예정 오후 3:24 · 1.4km 거리'));
+    expect(duration.top, lessThan(arrival.top));
+    expect(duration.height, greaterThan(arrival.height));
   });
 
   // 지하 4층·지상 8층인 건물에서 전량을 세우면 기둥 하나가 지도 좌측을 통째로
@@ -175,8 +202,13 @@ void main() {
 
     expect(
       tester.getSize(find.byType(RoutexFloorSelector)).height,
-      RoutexMetrics.minimumTouchTarget * 5,
-      reason: '일곱 층이어도 기둥은 다섯 칸이다',
+      RoutexMetrics.standardControl * 5,
+      reason: '일곱 층이어도 44dp 다섯 칸만 보여 지도 면적을 지킨다',
+    );
+    expect(
+      tester.getSize(find.byType(RoutexFloorSelector)).width,
+      RoutexMetrics.standardControl,
+      reason: '기둥 폭도 셀 높이와 같은 44dp로 줄여 지도 위 면적을 과점유하지 않는다',
     );
     // 마지막 층을 골랐으니 목록 끝까지 굴러가 있어야 한다 — 가운데 맞춤은
     // 끝에서 포기한다.
@@ -187,6 +219,45 @@ void main() {
     expect(position.pixels, position.maxScrollExtent);
     expect(find.text('B3'), findsOneWidget);
     expect(find.text('4F'), findsNothing, reason: '뷰포트 밖은 그리지 않는다');
+  });
+
+  testWidgets('층을 고른 뒤 정지한 목록 첫 셀에는 이전 층 구분선이 비치지 않는다', (tester) async {
+    const floors = ['5F', '4F', '3F', '2F', '1F', 'B1', 'B2'];
+    var selected = '3F';
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: StatefulBuilder(
+          builder: (context, setState) => Scaffold(
+            body: RoutexFloorSelector(
+              options: [
+                for (final floor in floors)
+                  RoutexFloorOption(id: floor, label: floor),
+              ],
+              selectedId: selected,
+              onSelected: (value) => setState(() => selected = value),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('1F'));
+    await tester.pumpAndSettle();
+
+    final firstItem = find
+        .ancestor(of: find.text('3F'), matching: find.byType(DecoratedBox))
+        .first;
+    final decoration =
+        tester.widget<DecoratedBox>(firstItem).decoration as BoxDecoration;
+    final border = decoration.border! as Border;
+    expect(
+      tester.getRect(firstItem).top,
+      tester.getRect(find.byType(RoutexFloorSelector)).top,
+    );
+    expect(border.top, BorderSide.none);
+    expect(border.bottom.width, RoutexStroke.hairline);
   });
 
   testWidgets('층이 다섯 이하면 굴리지 않는다', (tester) async {
@@ -209,7 +280,7 @@ void main() {
 
     expect(
       tester.getSize(find.byType(RoutexFloorSelector)).height,
-      RoutexMetrics.minimumTouchTarget * 2,
+      RoutexMetrics.standardControl * 2,
     );
     expect(
       tester.widget<Scrollable>(find.byType(Scrollable)).physics,
@@ -525,12 +596,35 @@ void main() {
     expect(find.byType(RoutexTravelModeBar), findsNothing);
     expect(
       tester.getSize(find.byType(RoutexRoutePlanner)).height,
-      RoutexMetrics.minimumTouchTarget * 2 +
-          RoutexStroke.hairline +
-          RoutexSpacing.inlineGap * 2,
+      RoutexMetrics.minimumTouchTarget * 2 + RoutexStroke.hairline,
     );
   });
 
+  testWidgets('경로 플래너의 끝 동작은 출발지와 도착지 순서를 바꾼다', (tester) async {
+    var swapped = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexRoutePlanner(
+            originLabel: '현재 위치',
+            destinationLabel: '오설록',
+            travelModes: const [],
+            selectedTravelModeId: null,
+            onTravelModeSelected: (_) {},
+            onDestinationMore: () => swapped = true,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(RoutexIcons.swapLocations), findsOneWidget);
+    expect(find.byTooltip('출발지와 도착지 순서 바꾸기'), findsOneWidget);
+    expect(find.byTooltip('목적지 더보기'), findsNothing);
+
+    await tester.tap(find.byIcon(RoutexIcons.swapLocations));
+    expect(swapped, isTrue);
+  });
   group('RoutexPlaceActions', () {
     testWidgets('한 쌍 안에서 primary는 도착 하나뿐이다', (tester) async {
       var origin = false;
@@ -1231,7 +1325,7 @@ void main() {
   });
 
   group('RoutexEtaCard와 RoutexArrivalCard', () {
-    testWidgets('계획 화면은 도착 시각과 시작을, 도착 화면은 종료를 준다', (tester) async {
+    testWidgets('계획 화면은 소요와 시작을, 도착 화면은 종료를 준다', (tester) async {
       var started = false;
       await tester.pumpWidget(
         MaterialApp(
@@ -1249,7 +1343,8 @@ void main() {
         ),
       );
 
-      expect(find.text('오후 3:24'), findsOneWidget);
+      expect(find.text('22분 소요'), findsOneWidget);
+      expect(find.text('도착 예정 오후 3:24 · 1.4km 거리'), findsOneWidget);
       expect(find.text('경로 지우기'), findsNothing);
       final etaSafeArea = tester.widget<SafeArea>(
         find.descendant(

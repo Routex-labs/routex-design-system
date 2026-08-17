@@ -59,6 +59,11 @@ abstract final class RoutexIcons {
   static const transfer = Icons.swap_calls_rounded;
   static const wrongWay = Icons.u_turn_right_rounded;
   static const turnLeft = Icons.turn_left_rounded;
+
+  /// 경로 입력의 출발지와 도착지를 맞바꾸는 동작이다.
+  ///
+  /// 목록을 정렬하는 [sort]와 달리, 두 위치 필드의 순서만 바꾼다.
+  static const swapLocations = Icons.swap_vert_rounded;
   static const turnRight = Icons.turn_right_rounded;
   static const straight = Icons.straight_rounded;
   static const escalator = Icons.escalator_rounded;

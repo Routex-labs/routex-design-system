@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../components/routex_surface.dart';
 import '../foundations/routex_icons.dart';
 import '../foundations/routex_metrics.dart';
 import '../foundations/routex_radii.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
-import '../components/routex_surface.dart';
 import '../theme/routex_color_tokens.dart';
 import 'routex_travel_mode_bar.dart';
 
@@ -43,6 +43,11 @@ class RoutexRoutePlanner extends StatelessWidget {
   final VoidCallback? onOriginPressed;
   final VoidCallback? onDestinationPressed;
   final VoidCallback? onClose;
+
+  /// 출발지와 목적지의 순서를 바꾼다.
+  ///
+  /// 공개 API 이름은 기존 소비 앱과의 호환을 위해 [onDestinationMore]를 유지한다.
+  /// 화면에는 더보기 대신 순서 변경의 아이콘과 설명을 드러낸다.
   final VoidCallback? onDestinationMore;
   final RoutexRouteField? editingField;
   final TextEditingController? editingController;
@@ -57,11 +62,10 @@ class RoutexRoutePlanner extends StatelessWidget {
     return RoutexSurface(
       role: RoutexSurfaceRole.chrome,
       child: Padding(
-        // 각 위치 행이 이미 48dp 터치 영역을 보장한다. 상하에도 controlGap을
-        // 더하면 입력 중 카드가 필요 이상으로 두꺼워지므로 inlineGap만 둔다.
+        // 위치 행과 이동수단은 각각 48dp hit box를 가진다. 카드의 바깥 세로
+        // 여백을 없애면 이동수단 트랙 내부의 8dp만 아래 여백으로 남는다.
         padding: const EdgeInsetsDirectional.symmetric(
           horizontal: RoutexSpacing.controlGap,
-          vertical: RoutexSpacing.inlineGap,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -103,18 +107,16 @@ class RoutexRoutePlanner extends StatelessWidget {
               onChanged: onEditingChanged,
               onSubmitted: onEditingSubmitted,
               onPressed: onDestinationPressed,
-              actionLabel: '목적지 더보기',
-              actionIcon: RoutexIcons.more,
+              actionLabel: '출발지와 도착지 순서 바꾸기',
+              actionIcon: RoutexIcons.swapLocations,
               onAction: onDestinationMore,
             ),
-            if (travelModes.isNotEmpty) ...[
-              const SizedBox(height: RoutexSpacing.inlineGap),
+            if (travelModes.isNotEmpty)
               RoutexTravelModeBar(
                 options: travelModes,
                 selectedId: selectedTravelModeId,
                 onSelected: onTravelModeSelected,
               ),
-            ],
           ],
         ),
       ),

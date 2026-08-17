@@ -574,8 +574,11 @@ void main() {
 
       expect(
         tester.getRect(find.text('전체 보기')).center.dy,
-        moreOrLessEquals(tester.getRect(find.text('최근 검색')).center.dy),
-        reason: '제목과 보조 동작은 같은 줄에서 세로 중앙을 공유한다',
+        moreOrLessEquals(
+          tester.getRect(find.text('최근 검색')).center.dy -
+              RoutexOpticalCorrection.sectionHeaderActionLabelTop,
+        ),
+        reason: '한글 보조 동작 glyph는 실제 중심보다 낮아 보여 2dp 위로 보정한다',
       );
       expect(
         tester.getSize(find.byType(TextButton)).height,
@@ -1042,7 +1045,6 @@ void main() {
       expect(tester.getSize(find.byType(RoutexMediaCarousel)).height, 0);
       expect(tester.getSize(find.byType(RoutexPhotoGrid)).height, 0);
     });
-
     testWidgets('사진 목록이 줄어들면 현재 카운터를 새 범위로 보정한다', (tester) async {
       var items = List.generate(
         5,
@@ -1076,6 +1078,21 @@ void main() {
       await tester.pump();
       expect(find.text('2 / 2'), findsOneWidget);
       expect(find.text('5 / 2'), findsNothing);
+    });
+    testWidgets('카드 안 사진은 바깥 곡률보다 한 단계 작은 곡률을 쓴다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexPhotoGrid(
+              items: [RoutexMediaItem(image: MemoryImage(Uint8List(0)))],
+            ),
+          ),
+        ),
+      );
+
+      final frame = tester.widget<ClipRRect>(find.byType(ClipRRect));
+      expect(frame.borderRadius, RoutexRadii.control);
     });
   });
 

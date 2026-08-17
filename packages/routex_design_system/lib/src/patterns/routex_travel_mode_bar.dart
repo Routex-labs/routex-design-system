@@ -10,14 +10,13 @@ import '../theme/routex_color_tokens.dart';
 
 /// 중첩된 세그먼트 표면의 geometry다.
 ///
-/// 48dp는 투명한 터치 영역, 40dp는 회색 트랙, 32dp는 선택·hover·pressed가
-/// 칠해지는 시각 영역이다. 트랙에서 선택 영역을 4dp 안으로 넣으면 곡률도
-/// 바깥 12dp에서 안쪽 8dp로 한 단계 줄어, 서로 다른 크기에서 같은 radius를
-/// 재사용할 때 생기는 시각적 과곡률을 피할 수 있다.
+/// 48dp는 터치 영역이고 회색 트랙은 그보다 8dp 얇은 40dp다. 트랙을 4dp 위로
+/// 올리면 위의 도착지 행과 리듬을 맞추면서, 남은 아래 8dp가 카드의 시각 여백이
+/// 된다. 32dp 선택 면은 트랙 안에서 위아래 4dp를 같은 값으로 둔다.
 abstract final class _TravelModeGeometry {
   static const hitHeight = RoutexMetrics.minimumTouchTarget;
-  static const trackHeight =
-      RoutexMetrics.compactControl + RoutexSpacing.inlineGap * 2;
+  static const visualHeightReduction = RoutexSpacing.controlGap;
+  static const trackHeight = hitHeight - visualHeightReduction;
   static const selectionHeight = RoutexMetrics.compactControl;
   static const inset = RoutexSpacing.inlineGap;
   static const trackRadius = RoutexRadii.field;
@@ -97,17 +96,15 @@ class RoutexTravelModeBar extends StatelessWidget {
       child: Stack(
         alignment: AlignmentDirectional.center,
         children: [
-          Positioned.fill(
-            child: Center(
-              child: SizedBox(
-                width: double.infinity,
-                height: _TravelModeGeometry.trackHeight,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: colors.surfaceCanvas,
-                    borderRadius: _TravelModeGeometry.trackRadius,
-                  ),
-                ),
+          PositionedDirectional(
+            top: 0,
+            start: 0,
+            end: 0,
+            height: _TravelModeGeometry.trackHeight,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: colors.surfaceCanvas,
+                borderRadius: _TravelModeGeometry.trackRadius,
               ),
             ),
           ),
@@ -201,45 +198,52 @@ class _TravelModeItemState extends State<_TravelModeItem> {
           onTapCancel: () => _setPressed(false),
           child: SizedBox(
             height: _TravelModeGeometry.hitHeight,
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsetsDirectional.symmetric(
-                  horizontal: _TravelModeGeometry.inset,
-                ),
-                child: SizedBox(
-                  height: _TravelModeGeometry.selectionHeight,
-                  width: double.infinity,
-                  child: RoutexFocusRing(
-                    radius: _TravelModeGeometry.selectionRadius,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: fill,
-                        borderRadius: _TravelModeGeometry.selectionRadius,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsetsDirectional.symmetric(
-                          horizontal: RoutexSpacing.controlGap,
+            child: Padding(
+              // 48dp hit box 안에서 40dp 트랙만 보이게 한다. 남는 8dp를 아래에
+              // 두면 트랙은 4dp 위로 올라가고 선택 면은 트랙의 중앙을 유지한다.
+              padding: const EdgeInsetsDirectional.only(
+                bottom: _TravelModeGeometry.visualHeightReduction,
+              ),
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(
+                    horizontal: _TravelModeGeometry.inset,
+                  ),
+                  child: SizedBox(
+                    height: _TravelModeGeometry.selectionHeight,
+                    width: double.infinity,
+                    child: RoutexFocusRing(
+                      radius: _TravelModeGeometry.selectionRadius,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: fill,
+                          borderRadius: _TravelModeGeometry.selectionRadius,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              widget.option.icon,
-                              size: RoutexMetrics.iconSmall,
-                              color: foreground,
-                            ),
-                            const SizedBox(width: RoutexSpacing.inlineGap),
-                            Flexible(
-                              child: Text(
-                                widget.option.label,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: RoutexTypography.control(
-                                  RoutexTypography.label,
-                                ).copyWith(color: foreground),
+                        child: Padding(
+                          padding: const EdgeInsetsDirectional.symmetric(
+                            horizontal: RoutexSpacing.controlGap,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                widget.option.icon,
+                                size: RoutexMetrics.iconSmall,
+                                color: foreground,
                               ),
-                            ),
-                          ],
+                              const SizedBox(width: RoutexSpacing.inlineGap),
+                              Flexible(
+                                child: Text(
+                                  widget.option.label,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: RoutexTypography.control(
+                                    RoutexTypography.label,
+                                  ).copyWith(color: foreground),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),

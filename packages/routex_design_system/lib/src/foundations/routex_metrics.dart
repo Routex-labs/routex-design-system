@@ -5,7 +5,7 @@ enum RoutexMetricRole {
   compactControl(32),
   standardControl(44),
   minimumTouchTarget(48),
-  searchField(52),
+  searchField(44),
   leadingColumn(40),
   textKeyline(64),
   thumbnail(72),
@@ -26,7 +26,7 @@ abstract final class RoutexMetrics {
   static const compactControl = 32.0;
   static const standardControl = 44.0;
   static const minimumTouchTarget = 48.0;
-  static const searchField = 52.0;
+  static const searchField = 44.0;
   static const leadingColumn = 40.0;
 
   /// 행의 제목 글자가 시작하는 자리다. 표면 안쪽 가장자리에서 잰다.
@@ -81,6 +81,12 @@ abstract final class RoutexOpticalCorrection {
   /// 글리프라, 같은 인셋에서 제목보다 안쪽으로 들어가 보인다.
   static const placeTrailingActionEnd = RoutexSpacing.controlGap;
 
+  /// 20dp 정보 아이콘은 16/24 본문 글리프보다 낮게 보여 2dp 위로 보정한다.
+  static const infoRowIconTop = 2.0;
+
+  /// Section header의 보조 action 글리프는 48dp 버튼의 수학적 중심보다 아래로
+  /// 보여 2dp 위로 보정한다.
+  static const sectionHeaderActionLabelTop = 2.0;
   static const sheetHeaderGlyph =
       RoutexMetrics.minimumTouchTarget / 2 -
       (RoutexSpacing.contentGap + RoutexMetrics.iconMedium / 2);

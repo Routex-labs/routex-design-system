@@ -56,7 +56,7 @@ MaterialApp(
   감싸 고정폭 숫자를 켠다. 크기·굵기를 바꾸지 않는 유일한 typography 변형이다.
 - 현재는 light theme만 지원한다. 검증되지 않은 자동 반전 dark theme은 제공하지 않는다.
 - 텍스트와 주요 action 조합은 WCAG 2.2 AA 4.5:1을 테스트로 고정한다.
-- 컨트롤의 시각 높이는 compact 32dp, standard 44dp, 검색 줄 52dp 역할을 쓴다. 누르는
+- 컨트롤의 시각 높이는 compact 32dp, standard·검색 줄 44dp 역할을 쓴다. 누르는
   영역은 시각 크기와 별개로 최소 48dp다. 작은 부모가 `IconButton`의 padded tap target을
   잘라서도 안 된다.
 - 아이콘은 `RoutexIcons`의 의미를 쓴다. 화면이 `Icons.*`에서 글리프를 직접 고르지 않는다.

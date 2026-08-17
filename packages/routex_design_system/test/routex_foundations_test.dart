@@ -25,6 +25,8 @@ void main() {
       expect(RoutexProportion.longLine, 0.6);
       expect(RoutexProportion.largeSheet, 0.75);
       expect(RoutexOpticalCorrection.listTitleGlyphTop, 4);
+      expect(RoutexOpticalCorrection.infoRowIconTop, 2);
+      expect(RoutexOpticalCorrection.sectionHeaderActionLabelTop, 2);
       expect(RoutexOpticalCorrection.sheetHeaderGlyph, 2);
       expect(RoutexTypography.scrollLayoutTextScale, 1.3);
       expect(RoutexMotion.disclosureExpandedTurns, 0.5);
@@ -32,10 +34,7 @@ void main() {
         RoutexFeedbackTiming.toastVisibility,
         const Duration(milliseconds: 1600),
       );
-      expect(
-        RoutexFeedbackTiming.noticeVisibility,
-        const Duration(seconds: 4),
-      );
+      expect(RoutexFeedbackTiming.noticeVisibility, const Duration(seconds: 4));
       // 되돌리기가 붙은 알림은 읽는 시간에 더해 손이 닿을 시간이 필요하다.
       expect(
         RoutexFeedbackTiming.noticeVisibility,
