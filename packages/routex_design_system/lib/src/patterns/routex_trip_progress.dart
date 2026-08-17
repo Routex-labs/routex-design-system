@@ -45,6 +45,7 @@ class RoutexTripProgress extends StatelessWidget {
 
     return RoutexBottomSheet(
       showHandle: false,
+      includeBottomSafeArea: true,
       child: stacked
           ? RoutexStack(gap: RoutexStackGap.content, children: [values, stop])
           : Row(

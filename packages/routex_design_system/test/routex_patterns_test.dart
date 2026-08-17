@@ -257,6 +257,18 @@ void main() {
       ),
     );
 
+    final guidanceSafeArea = tester.widget<SafeArea>(
+      find.descendant(
+        of: find.byType(RoutexTripProgress),
+        matching: find.byType(SafeArea),
+      ),
+    );
+    expect(
+      guidanceSafeArea.bottom,
+      isTrue,
+      reason: '안전 영역은 고정 안내 표면 안에 있어야 배경이 화면 끝까지 이어진다',
+    );
+
     await tester.tap(find.byTooltip('장소 저장'));
     await tester.tap(find.byTooltip('상세 열기'));
     await tester.tap(find.text('안내 종료'));
@@ -547,10 +559,22 @@ void main() {
       expect(
         tester
             .widgetList<RoutexButton>(find.byType(RoutexButton))
-            .every((button) => button.size == RoutexButtonSize.compact),
+            .every((button) => button.size == RoutexButtonSize.standard),
         isTrue,
-        reason: '쇼케이스와 소비 앱이 같은 장소 행동 밀도를 써야 한다',
+        reason: '글자가 테두리에 붙는 compact가 아니라 앱과 같은 standard를 써야 한다',
       );
+      for (final button in find.byType(TextButton).evaluate()) {
+        final style = (button.widget as TextButton).style!;
+        expect(
+          style.minimumSize!.resolve({})!.height,
+          RoutexMetrics.standardControl,
+        );
+        expect(
+          style.padding!.resolve({})!.vertical,
+          RoutexSpacing.inlineGap * 2,
+          reason: '버튼 글자와 테두리 사이의 세로 여백을 없애지 않는다',
+        );
+      }
 
       await tester.tap(find.text('출발'));
       await tester.tap(find.text('도착'));
@@ -559,6 +583,7 @@ void main() {
     });
 
     testWidgets('장소 overview가 정체성·경로 행동·소개를 한 패턴으로 묶는다', (tester) async {
+      var closed = false;
       await tester.pumpWidget(
         MaterialApp(
           theme: RoutexTheme.light,
@@ -567,6 +592,9 @@ void main() {
               name: '오설록',
               metadata: 'B1 · 카페',
               saved: false,
+              onClose: () => closed = true,
+              onShare: () {},
+              onSaved: (_) {},
               onOrigin: () {},
               onDestination: () {},
               description: '차 문화를 소개하는 공간',
@@ -577,6 +605,43 @@ void main() {
 
       expect(find.byType(RoutexPlaceHeader), findsOneWidget);
       expect(find.byType(RoutexPlaceActions), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(RoutexPlaceHeader),
+          matching: find.byTooltip('닫기'),
+        ),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: find.byType(RoutexPlaceHeader),
+          matching: find.byTooltip('장소 저장'),
+        ),
+        findsNothing,
+      );
+      expect(
+        tester.getTopLeft(find.byTooltip('장소 저장')).dx,
+        greaterThan(tester.getTopRight(find.text('도착')).dx),
+      );
+      final overviewRect = tester.getRect(find.byType(RoutexPlaceOverview));
+      final titleLeftInset =
+          tester.getRect(find.text('오설록')).left - overviewRect.left;
+      final closeRightInset =
+          overviewRect.right -
+          tester.getRect(find.byIcon(RoutexIcons.close)).right;
+      final saveRightInset =
+          overviewRect.right -
+          tester.getRect(find.byIcon(RoutexIcons.save)).right;
+      expect(
+        (titleLeftInset - closeRightInset).abs(),
+        lessThanOrEqualTo(RoutexSpacing.controlGap),
+        reason: '48dp 터치 박스는 유지하되 보이는 X는 제목과 비슷한 끝선이어야 한다',
+      );
+      expect(
+        (titleLeftInset - saveRightInset).abs(),
+        lessThanOrEqualTo(RoutexSpacing.controlGap),
+        reason: '아래 행의 저장 glyph도 제목과 같은 광학적 끝선을 쓴다',
+      );
       expect(find.text('차 문화를 소개하는 공간'), findsOneWidget);
       expect(
         tester.getTopLeft(find.byType(RoutexPlaceHeader)).dy,
@@ -586,7 +651,70 @@ void main() {
         tester.getTopLeft(find.byType(RoutexPlaceActions)).dy,
         lessThan(tester.getTopLeft(find.text('차 문화를 소개하는 공간')).dy),
       );
+      await tester.tap(find.byTooltip('닫기'));
+      expect(closed, isTrue);
     });
+  });
+
+  testWidgets('최근 목록은 history 아이콘과 정렬된 전체 삭제를 한 패턴으로 그린다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexRecentList(
+            title: '최근 검색어',
+            onClear: () {},
+            items: [
+              RoutexRecentItem(
+                id: 'coffee',
+                title: '고디바',
+                onPressed: () {},
+                onRemove: () {},
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byIcon(RoutexIcons.recent), findsOneWidget);
+    expect(find.text('전체 삭제'), findsOneWidget);
+    expect(
+      tester.getRect(find.byType(RoutexSectionHeader)).left,
+      RoutexSpacing.contentGap,
+    );
+    expect(
+      tester.getSize(find.byType(RoutexListCell)).height,
+      RoutexMetrics.minimumTouchTarget,
+    );
+  });
+
+  testWidgets('경로 플래너는 편집 행 안에서 직접 입력한다', (tester) async {
+    final controller = TextEditingController(text: '오설록');
+    final focusNode = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focusNode.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexRoutePlanner(
+            originLabel: '현재 위치',
+            destinationLabel: '오설록',
+            travelModes: const [],
+            selectedTravelModeId: null,
+            onTravelModeSelected: (_) {},
+            editingField: RoutexRouteField.destination,
+            editingController: controller,
+            editingFocusNode: focusNode,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(RoutexRoutePlanner), findsOneWidget);
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.byType(RoutexSearchBar), findsNothing);
   });
 
   group('RoutexHours', () {
@@ -1122,6 +1250,13 @@ void main() {
 
       expect(find.text('오후 3:24'), findsOneWidget);
       expect(find.text('경로 지우기'), findsNothing);
+      final etaSafeArea = tester.widget<SafeArea>(
+        find.descendant(
+          of: find.byType(RoutexEtaCard),
+          matching: find.byType(SafeArea),
+        ),
+      );
+      expect(etaSafeArea.bottom, isTrue);
       await tester.tap(find.text('안내 시작'));
       expect(started, isTrue);
 

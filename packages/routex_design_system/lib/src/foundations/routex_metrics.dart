@@ -77,6 +77,10 @@ abstract final class RoutexContentMeasure {
 abstract final class RoutexOpticalCorrection {
   static const listTitleGlyphTop = 4.0;
 
+  /// 상세의 오른쪽 quiet action은 48dp 터치 박스 가운데의 20dp
+  /// 글리프라, 같은 인셋에서 제목보다 안쪽으로 들어가 보인다.
+  static const placeTrailingActionEnd = RoutexSpacing.controlGap;
+
   static const sheetHeaderGlyph =
       RoutexMetrics.minimumTouchTarget / 2 -
       (RoutexSpacing.contentGap + RoutexMetrics.iconMedium / 2);

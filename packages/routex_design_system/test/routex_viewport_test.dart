@@ -182,6 +182,16 @@ class _PublicUiSet extends StatelessWidget {
               icon: Icons.image_outlined,
             ),
             RoutexPlaceActions(onOrigin: () {}, onDestination: () {}),
+            RoutexPlaceOverview(
+              name: '아주 긴 한글 이름의 실내 매장',
+              metadata: 'B1 · 카페·베이커리',
+              saved: false,
+              onClose: () {},
+              onShare: () {},
+              onSaved: (_) {},
+              onOrigin: () {},
+              onDestination: () {},
+            ),
             RoutexHours(
               state: RoutexHoursState.open,
               detail: '20:00 종료',

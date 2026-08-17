@@ -171,6 +171,11 @@ void main() {
               label: '도보',
               icon: RoutexIcons.walk,
             ),
+            RoutexTravelModeOption(
+              id: 'transit',
+              label: '대중교통',
+              icon: RoutexIcons.transit,
+            ),
           ],
           selectedTravelModeId: 'walk',
           onTravelModeSelected: (_) {},
@@ -198,6 +203,13 @@ void main() {
           greaterThanOrEqualTo(RoutexMetrics.minimumTouchTarget),
         );
       }
+      expect(
+        tester.getSize(find.byType(RoutexRoutePlanner)).height,
+        RoutexMetrics.minimumTouchTarget * 3 +
+            RoutexStroke.hairline +
+            RoutexSpacing.inlineGap * 3,
+        reason: '두 위치 행과 이동수단 사이에는 4dp만 두고 바깥 위아래도 4dp씩 둔다',
+      );
     });
   });
 

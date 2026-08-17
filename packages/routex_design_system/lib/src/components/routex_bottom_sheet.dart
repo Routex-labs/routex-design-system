@@ -26,6 +26,7 @@ class RoutexBottomSheet extends StatelessWidget {
     this.header,
     this.expand = false,
     this.showHandle = false,
+    this.includeBottomSafeArea = false,
     this.contentInset = RoutexBottomSheetContentInset.surface,
     super.key,
   });
@@ -49,6 +50,12 @@ class RoutexBottomSheet extends StatelessWidget {
   /// **본문이 스크롤하는 시트에서는 이 자리가 아니다.** [RoutexSheetHandle]을
   /// 본문 안에 직접 둔다 — 이유는 그 위젯에 적어 두었다.
   final bool showHandle;
+
+  /// 화면 아래에 붙는 고정 표면이면 true다.
+  ///
+  /// 안전 영역을 표면 바깥에 두면 시트가 홈 인디케이터 위에 떠 있는 카드처럼
+  /// 보인다. 이 옵션은 배경은 화면 끝까지 잇고 본문만 안전 영역 위로 올린다.
+  final bool includeBottomSafeArea;
 
   final RoutexBottomSheetContentInset contentInset;
 
@@ -105,23 +112,29 @@ class RoutexBottomSheet extends StatelessWidget {
         // 그리는 것이 없으므로 픽셀은 그대로다.
         child: Material(
           type: MaterialType.transparency,
-          child: Padding(
-            // handle이 있으면 위쪽 여백은 handle이 가져가므로 표면은 0, handle 없이
-            // header나 본문이 바로 오면 컴포넌트 여백 16을 쓴다.
-            padding: switch (contentInset) {
-              RoutexBottomSheetContentInset.surface =>
-                EdgeInsetsDirectional.fromSTEB(
-                  RoutexSpacing.componentPadding,
-                  showHandle ? 0 : RoutexSpacing.componentPadding,
-                  RoutexSpacing.componentPadding,
-                  RoutexSpacing.sectionGap,
-                ),
-              // 여백은 본문 조각들이 저마다 갖는다. 표면이 넣으면 가장자리까지 닿아야
-              // 하는 사진을 표현할 수 없다.
-              RoutexBottomSheetContentInset.content =>
-                EdgeInsetsDirectional.zero,
-            },
-            child: content,
+          child: SafeArea(
+            top: false,
+            left: false,
+            right: false,
+            bottom: includeBottomSafeArea,
+            child: Padding(
+              // handle이 있으면 위쪽 여백은 handle이 가져가므로 표면은 0, handle 없이
+              // header나 본문이 바로 오면 컴포넌트 여백 16을 쓴다.
+              padding: switch (contentInset) {
+                RoutexBottomSheetContentInset.surface =>
+                  EdgeInsetsDirectional.fromSTEB(
+                    RoutexSpacing.componentPadding,
+                    showHandle ? 0 : RoutexSpacing.componentPadding,
+                    RoutexSpacing.componentPadding,
+                    RoutexSpacing.sectionGap,
+                  ),
+                // 여백은 본문 조각들이 저마다 갖는다. 표면이 넣으면 가장자리까지 닿아야
+                // 하는 사진을 표현할 수 없다.
+                RoutexBottomSheetContentInset.content =>
+                  EdgeInsetsDirectional.zero,
+              },
+              child: content,
+            ),
           ),
         ),
       ),

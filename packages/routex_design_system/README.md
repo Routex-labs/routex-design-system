@@ -5,8 +5,8 @@ Navigation의 매장 상세·목록·안내 제품 패턴을 제공한다.
 
 색상, 타이포그래피, 간격, 곡률, 공통 metric, 지도 위 layer와 제품 motion token, 그리고
 `RoutexInset`·`RoutexStack`·`RoutexCluster` 같은 layout primitive는 proposal이다. 공개
-위젯 52종은 별도 예외가 없는 한 모두 beta이며 값과 API는 v1 전에 조정할 수 있다. 상태를
-52번 반복해서 적지 않고, stable·deprecated 같은 예외만 시스템화 기준 문서에 기록한다.
+위젯 53종은 별도 예외가 없는 한 모두 beta이며 값과 API는 v1 전에 조정할 수 있다. 상태를
+53번 반복해서 적지 않고, stable·deprecated 같은 예외만 시스템화 기준 문서에 기록한다.
 
 | 구분 | 공개 컴포넌트 | 소유하는 결정 |
 |---|---|---|
@@ -15,7 +15,7 @@ Navigation의 매장 상세·목록·안내 제품 패턴을 제공한다.
 | 피드백·대기 | `RoutexToast`, `RoutexToastSurface`, `RoutexInlineNotice`, `RoutexSkeleton`, `RoutexSkeletonList` | 되돌릴 것 없는 결과, 되돌리기가 붙는 결과, 아직 오지 않은 콘텐츠의 자리 |
 | 상세 콘텐츠 | `RoutexInfoRow`, `RoutexKeyValueRows`, `RoutexMediaCarousel`, `RoutexPhotoGrid` | 사실 한 줄과 복사, 라벨-값 표, 대표 사진과 사진 격자 |
 | 입력·설정 | `RoutexSearchBar`, `RoutexTravelModeBar`, `RoutexRoutePlanner`, `RoutexFloorSelector`, `RoutexSortMenu`, `RoutexSwitchRow` | 검색 진입, 출발·도착 순서, 가용 이동수단, 층 선택, 정렬 기준, 값 하나 켜고 끄기 |
-| 장소 패턴 | `RoutexPlaceOverview`, `RoutexPlaceHeader`, `RoutexPlaceActions`, `RoutexHours`, `RoutexMenuList`, `RoutexLinkList`, `RoutexResultList` | 대표 사진부터 소개까지의 상세 첫 구획, 장소 정보와 공유·저장, 출발·도착 위계, 영업 상태와 요일 표, 판매 목록, 외부 채널, 목록의 세 상태 |
+| 장소 패턴 | `RoutexPlaceOverview`, `RoutexPlaceHeader`, `RoutexPlaceActions`, `RoutexHours`, `RoutexMenuList`, `RoutexLinkList`, `RoutexResultList`, `RoutexRecentList` | 장소 정보부터 대표 사진까지의 상세 첫 구획, 장소 정보와 공유·저장, 출발·도착 위계, 영업 상태와 요일 표, 판매 목록, 외부 채널, 결과·최근 목록 상태 |
 | 안내 패턴 | `RoutexManeuverBanner`, `RoutexRouteOption`, `RoutexTripProgress`, `RoutexEtaCard`, `RoutexStepList`, `RoutexArrivalCard`, `RoutexTransitItinerary`, `RoutexTransitLegStrip` | 다음 행동, 경로 선택, 진행 정보, 출발 전 요약, 단계 목록, 도착 확인, 대중교통 후보 |
 | 상태 | `RoutexInfoSection`, `RoutexEmptyState`, `RoutexStatusBanner` | 상세 설명, 빈 값, 완료·경고·오류 |
 
@@ -87,7 +87,9 @@ MaterialApp(
   자리는 `RoutexTravelModeBar`를 사용한다. 두 역할을 한 컴포넌트로 합치지 않는다.
 - 목록 묶음의 제목과 "전체 보기" 같은 보조 동작은 `RoutexSectionHeader`가 소유한다. 이 줄에
   주 행동을 넣지 않는다. 한 목록 안의 구획 라벨은 `RoutexSectionHeaderLevel.group`을 쓴다.
-- 시트의 뒤로·제목·닫기는 `RoutexSheetHeader`를 `RoutexBottomSheet.header`에 넘겨 만든다.
+- 목록·검색 시트의 뒤로·제목·닫기는 `RoutexSheetHeader`를
+  `RoutexBottomSheet.header`에 넘겨 만든다. 장소 상세는 이름 줄의 X가 닫기를
+  맡으므로 별도 시트 헤더를 중복하지 않는다.
   본문에서 제목 줄을 다시 조립하지 않는다. `trailing`에는 화면을 바꾸지 않는 버튼만 온다.
 - 시트 handle은 실제로 끌어 확장할 수 있는 소비 화면만 `showHandle: true`로 켠다. 기본값은
   false이며 고정 카드·검색 결과·고정 높이 목록의 위쪽 여백 장식으로 사용하지 않는다.
