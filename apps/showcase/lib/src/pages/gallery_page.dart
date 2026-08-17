@@ -73,7 +73,7 @@ class _GalleryGridState extends State<GalleryGrid> {
   bool _saved = false;
   String _travelMode = 'walk';
   String? _category = '음식점';
-  int _floor = 1;
+  String _floor = '1F';
   String _sort = 'name';
   int _itinerary = 0;
   bool _autoIndoor = true;
@@ -467,9 +467,9 @@ class _GalleryGridState extends State<GalleryGrid> {
                   surface: _CardSurface.map,
                   child: RoutexFloorSelector(
                     options: const [
-                      RoutexFloorOption(id: 2, label: '2F'),
-                      RoutexFloorOption(id: 1, label: '1F'),
-                      RoutexFloorOption(id: -1, label: 'B1'),
+                      RoutexFloorOption(id: '2F', label: '2F'),
+                      RoutexFloorOption(id: '1F', label: '1F'),
+                      RoutexFloorOption(id: 'B1', label: 'B1'),
                     ],
                     selectedId: _floor,
                     onSelected: (value) => setState(() => _floor = value),
@@ -494,7 +494,7 @@ class _GalleryGridState extends State<GalleryGrid> {
                       RoutexMapControl(
                         label: '추적 중',
                         icon: RoutexIcons.followLocation,
-                        selected: true,
+                        tone: RoutexMapControlTone.active,
                         onPressed: () {},
                       ),
                     ],
