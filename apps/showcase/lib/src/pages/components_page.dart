@@ -101,9 +101,10 @@ class _ComponentsPageState extends State<ComponentsPage> {
                       tone: RoutexMapControlTone.active,
                       onPressed: () {},
                     ),
+                    // 앞의 셋이 icon 변형이므로 여기는 text 변형을 보여 준다.
                     RoutexMapControl(
                       label: '층 선택',
-                      icon: RoutexIcons.floors,
+                      text: '1F',
                       onPressed: () {},
                     ),
                   ],
