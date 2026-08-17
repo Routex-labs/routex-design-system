@@ -2,13 +2,13 @@
 
 ## 문서 상태와 범위
 
-- 상태: 단계 4 진행 중 · 단계 5 착수
+- 상태: 단계 0~5·7 적용 · 단계 6 일부(건물 안 확인 대기) · 단계 8 판정 완료
 - 공급자: `packages/routex_design_system`
 - 소비자: `Routex-labs/Navigation`의 Flutter 클라이언트
 - 목적: Showcase에서 검증한 현재 디자인과 컴포넌트 계약을 원본 앱에 안전하게 연결하는 방법 정의
 - 비목적: 이 문서만으로 단계 2 이후를 시작하거나 승인하지 않음
 - 원본 코드 조사 기준: Navigation `main`의 `b655c066e00ca6b2bab6dd9035c37a9d8d54fe62`
-- 앱이 소비 중인 Runtime Kit release: `v0.2.17`. 앱이 실제로 고정한 전체 SHA는 Navigation
+- 앱이 소비 중인 Runtime Kit release: `v0.2.21`. 앱이 실제로 고정한 전체 SHA는 Navigation
   `client/pubspec.lock`의 `resolved-ref`가 단일 출처다
 
 ### 적용 상태
@@ -19,12 +19,26 @@
 | 1. 의존성과 테마 브리지 | 적용 | `client/pubspec.yaml`·`client/pubspec.lock`의 고정 ref, `AppTheme.withRoutexTokens`, `client/test/theme/routex_theme_bridge_test.dart` |
 | 2. 저위험 기반 요소 | 적용 | 아래 표 |
 | 3. 하단 시트 | 적용 | 시트 여덟이 `RoutexBottomSheet` 표면을 쓴다. 손잡이 판정은 `client/test/widgets/sheet_handle_test.dart` |
-| 4. 검색과 결과 목록 | 진행 중 | 아래 표 |
-| 5. 장소 상세와 공유 | 진행 중 | 아래 표. 공유·딥링크는 미착수 |
-| 6 이후 | 미착수 | — |
+| 4. 검색과 결과 목록 | 적용 | 아래 표 |
+| 5. 장소 상세와 공유 | 적용 | 아래 표. 공유·딥링크까지 붙었다 |
+| 6. 안내 전·안내 중·도착 | 일부 | 계획 카드·단계 목록은 적용. 안내 배너·도착 카드는 **건물 안에서만** 확인돼 대기 |
+| 7. 지도 컨트롤 | 적용 | 지도 버튼 셋·층 선택기. 나머지는 조사에서 "옮기면 안 됨"으로 판정났다 |
+| 8. 레거시 제거와 전환 판단 | 판정 완료 | 아래 "전역 전환" |
 
 전역 테마는 아직 `RoutexTheme.light`가 아니다. 브리지는 `RoutexColorTokens` ThemeExtension **하나만**
 더하며, 그 사실 자체를 `withRoutexTokens`에 대한 테스트가 지킨다.
+
+**단계 8의 전환 판정은 "아직 아니다"이고, 근거는 잰 값이다.** 갈아 끼우고 전체를 돌려 보니
+1,555개 중 실패가 둘뿐이었는데 그 둘이 "전환하지 않았음"을 지키던 브리지 테스트 자신이었다 —
+즉 **테스트 통과가 이 변경의 근거가 되지 못한다.** 계산된 `ThemeData`를 직접 견주면 앱
+`primary`(하늘)와 Kit `actionPrimary`(진파랑)가 다른 색이고, 본문이 14 → 16에 행간 1.5로
+늘며, 컴포넌트 테마 여덟이 한꺼번에 Material 기본으로 떨어진다. 남은 차이의 목록은 Navigation
+`client/test/theme/routex_theme_bridge_test.dart`의 전환 게이트가 단일 출처이며, 그 목록이
+비는 날 전환한다. 판정 근거와 순서는 Navigation `docs/client/theme-handover.md`에 있다.
+
+> **전환을 시도해 보지 않았으면 못 찾았을 결함이 하나 나왔다.** `RoutexTheme.light`가 역할 슬롯
+> 여덟만 채우는데 Material 슬롯은 열다섯이라, 남는 일곱이 기본값 Roboto로 남아 한글이 시스템
+> 대체 글꼴로 떨어지고 있었다. `TextField`의 입력 글자가 `bodyLarge`다. v0.2.21에서 고쳤다.
 
 tag는 사람이 읽는 이름이고 **앱이 고정하는 것은 그 tag가 가리키는 전체 SHA**다. tag는 옮길 수 있지만
 SHA는 그럴 수 없다.
@@ -487,7 +501,7 @@ ThemeData가 이전과 같다**는 것이다. `AppTheme.light.copyWith(extension
 | 공지 | 적용 — 평평한 표면 + `RoutexInfoRow`로 조립했다. 계약을 늘리지 않았다 |
 | 메뉴 줄·갈래 탭·카테고리 탭·검색창 | 미착수 |
 | 지도 바로가기 | 옮기지 않는다 — 앱이 `map` 섹션을 화면에서 걸러 내고 있어 뜨지 않는다 |
-| 공유, 딥링크 | 미착수 — manifest·entitlement를 처음 건드리는 자리다 |
+| 공유, 딥링크 | 적용. origin은 Cloud Run 주소이고 증명 파일 둘과 fallback 페이지는 백엔드가 연다 |
 
 진행:
 
