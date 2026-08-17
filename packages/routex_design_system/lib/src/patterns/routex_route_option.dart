@@ -31,7 +31,9 @@ class RoutexRouteOption extends StatelessWidget {
       button: true,
       selected: selected,
       enabled: onPressed != null,
+      focusable: onPressed != null,
       label: '$title, $detail, $meta',
+      onTap: onPressed,
       excludeSemantics: true,
       child: Material(
         color: selected ? colors.actionPrimarySubtle : colors.surfaceRaised,

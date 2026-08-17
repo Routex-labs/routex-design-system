@@ -171,6 +171,7 @@ class _TravelModeItemState extends State<_TravelModeItem> {
     return Semantics(
       button: true,
       selected: widget.selected,
+      focusable: true,
       label: widget.option.label,
       onTap: widget.onPressed,
       excludeSemantics: true,

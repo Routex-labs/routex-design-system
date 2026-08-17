@@ -37,14 +37,19 @@ class RoutexButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: !disabled,
+      focusable: !disabled,
       label: label,
       liveRegion: isLoading,
+      onTap: disabled ? null : onPressed,
       excludeSemantics: true,
       child: TextButton(
         onPressed: disabled ? null : onPressed,
         style: ButtonStyle(
           minimumSize: const WidgetStatePropertyAll(
-            Size(64, RoutexMetrics.standardControl),
+            Size(
+              RoutexMetrics.minimumButtonWidth,
+              RoutexMetrics.standardControl,
+            ),
           ),
           tapTargetSize: MaterialTapTargetSize.padded,
           padding: const WidgetStatePropertyAll(
@@ -75,7 +80,7 @@ class RoutexButton extends StatelessWidget {
                   key: const ValueKey('loading'),
                   dimension: RoutexMetrics.iconMedium,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: RoutexStroke.emphasis,
                     color: foreground,
                   ),
                 )

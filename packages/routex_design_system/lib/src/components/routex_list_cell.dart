@@ -92,6 +92,8 @@ class RoutexListCell extends StatelessWidget {
 
   bool get _hasMetric => metric?.trim().isNotEmpty ?? false;
 
+  bool get _hasAccessory => trailingActionLabel != null || reorderable;
+
   /// 강조 구간을 색이 다른 span으로 가른다. 구간이 없으면 원문 하나다.
   List<TextSpan> _titleSpans(Color emphasis) {
     assert(
@@ -146,6 +148,7 @@ class RoutexListCell extends StatelessWidget {
       container: true,
       button: interactive,
       enabled: interactive ? enabled : null,
+      focusable: interactive && enabled,
       selected: selected,
       // 강조는 색이라 읽어 주지 않는다. 값은 읽어 준다 — 보이는 것과 같은 순서다.
       label: [
@@ -153,7 +156,9 @@ class RoutexListCell extends StatelessWidget {
         if (_hasSubtitle) subtitle!,
         if (_hasMetric) metric!,
       ].join(', '),
-      excludeSemantics: true,
+      onTap: interactive && enabled ? onPressed : null,
+      excludeSemantics: !_hasAccessory,
+      explicitChildNodes: _hasAccessory,
       child: RoutexFocusRing(
         radius: RoutexRadii.field,
         enabled: interactive && enabled,
@@ -162,6 +167,7 @@ class RoutexListCell extends StatelessWidget {
           borderRadius: RoutexRadii.field,
           child: InkWell(
             onTap: enabled ? onPressed : null,
+            excludeFromSemantics: true,
             borderRadius: RoutexRadii.field,
             // focus는 링이 맡는다. 채움은 selected·hover·pressed가 나눠 쓴다.
             focusColor: Colors.transparent,
@@ -221,51 +227,57 @@ class RoutexListCell extends StatelessWidget {
                     ),
                     const SizedBox(width: RoutexSpacing.contentGap),
                     Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (titleHighlights.isEmpty)
-                            Text(
-                              title,
-                              style: RoutexTypography.bodyStrong.copyWith(
-                                color: foreground,
+                      child: ExcludeSemantics(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (titleHighlights.isEmpty)
+                              Text(
+                                title,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: RoutexTypography.bodyStrong.copyWith(
+                                  color: foreground,
+                                ),
+                              )
+                            else
+                              Text.rich(
+                                TextSpan(
+                                  children: _titleSpans(
+                                    enabled
+                                        ? colors.actionPrimary
+                                        : colors.contentDisabled,
+                                  ),
+                                ),
+                                style: RoutexTypography.bodyStrong.copyWith(
+                                  color: foreground,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                            )
-                          else
-                            Text.rich(
-                              TextSpan(
-                                children: _titleSpans(
-                                  enabled
-                                      ? colors.actionPrimary
-                                      : colors.contentDisabled,
+                            if (_hasSubtitle) ...[
+                              const SizedBox(height: RoutexSpacing.inlineGap),
+                              Text(
+                                subtitle!,
+                                style: RoutexTypography.bodySmall.copyWith(
+                                  color: secondaryForeground,
                                 ),
                               ),
-                              style: RoutexTypography.bodyStrong.copyWith(
-                                color: foreground,
+                            ],
+                            if (_hasMetric) ...[
+                              const SizedBox(height: RoutexSpacing.inlineGap),
+                              Text(
+                                metric!,
+                                // 맥락보다 한 단계 진하다. 크기는 같고 굵기와 색만
+                                // 올려, 훑는 눈이 값에서 멈추게 한다.
+                                style: RoutexTypography.label.copyWith(
+                                  color: foreground,
+                                ),
                               ),
-                            ),
-                          if (_hasSubtitle) ...[
-                            const SizedBox(height: RoutexSpacing.inlineGap),
-                            Text(
-                              subtitle!,
-                              style: RoutexTypography.bodySmall.copyWith(
-                                color: secondaryForeground,
-                              ),
-                            ),
+                            ],
                           ],
-                          if (_hasMetric) ...[
-                            const SizedBox(height: RoutexSpacing.inlineGap),
-                            Text(
-                              metric!,
-                              // 맥락보다 한 단계 진하다. 크기는 같고 굵기와 색만
-                              // 올려, 훑는 눈이 값에서 멈추게 한다.
-                              style: RoutexTypography.label.copyWith(
-                                color: foreground,
-                              ),
-                            ),
-                          ],
-                        ],
+                        ),
                       ),
                     ),
                     if (trailingIcon case final icon?) ...[
@@ -285,11 +297,20 @@ class RoutexListCell extends StatelessWidget {
                     // 배경을 가지면 서로 다른 컨트롤로 읽힌다.
                     if (trailingActionLabel case final actionLabel?) ...[
                       const SizedBox(width: RoutexSpacing.controlGap),
-                      RoutexIconAction(
+                      Semantics(
+                        container: true,
+                        button: true,
+                        enabled: enabled && onTrailingAction != null,
+                        focusable: enabled && onTrailingAction != null,
                         label: actionLabel,
-                        icon: trailingActionIcon,
-                        tone: RoutexIconActionTone.quiet,
-                        onPressed: enabled ? onTrailingAction : null,
+                        onTap: enabled ? onTrailingAction : null,
+                        excludeSemantics: true,
+                        child: RoutexIconAction(
+                          label: actionLabel,
+                          icon: trailingActionIcon,
+                          tone: RoutexIconActionTone.quiet,
+                          onPressed: enabled ? onTrailingAction : null,
+                        ),
                       ),
                     ],
                     if (reorderable) ...[
@@ -300,6 +321,7 @@ class RoutexListCell extends StatelessWidget {
                         // 중심이 2 어긋난다. 누르지 않는 자리라도 상자는 맞춘다.
                         dimension: RoutexMetrics.minimumTouchTarget,
                         child: Semantics(
+                          container: true,
                           label: '순서 바꾸기 손잡이',
                           child: Icon(
                             RoutexIcons.reorder,

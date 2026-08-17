@@ -210,7 +210,9 @@ class _MenuRow extends StatelessWidget {
 
     return Semantics(
       button: true,
+      focusable: true,
       label: entry.name,
+      onTap: onPressed,
       excludeSemantics: true,
       child: RoutexFocusRing(
         radius: RoutexRadii.field,

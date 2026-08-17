@@ -54,7 +54,10 @@ class RoutexInlineNotice extends StatelessWidget {
                     shape: const RoundedRectangleBorder(
                       borderRadius: RoutexRadii.control,
                     ),
-                    minimumSize: const Size(0, RoutexMetrics.standardControl),
+                    minimumSize: const Size(
+                      RoutexMetrics.minimumInlineActionWidth,
+                      RoutexMetrics.standardControl,
+                    ),
                     tapTargetSize: MaterialTapTargetSize.padded,
                   ),
                   child: Text(actionLabel!),

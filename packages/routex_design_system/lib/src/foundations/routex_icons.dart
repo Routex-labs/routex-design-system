@@ -38,6 +38,7 @@ abstract final class RoutexIcons {
   // 저장
   static const save = Icons.bookmark_border_rounded;
   static const saved = Icons.bookmark_rounded;
+  static const delete = Icons.delete_outline_rounded;
 
   // 지도 조작
   static const currentLocation = Icons.my_location_rounded;
@@ -56,8 +57,12 @@ abstract final class RoutexIcons {
   static const subway = Icons.subway_rounded;
   static const train = Icons.train_rounded;
   static const transfer = Icons.swap_calls_rounded;
+  static const wrongWay = Icons.u_turn_right_rounded;
+  static const turnLeft = Icons.turn_left_rounded;
   static const turnRight = Icons.turn_right_rounded;
   static const straight = Icons.straight_rounded;
+  static const escalator = Icons.escalator_rounded;
+  static const elevator = Icons.elevator_rounded;
   static const play = Icons.play_arrow_rounded;
   static const pause = Icons.pause_rounded;
   static const muted = Icons.volume_off_rounded;

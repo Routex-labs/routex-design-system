@@ -124,7 +124,9 @@ class RoutexTransitItinerary extends StatelessWidget {
     return Semantics(
       button: true,
       selected: selected,
+      focusable: true,
       label: '$duration, ${facts.join(', ')}',
+      onTap: onPressed,
       excludeSemantics: true,
       child: RoutexFocusRing(
         radius: RoutexRadii.field,

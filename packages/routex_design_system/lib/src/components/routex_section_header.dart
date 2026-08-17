@@ -61,7 +61,9 @@ class RoutexSectionHeader extends StatelessWidget {
             const SizedBox(width: RoutexSpacing.controlGap),
             Semantics(
               button: true,
+              focusable: true,
               label: actionLabel,
+              onTap: onAction,
               excludeSemantics: true,
               child: TextButton(
                 onPressed: onAction,

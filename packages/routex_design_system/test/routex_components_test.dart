@@ -16,6 +16,17 @@ void main() {
 
     expect(find.text('길찾기'), findsOneWidget);
     expect(
+      tester.getSemantics(find.byType(RoutexButton)),
+      matchesSemantics(
+        label: '길찾기',
+        isButton: true,
+        hasEnabledState: true,
+        isEnabled: true,
+        isFocusable: true,
+        hasTapAction: true,
+      ),
+    );
+    expect(
       tester.getSize(find.byType(TextButton)).height,
       greaterThanOrEqualTo(RoutexMetrics.minimumTouchTarget),
     );
@@ -192,6 +203,50 @@ void main() {
       expect(find.byIcon(RoutexIcons.more), findsNothing);
     });
 
+    testWidgets('행 동작과 끝 동작·재정렬 이름은 독립 semantics로 남는다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexListCell(
+              title: '나이키',
+              subtitle: '1F',
+              trailingActionLabel: '나이키 삭제',
+              onTrailingAction: () {},
+              reorderable: true,
+              onPressed: () {},
+            ),
+          ),
+        ),
+      );
+
+      expect(
+        tester.getSemantics(find.byType(RoutexListCell)),
+        matchesSemantics(
+          label: '나이키, 1F',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          hasSelectedState: true,
+          isSelected: false,
+          isFocusable: true,
+          hasTapAction: true,
+        ),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('나이키 삭제')),
+        matchesSemantics(
+          label: '나이키 삭제',
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isFocusable: true,
+          hasTapAction: true,
+        ),
+      );
+      expect(find.bySemanticsLabel('순서 바꾸기 손잡이'), findsOneWidget);
+    });
+
     testWidgets('selected·disabled 상태를 의미와 동작에 함께 반영한다', (tester) async {
       await tester.pumpWidget(
         MaterialApp(
@@ -279,11 +334,14 @@ void main() {
             MaterialApp(
               theme: RoutexTheme.light,
               home: const Scaffold(
-                body: RoutexListCell(
-                  title: '더현대 서울에서 저장한 아주 긴 장소 이름',
-                  subtitle: '지하 2층에서 찾을 수 있는 카페와 베이커리 상세 정보',
-                  leadingIcon: Icons.storefront_outlined,
-                  trailingIcon: Icons.chevron_right,
+                body: Align(
+                  alignment: Alignment.topCenter,
+                  child: RoutexListCell(
+                    title: '더현대 서울에서 저장한 아주 긴 장소 이름',
+                    subtitle: '지하 2층에서 찾을 수 있는 카페와 베이커리 상세 정보',
+                    leadingIcon: Icons.storefront_outlined,
+                    trailingIcon: Icons.chevron_right,
+                  ),
                 ),
               ),
             ),
@@ -291,6 +349,11 @@ void main() {
           await tester.pump();
 
           expect(find.textContaining('더현대 서울'), findsOneWidget);
+          final title = tester.widget<Text>(
+            find.text('더현대 서울에서 저장한 아주 긴 장소 이름'),
+          );
+          expect(title.maxLines, 2);
+          expect(title.overflow, TextOverflow.ellipsis);
           expect(tester.takeException(), isNull);
         });
       }
@@ -656,6 +719,9 @@ void main() {
       await tester.tap(find.byType(TextButton));
       await tester.pumpAndSettle();
       expect(find.text('접기'), findsOneWidget, reason: '펼친 뒤 개수는 세지 않는다');
+
+      final label = tester.widget<Text>(find.text('접기'));
+      expect(label.overflow, TextOverflow.ellipsis);
     });
   });
 
@@ -975,6 +1041,41 @@ void main() {
 
       expect(tester.getSize(find.byType(RoutexMediaCarousel)).height, 0);
       expect(tester.getSize(find.byType(RoutexPhotoGrid)).height, 0);
+    });
+
+    testWidgets('사진 목록이 줄어들면 현재 카운터를 새 범위로 보정한다', (tester) async {
+      var items = List.generate(
+        5,
+        (index) => RoutexMediaItem(
+          image: MemoryImage(Uint8List.fromList([index])),
+          semanticLabel: '사진 ${index + 1}',
+        ),
+      );
+      late StateSetter update;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                update = setState;
+                return RoutexMediaCarousel(items: items);
+              },
+            ),
+          ),
+        ),
+      );
+
+      for (var index = 0; index < 4; index++) {
+        await tester.drag(find.byType(PageView), const Offset(-500, 0));
+        await tester.pumpAndSettle();
+      }
+      expect(find.text('5 / 5'), findsOneWidget);
+
+      update(() => items = items.take(2).toList());
+      await tester.pump();
+      expect(find.text('2 / 2'), findsOneWidget);
+      expect(find.text('5 / 2'), findsNothing);
     });
   });
 

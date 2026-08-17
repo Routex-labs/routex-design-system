@@ -120,7 +120,9 @@ class _LinkRow extends StatelessWidget {
 
     return Semantics(
       button: true,
+      focusable: true,
       label: '${item.label}, 앱 밖에서 열기',
+      onTap: onPressed,
       excludeSemantics: true,
       child: RoutexFocusRing(
         radius: RoutexRadii.field,

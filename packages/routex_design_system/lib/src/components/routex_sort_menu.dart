@@ -59,9 +59,9 @@ class RoutexSortMenu extends StatelessWidget {
     );
 
     return Semantics(
+      container: true,
       button: true,
       label: '정렬 기준, ${selected.label}',
-      excludeSemantics: true,
       child: PopupMenuButton<String>(
         initialValue: selected.id,
         tooltip: '정렬 기준',
