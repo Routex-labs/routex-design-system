@@ -54,19 +54,3 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
       - run: flutter build web
-
-  promo-studio:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/promo_studio
-    steps:
-      - uses: actions/checkout@v7
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: 3.44.8
-          channel: stable
-          cache: true
-      - run: flutter pub get
-      - run: flutter analyze
-      - run: flutter build web
