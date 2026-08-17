@@ -1,3 +1,20 @@
+## 0.2.23 — handle이 제 여백을 갖는다
+
+- `RoutexSheetHandle`이 **위아래 여백(각 8)을 스스로 갖는다.** 지금까지 그 여백은 표면의
+  padding이 만들고 있어서, handle이 표면 밖 본문으로 나가는 순간 사라졌다.
+  `contentInset: content`인 스크롤 시트에서는 위 여백이 **정확히 0**이 되어 handle 4dp 띠가
+  시트 맨 윗줄에 붙었다. 카테고리 매장 시트에서 그렇게 보였다.
+  `RoutexBottomSheet`는 `showHandle`일 때 위쪽 inset을 handle에 넘긴다.
+  **화면 영향:** `showHandle`을 쓰던 시트는 픽셀이 그대로다(handle 위 8, 아래 8 — 측정으로
+  확인했다). 본문이 handle을 소유하던 시트만 handle이 8만큼 내려오고 시트가 16 높아진다.
+  **앱 영향:** 코드는 안 바뀐다. 본문 안 handle 앞뒤에 `SizedBox`나 `Padding`으로 여백을
+  덧대 두었다면 그것을 지운다.
+- 이것이 새지 않게 두 경로의 `handle.top`이 같은 값인지 좌표로 고정했다. 이전 테스트는
+  본문 안 handle을 `findsOneWidget`으로만 확인해서 자리를 보지 않았다.
+- Showcase `표면` 섹션에 **본문이 handle을 소유하는 스크롤 시트** 틀을 넣었다. 실제 시트가
+  반드시 쓰는 경로인데 카탈로그에는 `showHandle: true`만 있어, 눈으로도 대조할 수 없었다.
+  **골든을 다시 찍어야 한다** — `components_표면-beta` 한 장이다.
+
 ## 0.2.22 — 포인트 색 전환
 
 - 포인트 색을 파랑에서 초록(`#0F5A46`)으로 바꿨다. `actionPrimary`·`actionPrimaryPressed`·

@@ -58,7 +58,7 @@ SHA는 그럴 수 없다.
 
 #### 단계 3에서 드러난 것
 
-시트 여덟을 옮기며 **표면이 무엇을 소유해야 하는지**가 세 번 갱신됐다. 셋 다 "지금 디자인을 표현할
+시트 여덟을 옮기며 **표면이 무엇을 소유해야 하는지**가 네 번 갱신됐다. 넷 다 "지금 디자인을 표현할
 수 있는가"에서 걸렸고, 앱에서 흉내 내는 대신 공급자 계약으로 올렸다.
 
 | 걸린 것 | 왜 | 어디서 |
@@ -66,8 +66,11 @@ SHA는 그럴 수 없다.
 | 손잡이가 표면 위에 고정돼 있었다 | `DraggableScrollableSheet`는 제 scrollController가 받은 드래그로만 크기가 바뀐다. 표면 위 손잡이는 끌리지 않는 장식이다 | `RoutexSheetHandle`(v0.2.4) |
 | 표면이 본문 여백을 강제했다 | 대표 사진은 가장자리까지 닿아야 하고 글은 안으로 들어와야 한다 | `contentInset`(v0.2.4) |
 | 표면이 잉크 면을 주지 않았다 | 시트 안의 누를 수 있는 줄이 배경·물결을 칠할 자리가 시트 색 아래로 내려갔다. `ListTile`이 단언으로 잡는다 | 투명 `Material`(v0.2.5) |
+| 본문으로 옮긴 손잡이가 시트 맨 윗줄에 붙었다 | 손잡이 위 여백을 표면 padding이 만들고 있었다. 표면 밖으로 나가면 여백이 0이 된다 | 손잡이가 제 여백을 소유(v0.2.23) |
 
-셋 다 **화면을 열어 보기 전에는 안 보이는** 종류였다. 계약을 문서에서만 대조했다면 셋 다 놓쳤다.
+넷 다 **화면을 열어 보기 전에는 안 보이는** 종류였다. 계약을 문서에서만 대조했다면 넷 다 놓쳤다.
+넷째는 조각을 나누면서 **표시만 들고 나오고 배치 계약을 두고 온** 경우다. 공개 API를 쪼갤 때는
+나온 조각이 혼자 서도 같은 자리에 서는지 좌표로 확인한다.
 
 이 문서는 **어떻게 옮길지**를 설명한다. 장소 상세·공유·안내 화면의 제품 결정은
 [`place-detail-guidance-decisions.md`](place-detail-guidance-decisions.md), 현재 픽셀을 바꾸지 않고
@@ -779,8 +782,9 @@ link coordinator가 test home 위에 강제로 map shell을 열면 기존 테스
 3. builder가 준 controller를 `SingleChildScrollView`에 그대로 연결하고 keyboard bottom inset과
    overscroll 억제를 유지한다.
 4. Material·개별 padding·`SheetGrabHandle`·`SheetHeader`·`_PlaceCore`·`_PlaceActions`의 표시 책임만
-   `RoutexBottomSheet(showHandle: true)`, `RoutexSheetHeader`, `RoutexPlaceHeader`,
-   `RoutexPlaceActions`로 교체한다.
+   `RoutexBottomSheet`, `RoutexSheetHeader`, `RoutexPlaceHeader`, `RoutexPlaceActions`로 교체한다.
+   본문이 스크롤하므로 `showHandle`은 false로 두고 `RoutexSheetHandle`을 스크롤 콘텐츠의 첫
+   항목으로 둔다. handle 위아래 여백은 handle이 가지므로 앞뒤에 `SizedBox`를 넣지 않는다.
 5. 상세 header의 `supportingText`와 `leadingIcon`은 비운다. 검색 결과의 reach는 삭제하지 않는다.
 6. `_loadDetailContent`와 `_loadNearbyStores`는 독립 완료 순서와 실패 격리를 유지한다.
 7. section은 summary, hours, menu, business info, link, media, nearby의 데이터 순서와 조건을 먼저

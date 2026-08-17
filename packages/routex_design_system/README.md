@@ -91,6 +91,10 @@ MaterialApp(
   본문에서 제목 줄을 다시 조립하지 않는다. `trailing`에는 화면을 바꾸지 않는 버튼만 온다.
 - 시트 handle은 실제로 끌어 확장할 수 있는 소비 화면만 `showHandle: true`로 켠다. 기본값은
   false이며 고정 카드·검색 결과·고정 높이 목록의 위쪽 여백 장식으로 사용하지 않는다.
+- 본문이 스크롤하는 시트는 `showHandle: false`로 두고 `RoutexSheetHandle`을 스크롤 콘텐츠의 첫
+  항목으로 둔다. `DraggableScrollableSheet`는 제 scrollController가 받은 드래그로만 크기가
+  바뀌므로 표면 위 handle은 끌리지 않는 장식이다. **handle 위아래 여백은 handle이 소유하므로
+  두 경로의 자리는 같다.** 앞뒤에 `SizedBox`나 `Padding`을 덧대 여백을 만들지 않는다.
 - 지도에 보이는 대상을 좁히는 칩은 `RoutexMapOverlay.filters`에 `RoutexChipSurface.onMap`으로
   둔다. 목록을 좁히는 칩은 그 목록이 있는 시트 안에 `inSheet`로 둔다.
 - 장소·검색 결과 행은 `RoutexListCell`을 사용한다. 현재 beta 계약은 leading 유무와 관계없이
