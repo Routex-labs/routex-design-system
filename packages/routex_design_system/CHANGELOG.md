@@ -1,3 +1,23 @@
+## 미출시 — 동작 semantics와 동적 콘텐츠 보정
+
+- 자식 semantics를 제외하는 버튼·행·경로 패턴의 부모 노드에 `tap`과
+  focusable 상태를 연결했다. `RoutexListCell`의 끝 동작과 재정렬 손잡이는
+  행 자체와 별도의 semantics 노드로 남는다.
+- `RoutexMediaCarousel`은 사진 목록이 줄어들면 현재 페이지를 새 범위로
+  보정한다. `RoutexListCell` 제목은 2줄 말줄임, `RoutexShowMore` 라벨은 1줄
+  말줄임으로 긴 한글·2배 글자의 높이와 잘림을 제한한다.
+- source guard가 `strokeWidth`와 `Size`의 위치 인자, `routex_theme.dart`를 포함하며
+  주석·문자열은 검사하지 않는다. 색 역할 전수를 대비 계약·면제 목록과
+  대조해 새 역할이 조용히 누락되지 않게 했다.
+- `RoutexSearchBar`가 소비 앱의 전역 입력 채움·테두리를 차단한다. 검색 표면 안에
+  파란 입력 면이 한 겹 더 생기지 않는다.
+- `RoutexRoutePlanner`는 이동수단이 없을 때 그 자리를 만들지 않고, 위치 행의 48dp
+  터치 영역은 유지하면서 중복 상하 여백을 줄였다.
+- `RoutexButtonSize.compact`를 추가하고 `RoutexPlaceActions`가 이를 사용한다.
+  쇼케이스와 소비 앱 모두 출발·도착 버튼은 32dp 시각 면과 48dp 터치 영역을 쓴다.
+- `RoutexPlaceOverview`가 대표 사진 → 장소 정보 → 출발·도착 → 소개의 순서와
+  간격을 소유한다. 쇼케이스와 Navigation 앱이 이 패턴을 함께 사용한다.
+
 ## 0.2.23 — handle이 제 여백을 갖는다
 
 - `RoutexSheetHandle`이 **위아래 여백(각 8)을 스스로 갖는다.** 지금까지 그 여백은 표면의

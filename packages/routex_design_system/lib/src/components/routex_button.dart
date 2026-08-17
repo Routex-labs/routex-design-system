@@ -9,6 +9,9 @@ import '../theme/routex_color_tokens.dart';
 
 enum RoutexButtonVariant { primary, secondary, quiet, danger }
 
+/// 버튼이 차지하는 시각적 밀도다. 두 크기 모두 실제 터치 영역은 48dp다.
+enum RoutexButtonSize { standard, compact }
+
 /// v0.1의 첫 vertical slice다. 임의 padding/radius/textStyle은 외부에 열지 않는다.
 class RoutexButton extends StatelessWidget {
   const RoutexButton({
@@ -17,6 +20,7 @@ class RoutexButton extends StatelessWidget {
     this.variant = RoutexButtonVariant.primary,
     this.leadingIcon,
     this.isLoading = false,
+    this.size = RoutexButtonSize.standard,
     super.key,
   });
 
@@ -25,6 +29,7 @@ class RoutexButton extends StatelessWidget {
   final RoutexButtonVariant variant;
   final IconData? leadingIcon;
   final bool isLoading;
+  final RoutexButtonSize size;
 
   @override
   Widget build(BuildContext context) {
@@ -45,17 +50,21 @@ class RoutexButton extends StatelessWidget {
       child: TextButton(
         onPressed: disabled ? null : onPressed,
         style: ButtonStyle(
-          minimumSize: const WidgetStatePropertyAll(
+          minimumSize: WidgetStatePropertyAll(
             Size(
               RoutexMetrics.minimumButtonWidth,
-              RoutexMetrics.standardControl,
+              size == RoutexButtonSize.compact
+                  ? RoutexMetrics.compactControl
+                  : RoutexMetrics.standardControl,
             ),
           ),
           tapTargetSize: MaterialTapTargetSize.padded,
-          padding: const WidgetStatePropertyAll(
+          padding: WidgetStatePropertyAll(
             EdgeInsetsDirectional.symmetric(
               horizontal: RoutexSpacing.componentPadding,
-              vertical: RoutexSpacing.inlineGap,
+              vertical: size == RoutexButtonSize.compact
+                  ? 0
+                  : RoutexSpacing.inlineGap,
             ),
           ),
           shape: const WidgetStatePropertyAll(

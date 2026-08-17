@@ -85,6 +85,33 @@ void main() {
       );
     });
 
+    testWidgets('compact 버튼은 32로 보이고 48로 눌린다', (tester) async {
+      await pump(
+        tester,
+        RoutexButton(
+          label: '출발',
+          onPressed: () {},
+          size: RoutexButtonSize.compact,
+        ),
+      );
+
+      expect(
+        tester
+            .widget<TextButton>(find.byType(TextButton))
+            .style!
+            .minimumSize!
+            .resolve({})!
+            .height,
+        RoutexMetrics.compactControl,
+        reason: '버튼의 보이는 면은 compactControl 토큰을 따른다',
+      );
+      expect(
+        tester.getSize(find.byType(RoutexButton)).height,
+        RoutexMetrics.minimumTouchTarget,
+        reason: '작은 시각면과 무관하게 터치 영역은 48dp다',
+      );
+    });
+
     testWidgets('칩은 32로 보이고 48로 눌린다', (tester) async {
       await pump(
         tester,
@@ -503,9 +530,7 @@ void main() {
       Future<double> handleTop(WidgetTester tester, Widget sheet) async {
         await pump(tester, sheet);
         final surface = tester.getRect(find.byType(RoutexBottomSheet));
-        final handle = tester.getRect(
-          find.byKey(RoutexBottomSheet.handleKey),
-        );
+        final handle = tester.getRect(find.byKey(RoutexBottomSheet.handleKey));
         return handle.top - surface.top;
       }
 
@@ -528,11 +553,7 @@ void main() {
       );
 
       expect(bySurface, RoutexSpacing.controlGap);
-      expect(
-        byContent,
-        bySurface,
-        reason: 'handle 위 여백은 누가 그리든 같아야 한다',
-      );
+      expect(byContent, bySurface, reason: 'handle 위 여백은 누가 그리든 같아야 한다');
     });
 
     // 대표 사진처럼 가장자리까지 닿아야 하는 조각이 있는 시트가 있다. 표면이 여백을
@@ -589,10 +610,7 @@ void main() {
     // 스크롤하는 본문은 둥근 모서리를 지나 올라간다. 자르지 않으면 그 자리에서
     // 사각으로 튀어나와, 표면이 아니라 본문이 모서리를 그리는 것처럼 보인다.
     testWidgets('본문은 표면의 곡률로 잘린다', (tester) async {
-      await pump(
-        tester,
-        const RoutexBottomSheet(child: SizedBox(height: 40)),
-      );
+      await pump(tester, const RoutexBottomSheet(child: SizedBox(height: 40)));
 
       final clip = tester.widget<ClipRRect>(
         find.descendant(

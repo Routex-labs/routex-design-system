@@ -465,6 +465,60 @@ void main() {
     expect(controller.text, isEmpty);
   });
 
+  testWidgets('검색 바 입력 면은 소비 앱의 전역 채움 테마를 상속하지 않는다', (tester) async {
+    final controller = TextEditingController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light.copyWith(
+          inputDecorationTheme: const InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.blue,
+          ),
+        ),
+        home: Scaffold(
+          body: RoutexSearchBar(
+            placeholder: '장소 검색',
+            onSearchPressed: () {},
+            leading: RoutexSearchLeading.menu,
+            onLeadingPressed: () {},
+            controller: controller,
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).decoration?.filled,
+      isFalse,
+    );
+  });
+
+  testWidgets('경로 플래너는 두 끝점이 준비되기 전 이동수단 자리를 만들지 않는다', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: Scaffold(
+          body: RoutexRoutePlanner(
+            originLabel: '현재 위치',
+            destinationLabel: '도착지를 정해 주세요',
+            travelModes: const [],
+            selectedTravelModeId: null,
+            onTravelModeSelected: (_) {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(RoutexTravelModeBar), findsNothing);
+    expect(
+      tester.getSize(find.byType(RoutexRoutePlanner)).height,
+      RoutexMetrics.minimumTouchTarget * 2 +
+          RoutexStroke.hairline +
+          RoutexSpacing.inlineGap * 2,
+    );
+  });
+
   group('RoutexPlaceActions', () {
     testWidgets('한 쌍 안에서 primary는 도착 하나뿐이다', (tester) async {
       var origin = false;
@@ -490,11 +544,48 @@ void main() {
         1,
         reason: '같은 위계의 주 행동이 둘이면 무엇을 누를지가 사라진다',
       );
+      expect(
+        tester
+            .widgetList<RoutexButton>(find.byType(RoutexButton))
+            .every((button) => button.size == RoutexButtonSize.compact),
+        isTrue,
+        reason: '쇼케이스와 소비 앱이 같은 장소 행동 밀도를 써야 한다',
+      );
 
       await tester.tap(find.text('출발'));
       await tester.tap(find.text('도착'));
       expect(origin, isTrue);
       expect(destination, isTrue);
+    });
+
+    testWidgets('장소 overview가 정체성·경로 행동·소개를 한 패턴으로 묶는다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: Scaffold(
+            body: RoutexPlaceOverview(
+              name: '오설록',
+              metadata: 'B1 · 카페',
+              saved: false,
+              onOrigin: () {},
+              onDestination: () {},
+              description: '차 문화를 소개하는 공간',
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(RoutexPlaceHeader), findsOneWidget);
+      expect(find.byType(RoutexPlaceActions), findsOneWidget);
+      expect(find.text('차 문화를 소개하는 공간'), findsOneWidget);
+      expect(
+        tester.getTopLeft(find.byType(RoutexPlaceHeader)).dy,
+        lessThan(tester.getTopLeft(find.byType(RoutexPlaceActions)).dy),
+      );
+      expect(
+        tester.getTopLeft(find.byType(RoutexPlaceActions)).dy,
+        lessThan(tester.getTopLeft(find.text('차 문화를 소개하는 공간')).dy),
+      );
     });
   });
 

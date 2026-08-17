@@ -5,17 +5,17 @@ Navigation의 매장 상세·목록·안내 제품 패턴을 제공한다.
 
 색상, 타이포그래피, 간격, 곡률, 공통 metric, 지도 위 layer와 제품 motion token, 그리고
 `RoutexInset`·`RoutexStack`·`RoutexCluster` 같은 layout primitive는 proposal이다. 공개
-위젯 51종은 별도 예외가 없는 한 모두 beta이며 값과 API는 v1 전에 조정할 수 있다. 상태를
-51번 반복해서 적지 않고, stable·deprecated 같은 예외만 시스템화 기준 문서에 기록한다.
+위젯 52종은 별도 예외가 없는 한 모두 beta이며 값과 API는 v1 전에 조정할 수 있다. 상태를
+52번 반복해서 적지 않고, stable·deprecated 같은 예외만 시스템화 기준 문서에 기록한다.
 
 | 구분 | 공개 컴포넌트 | 소유하는 결정 |
 |---|---|---|
-| 기본 | `RoutexButton`, `RoutexIconAction`, `RoutexListCell`, `RoutexChipBar`, `RoutexSectionHeader`, `RoutexDivider`, `RoutexBadge` | 행동 위계, 44dp 시각 높이, 48dp 터치 영역, 텍스트 열, 분류 필터, 묶음 제목, 묶음 경계, 상태 표시 |
+| 기본 | `RoutexButton`, `RoutexIconAction`, `RoutexListCell`, `RoutexChipBar`, `RoutexSectionHeader`, `RoutexDivider`, `RoutexBadge` | 행동 위계, standard·compact 시각 높이, 48dp 터치 영역, 텍스트 열, 분류 필터, 묶음 제목, 묶음 경계, 상태 표시 |
 | 표면·탐색 | `RoutexBottomSheet`, `RoutexTabs`, `RoutexMapControl`, `RoutexDialog`, `RoutexDisclosure`, `RoutexShowMore` | 시트 곡률·여백·handle, 탭 선택선, 지도 조작 크기, 확인 표면, 그 자리에서 펼치기 |
 | 피드백·대기 | `RoutexToast`, `RoutexToastSurface`, `RoutexInlineNotice`, `RoutexSkeleton`, `RoutexSkeletonList` | 되돌릴 것 없는 결과, 되돌리기가 붙는 결과, 아직 오지 않은 콘텐츠의 자리 |
 | 상세 콘텐츠 | `RoutexInfoRow`, `RoutexKeyValueRows`, `RoutexMediaCarousel`, `RoutexPhotoGrid` | 사실 한 줄과 복사, 라벨-값 표, 대표 사진과 사진 격자 |
 | 입력·설정 | `RoutexSearchBar`, `RoutexTravelModeBar`, `RoutexRoutePlanner`, `RoutexFloorSelector`, `RoutexSortMenu`, `RoutexSwitchRow` | 검색 진입, 출발·도착 순서, 가용 이동수단, 층 선택, 정렬 기준, 값 하나 켜고 끄기 |
-| 장소 패턴 | `RoutexPlaceHeader`, `RoutexPlaceActions`, `RoutexHours`, `RoutexMenuList`, `RoutexLinkList`, `RoutexResultList` | 장소 정보와 공유·저장, 출발·도착 위계, 영업 상태와 요일 표, 판매 목록, 외부 채널, 목록의 세 상태 |
+| 장소 패턴 | `RoutexPlaceOverview`, `RoutexPlaceHeader`, `RoutexPlaceActions`, `RoutexHours`, `RoutexMenuList`, `RoutexLinkList`, `RoutexResultList` | 대표 사진부터 소개까지의 상세 첫 구획, 장소 정보와 공유·저장, 출발·도착 위계, 영업 상태와 요일 표, 판매 목록, 외부 채널, 목록의 세 상태 |
 | 안내 패턴 | `RoutexManeuverBanner`, `RoutexRouteOption`, `RoutexTripProgress`, `RoutexEtaCard`, `RoutexStepList`, `RoutexArrivalCard`, `RoutexTransitItinerary`, `RoutexTransitLegStrip` | 다음 행동, 경로 선택, 진행 정보, 출발 전 요약, 단계 목록, 도착 확인, 대중교통 후보 |
 | 상태 | `RoutexInfoSection`, `RoutexEmptyState`, `RoutexStatusBanner` | 상세 설명, 빈 값, 완료·경고·오류 |
 
