@@ -30,61 +30,66 @@ abstract final class RoutexTypography {
   /// 이 배율부터 균등 칸보다 가로 스크롤이 읽기 순서를 더 잘 보존한다.
   static const scrollLayoutTextScale = 1.3;
 
-  static const _fontFamily = 'Pretendard';
-  static const _fontPackage = 'routex_design_system';
+  /// 테마를 조립할 때 `ThemeData(fontFamily:, package:)`로 함께 넘긴다.
+  ///
+  /// [textTheme]은 제품이 쓰는 역할 슬롯만 채우므로, 나머지 Material 슬롯은
+  /// 기본값(Roboto)으로 남아 한글이 시스템 대체 글꼴로 떨어진다. 그 자리를
+  /// 메우려면 가족 이름이 package 밖에서도 필요하다.
+  static const fontFamily = 'Pretendard';
+  static const fontPackage = 'routex_design_system';
 
   static const display = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 28,
     height: 1.25,
     fontWeight: FontWeight.w800,
   );
   static const headline = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 22,
     height: 30 / 22,
     fontWeight: FontWeight.w700,
   );
   static const title = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 18,
     height: 26 / 18,
     fontWeight: FontWeight.w700,
   );
   static const body = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 16,
     height: 1.5,
     fontWeight: FontWeight.w400,
   );
   static const bodyStrong = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 16,
     height: 1.5,
     fontWeight: FontWeight.w600,
   );
   static const bodySmall = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 14,
     height: 20 / 14,
     fontWeight: FontWeight.w400,
   );
   static const label = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 14,
     height: 20 / 14,
     fontWeight: FontWeight.w600,
   );
   static const caption = TextStyle(
-    fontFamily: _fontFamily,
-    package: _fontPackage,
+    fontFamily: fontFamily,
+    package: fontPackage,
     fontSize: 12,
     height: 1.5,
     fontWeight: FontWeight.w500,
