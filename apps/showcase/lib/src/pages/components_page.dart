@@ -124,17 +124,18 @@ class _ComponentsPageState extends State<ComponentsPage> {
                 child: RoutexStack(
                   gap: RoutexStackGap.control,
                   children: [
-                    RoutexSectionHeader(
+                    RoutexRecentList(
                       title: '최근 검색',
-                      actionLabel: '전체 보기',
-                      onAction: () {},
-                    ),
-                    const RoutexListCell(
-                      title: '더현대 서울',
-                      subtitle: '1F · 패션',
-                      leadingIcon: RoutexIcons.place,
-                      trailingIcon: RoutexIcons.forward,
-                      onPressed: _noop,
+                      onClear: _noop,
+                      items: const [
+                        RoutexRecentItem(
+                          id: 'the-hyundai',
+                          title: '더현대 서울',
+                          subtitle: '1F · 패션',
+                          onPressed: _noop,
+                          onRemove: _noop,
+                        ),
+                      ],
                     ),
                     const RoutexListCell(
                       title: '아이콘이 없는 선택 상태',
@@ -479,7 +480,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
           child: _FrameRow(
             children: [
               MobileFrame(
-                label: '사진과 주 행동',
+                label: '실제 상세 시트 첫 구획',
                 surface: MobileFrameSurface.sheet,
                 child: PlaceDetailHeaderCard(detail: _detail),
               ),

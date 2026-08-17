@@ -22,6 +22,22 @@ void main() {
     expect(find.text('B1 · 식음료 · 카페'), findsOneWidget);
     expect(find.textContaining('도보 3분'), findsNothing);
     expect(find.byTooltip('장소 공유'), findsOneWidget);
+    expect(find.byTooltip('장소 저장'), findsOneWidget);
+    expect(find.byTooltip('닫기'), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byType(RoutexPlaceHeader),
+        matching: find.byTooltip('닫기'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(RoutexPlaceHeader),
+        matching: find.byTooltip('장소 저장'),
+      ),
+      findsNothing,
+    );
   });
 
   testWidgets('주소는 사실로 표시하되 복사 action을 만들지 않는다', (tester) async {

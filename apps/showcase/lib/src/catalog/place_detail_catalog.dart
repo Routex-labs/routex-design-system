@@ -36,6 +36,7 @@ class _PlaceDetailHeaderCardState extends State<PlaceDetailHeaderCard> {
       name: detail.name,
       metadata: '${detail.floorLabel} · ${detail.category}',
       saved: _saved,
+      onClose: () => RoutexToast.show(context, '상세를 닫았습니다'),
       onShare: () => RoutexToast.show(context, '장소 공유 링크를 준비했습니다'),
       onSaved: (value) {
         setState(() => _saved = value);
@@ -43,7 +44,6 @@ class _PlaceDetailHeaderCardState extends State<PlaceDetailHeaderCard> {
       },
       onOrigin: () {},
       onDestination: () {},
-      description: detail.summary,
     );
   }
 }

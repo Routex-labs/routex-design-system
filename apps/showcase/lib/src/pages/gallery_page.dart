@@ -366,24 +366,25 @@ class _GalleryGridState extends State<GalleryGrid> {
               child: RoutexStack(
                 gap: RoutexStackGap.control,
                 children: [
-                  RoutexSectionHeader(
+                  RoutexRecentList(
                     title: '최근 검색',
-                    actionLabel: '전체 보기',
-                    onAction: () {},
-                  ),
-                  const RoutexListCell(
-                    title: '더현대 서울',
-                    subtitle: '1F · 패션',
-                    leadingIcon: RoutexIcons.place,
-                    trailingIcon: RoutexIcons.forward,
-                    onPressed: _noop,
-                  ),
-                  const RoutexListCell(
-                    title: '롯데월드타워',
-                    subtitle: '지하 1층 · 복합몰',
-                    leadingIcon: RoutexIcons.place,
-                    trailingIcon: RoutexIcons.forward,
-                    onPressed: _noop,
+                    onClear: _noop,
+                    items: const [
+                      RoutexRecentItem(
+                        id: 'the-hyundai',
+                        title: '더현대 서울',
+                        subtitle: '1F · 패션',
+                        onPressed: _noop,
+                        onRemove: _noop,
+                      ),
+                      RoutexRecentItem(
+                        id: 'lotte-tower',
+                        title: '롯데월드타워',
+                        subtitle: '지하 1층 · 복합몰',
+                        onPressed: _noop,
+                        onRemove: _noop,
+                      ),
+                    ],
                   ),
                 ],
               ),
