@@ -50,6 +50,9 @@ class RoutexButton extends StatelessWidget {
       child: TextButton(
         onPressed: disabled ? null : onPressed,
         style: ButtonStyle(
+          // ThemeData.visualDensity는 데스크톱에서 기본적으로 compact라 같은
+          // size도 웹에서 작아진다. 크기 토큰은 플랫폼과 무관한 계약이다.
+          visualDensity: VisualDensity.standard,
           minimumSize: WidgetStatePropertyAll(
             Size(
               RoutexMetrics.minimumButtonWidth,

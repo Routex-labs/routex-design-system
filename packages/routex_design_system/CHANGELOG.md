@@ -16,8 +16,8 @@
 - `RoutexRoutePlanner`는 이동수단이 없을 때 그 자리를 만들지 않고, 위치 행의 48dp
   터치 영역은 유지하면서 중복 상하 여백을 줄였다.
 - `RoutexButtonSize.compact`는 32dp 시각 면과 48dp 터치 영역을 분리한다.
-  다만 상세의 `RoutexPlaceActions`는 글자 주변 여백을 지키는 standard 44dp를
-  사용하며, 쇼케이스와 소비 앱이 같은 패턴을 렌더링한다.
+  데스크톱의 adaptive visual density를 상속하지 않아 웹과 앱에서 같은 높이를
+  렌더링하며, 상세의 `RoutexPlaceActions`가 이 크기를 함께 사용한다.
 - `RoutexPlaceOverview`가 장소 정보 → 출발·도착 → 대표 사진 → 소개의 순서와
   간격을 소유한다. 쇼케이스와 Navigation 앱이 이 패턴을 함께 사용한다.
 - 장소 상세의 닫기는 이름 줄 끝에, 공유·저장은 출발·도착 줄 오른쪽에 배치해

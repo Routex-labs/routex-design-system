@@ -559,21 +559,22 @@ void main() {
       expect(
         tester
             .widgetList<RoutexButton>(find.byType(RoutexButton))
-            .every((button) => button.size == RoutexButtonSize.standard),
+            .every((button) => button.size == RoutexButtonSize.compact),
         isTrue,
-        reason: '글자가 테두리에 붙는 compact가 아니라 앱과 같은 standard를 써야 한다',
+        reason: '상세의 짧은 두 글자 행동은 앱과 쇼케이스 모두 compact를 쓴다',
       );
       for (final button in find.byType(TextButton).evaluate()) {
         final style = (button.widget as TextButton).style!;
         expect(
           style.minimumSize!.resolve({})!.height,
-          RoutexMetrics.standardControl,
+          RoutexMetrics.compactControl,
         );
         expect(
           style.padding!.resolve({})!.vertical,
-          RoutexSpacing.inlineGap * 2,
-          reason: '버튼 글자와 테두리 사이의 세로 여백을 없애지 않는다',
+          0,
+          reason: 'compact의 시각 면은 높이 토큰이 소유한다',
         );
+        expect(style.visualDensity, VisualDensity.standard);
       }
 
       await tester.tap(find.text('출발'));

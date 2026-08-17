@@ -106,6 +106,11 @@ void main() {
         reason: '버튼의 보이는 면은 compactControl 토큰을 따른다',
       );
       expect(
+        tester.widget<TextButton>(find.byType(TextButton)).style!.visualDensity,
+        VisualDensity.standard,
+        reason: '데스크톱 adaptive density가 compact 면을 더 줄이면 안 된다',
+      );
+      expect(
         tester.getSize(find.byType(RoutexButton)).height,
         RoutexMetrics.minimumTouchTarget,
         reason: '작은 시각면과 무관하게 터치 영역은 48dp다',
