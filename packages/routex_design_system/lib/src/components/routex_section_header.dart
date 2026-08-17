@@ -68,17 +68,13 @@ class RoutexSectionHeader extends StatelessWidget {
               child: TextButton(
                 onPressed: onAction,
                 style: ButtonStyle(
-                  // 누를 자리는 넓히되 글자는 표면 가장자리에 맞춘다. 좌우
-                  // 패딩으로 터치 영역을 만들면 그 패딩만큼 글자가 안쪽으로
-                  // 밀려, 패딩 없는 왼쪽 제목과 여백이 달라진다. 상자를 키우고
-                  // 글자를 끝에 붙여 터치 영역이 정렬선 바깥으로 자라게 한다.
-                  // 짧은 라벨에도 상자를 48로 잡는다. 44로 두면 Material이
-                  // 터치 영역을 48로 늘리면서 좌우로 2씩 나눠 붙여, 글자가 다시
-                  // 안쪽으로 밀린다.
+                  // 카드의 끝선은 48dp 터치 상자가 맡는다. 글자를 끝에 붙이면
+                  // hover·pressed 배경이 보일 때 짧은 라벨이 오른쪽으로 쏠려
+                  // 보이므로, 글리프는 그 상자 한가운데에 둔다.
                   minimumSize: const WidgetStatePropertyAll(
                     Size.square(RoutexMetrics.minimumTouchTarget),
                   ),
-                  alignment: AlignmentDirectional.centerEnd,
+                  alignment: AlignmentDirectional.center,
                   padding: const WidgetStatePropertyAll(EdgeInsets.zero),
                   shape: const WidgetStatePropertyAll(
                     RoundedRectangleBorder(borderRadius: RoutexRadii.control),
@@ -88,7 +84,15 @@ class RoutexSectionHeader extends StatelessWidget {
                   ),
                   foregroundColor: WidgetStatePropertyAll(colors.actionPrimary),
                 ),
-                child: Text(actionLabel),
+                child: Padding(
+                  // line box는 중앙이어도 14dp 한글 glyph가 아래로 보인다. 아래
+                  // padding을 두 배로 잡으면 48dp 버튼의 실제 글리프가 2dp 올라간다.
+                  padding: const EdgeInsetsDirectional.only(
+                    bottom:
+                        RoutexOpticalCorrection.sectionHeaderActionLabelTop * 2,
+                  ),
+                  child: Text(actionLabel),
+                ),
               ),
             ),
           ],

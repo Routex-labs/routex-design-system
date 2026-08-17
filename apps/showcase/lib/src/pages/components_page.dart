@@ -19,6 +19,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
   int _route = 0;
   bool _saved = false;
   String _travelMode = 'walk';
+  bool _routeLocationsSwapped = false;
   String? _category = '음식점';
   String _floor = '1F';
   bool _autoIndoor = true;
@@ -121,6 +122,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
               MobileFrame(
                 label: '장소 목록',
                 surface: MobileFrameSurface.sheet,
+                contentInset: MobileFrameContentInset.searchAttached,
                 child: RoutexStack(
                   gap: RoutexStackGap.control,
                   children: [
@@ -161,9 +163,14 @@ class _ComponentsPageState extends State<ComponentsPage> {
                 child: RoutexStack(
                   gap: RoutexStackGap.control,
                   children: [
-                    const RoutexSectionHeader(
-                      title: '저장한 장소',
-                      level: RoutexSectionHeaderLevel.group,
+                    const Padding(
+                      padding: EdgeInsetsDirectional.symmetric(
+                        horizontal: RoutexSpacing.contentGap,
+                      ),
+                      child: RoutexSectionHeader(
+                        title: '저장한 장소',
+                        level: RoutexSectionHeaderLevel.group,
+                      ),
                     ),
                     RoutexListCell(
                       title: '발렌시아가',
@@ -224,8 +231,12 @@ class _ComponentsPageState extends State<ComponentsPage> {
                 label: '경로 입력',
                 surface: MobileFrameSurface.map,
                 child: RoutexRoutePlanner(
-                  originLabel: '현재 위치',
-                  destinationLabel: '더현대 서울 1F · 발렌시아가',
+                  originLabel: _routeLocationsSwapped
+                      ? '더현대 서울 1F · 발렌시아가'
+                      : '현재 위치',
+                  destinationLabel: _routeLocationsSwapped
+                      ? '현재 위치'
+                      : '더현대 서울 1F · 발렌시아가',
                   travelModes: const [
                     RoutexTravelModeOption(
                       id: 'car',
@@ -249,7 +260,9 @@ class _ComponentsPageState extends State<ComponentsPage> {
                   onOriginPressed: () {},
                   onDestinationPressed: () {},
                   onClose: () {},
-                  onDestinationMore: () {},
+                  onDestinationMore: () => setState(
+                    () => _routeLocationsSwapped = !_routeLocationsSwapped,
+                  ),
                 ),
               ),
             ],
@@ -518,6 +531,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
               MobileFrame(
                 label: '결과와 정렬',
                 surface: MobileFrameSurface.sheet,
+                contentInset: MobileFrameContentInset.searchAttached,
                 child: RoutexResultList(
                   status: RoutexResultStatus.ready,
                   summary: '32개 결과',
@@ -550,6 +564,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
               const MobileFrame(
                 label: '찾는 중',
                 surface: MobileFrameSurface.sheet,
+                contentInset: MobileFrameContentInset.searchAttached,
                 child: RoutexResultList(
                   status: RoutexResultStatus.loading,
                   loadingMessage: '실내 매장을 찾는 중',
@@ -559,6 +574,7 @@ class _ComponentsPageState extends State<ComponentsPage> {
               const MobileFrame(
                 label: '찾지 못함',
                 surface: MobileFrameSurface.sheet,
+                contentInset: MobileFrameContentInset.searchAttached,
                 child: RoutexResultList(
                   status: RoutexResultStatus.empty,
                   children: [],

@@ -46,6 +46,13 @@ class RoutexFloorSelector extends StatefulWidget {
 /// 한 번에 보이는 최대 셀 수.
 const _maxVisibleOptions = 5;
 
+/// 지도 위 층 전환기는 반복된 세로 control이라 표준 시각 높이를 쓴다.
+///
+/// 한 셀을 48dp로 두면 다섯 층 기둥이 지도 위에서 지나치게 넓고 길어진다. 층
+/// 전환은 화면 가장자리에 고정된 밀집 control이므로, 일반 버튼과 같은 44dp
+/// 밀도로 낮춰 지도와 경쟁하지 않게 한다.
+const _floorCellExtent = RoutexMetrics.standardControl;
+
 class _RoutexFloorSelectorState extends State<RoutexFloorSelector> {
   final _controller = ScrollController();
 
@@ -82,7 +89,7 @@ class _RoutexFloorSelectorState extends State<RoutexFloorSelector> {
       (option) => option.id == widget.selectedId,
     );
     if (index < 0) return;
-    const cell = RoutexMetrics.minimumTouchTarget;
+    const cell = _floorCellExtent;
     // 목록 밖으로는 넘기지 않는다 — 위아래 끝에서는 가운데 맞춤을 포기한다.
     final target = (index * cell - (_maxVisibleOptions - 1) / 2 * cell)
         .clamp(0, _controller.position.maxScrollExtent)
@@ -112,11 +119,11 @@ class _RoutexFloorSelectorState extends State<RoutexFloorSelector> {
 
     return SizedBox(
       // 세로 컨트롤이므로 부모가 넓어져도 폭은 셀 하나의 폭을 유지한다.
-      width: RoutexMetrics.minimumTouchTarget,
-      height: visible * RoutexMetrics.minimumTouchTarget,
+      width: _floorCellExtent,
+      height: visible * _floorCellExtent,
       child: Material(
         color: colors.surfaceRaised,
-        borderRadius: RoutexRadii.field,
+        borderRadius: RoutexRadii.control,
         elevation: RoutexLayer.onMap,
         shadowColor: colors.shadow,
         clipBehavior: Clip.antiAlias,
@@ -128,13 +135,14 @@ class _RoutexFloorSelectorState extends State<RoutexFloorSelector> {
               ? const ClampingScrollPhysics()
               : const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
-          itemExtent: RoutexMetrics.minimumTouchTarget,
+          itemExtent: _floorCellExtent,
           itemCount: widget.options.length,
           itemBuilder: (context, index) => _FloorItem(
             option: widget.options[index],
             selected: widget.options[index].id == widget.selectedId,
-            // 구분선은 셀 **위**에 그린다. 첫 셀 위에는 표면 가장자리가 이미 있다.
-            divided: index > 0,
+            // 구분선은 셀 **아래**에 그린다. 선택한 층으로 정확히 스크롤됐을 때
+            // 첫 셀 위로 이전 층의 선이 비치면, 목록이 아직 움직이는 것처럼 보인다.
+            divided: index < widget.options.length - 1,
             onPressed: () => widget.onSelected(widget.options[index].id),
           ),
         ),
@@ -170,7 +178,7 @@ class _FloorItem extends StatelessWidget {
         decoration: BoxDecoration(
           border: divided
               ? Border(
-                  top: BorderSide(
+                  bottom: BorderSide(
                     color: colors.borderSubtle,
                     width: RoutexStroke.hairline,
                   ),

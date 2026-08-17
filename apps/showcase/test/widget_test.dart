@@ -2,9 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:routex_design_system/routex_design_system.dart';
 import 'package:showcase/src/app/showcase_app.dart';
+import 'package:showcase/src/catalog/mobile_frame.dart';
 import 'package:showcase/src/fixtures/alignment_rhythm_fixture.dart';
 
 void main() {
+  testWidgets('검색에 붙는 목록 틀은 상단 inset만 control gap으로 낮춘다', (tester) async {
+    const childKey = ValueKey('search-attached-child');
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: RoutexTheme.light,
+        home: const Scaffold(
+          body: MobileFrame(
+            surface: MobileFrameSurface.sheet,
+            contentInset: MobileFrameContentInset.searchAttached,
+            child: SizedBox(key: childKey, height: 40, width: double.infinity),
+          ),
+        ),
+      ),
+    );
+
+    final frame = tester.getRect(find.byType(DecoratedBox));
+    final child = tester.getRect(find.byKey(childKey));
+    expect(child.top - frame.top, RoutexSpacing.controlGap);
+    expect(frame.bottom - child.bottom, RoutexSpacing.screenGutter);
+  });
+
   testWidgets('Runtime Kit의 catalog와 실제 버튼을 렌더링한다', (tester) async {
     await tester.pumpWidget(const RoutexShowcaseApp());
 

@@ -90,7 +90,7 @@ class RoutexInfoRow extends StatelessWidget {
                     // 아이콘 윗면을 첫 줄 글자 윗면에 맞춘다. line box는 글자보다
                     // 위아래로 여유가 있어 그냥 두면 아이콘이 떠 보인다.
                     padding: const EdgeInsetsDirectional.only(
-                      top: RoutexSpacing.inlineGap,
+                      top: RoutexOpticalCorrection.infoRowIconTop,
                     ),
                     child: Icon(
                       icon,

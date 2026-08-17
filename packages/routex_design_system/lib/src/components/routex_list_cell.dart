@@ -329,11 +329,9 @@ class RoutexListCell extends StatelessWidget {
                             RoutexIcons.reorder,
                             size: RoutexMetrics.iconMedium,
                             // 손잡이는 글이 아니라 잡는 자리를 알리는 장식이다.
-                            // 보조 동작과 같은 content 색을 쓰면 둘이 같은 무게의
-                            // 버튼으로 읽힌다.
-                            color: enabled
-                                ? colors.borderStrong
-                                : colors.contentDisabled,
+                            // 보조 동작보다 낮은 강조색으로 두어 버튼처럼 읽히지
+                            // 않되, 드래그 affordance는 남긴다.
+                            color: colors.contentDisabled,
                           ),
                         ),
                       ),
