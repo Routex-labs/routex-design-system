@@ -1,3 +1,21 @@
+## 0.2.21
+
+- `RoutexTheme.light`가 **Material 기본 슬롯까지 Pretendard로 세운다.** 역할 슬롯은 여덟인데
+  Material 슬롯은 열다섯이라, `textTheme`만 채우면 남는 일곱(`titleLarge`·`bodyLarge` 등)이
+  기본값 Roboto로 남는다. Roboto에는 한글이 없어 **그 자리만 시스템 대체 글꼴로 떨어진다** —
+  `TextField`의 입력 글자가 `bodyLarge`라 검색창 하나 때문에 한 화면에 두 글꼴이 선다.
+  영문으로 보면 티가 안 나서 그동안 드러나지 않았고, 단계 8의 전역 전환을 **시도해 보다**
+  나왔다. 가족만 맞추고 크기·굵기는 Material 기본을 그대로 둔다 — 남는 슬롯을 우리 역할에
+  매핑하는 것은 글꼴 결함과 별개 결정이라 여기서 함께 하지 않는다.
+  **앱 영향:** 브리지(`RoutexColorTokens`만 얹는 방식)로 쓰는 동안은 없다. `RoutexTheme.light`를
+  전역으로 쓰는 소비자에게만 해당한다.
+- `RoutexTypography.fontFamily`·`fontPackage` 공개. 테마를 조립할 때 `ThemeData`의 `fontFamily`·
+  `package`로 함께 넘겨야 해서, 가족 이름이 package 밖에서도 필요해졌다. 소비 앱이 제 테마를
+  조립할 때도 같은 값을 읽는다.
+- Showcase가 못 따라가던 계약 변경 둘을 맞췄다(`RoutexMapControl`의 tone 분리, 층 옵션 id의
+  `String` 전환). `analyze`가 여섯 commit째 막혀 CI가 test까지 가지 못하고 있었다. 층 선택
+  컨트롤은 `icon`과 `text`를 함께 주어 단언도 어기고 있었다.
+
 ## 0.2.20
 
 - **파괴적:** `RoutexFloorOption.id`가 `int` → `String`이다. Kit의 다른 옵션 타입은 전부 `String id`이고
