@@ -31,23 +31,19 @@ class _PlaceDetailHeaderCardState extends State<PlaceDetailHeaderCard> {
         ?showcaseMediaItem(asset, semanticLabel: '${detail.name} 매장 사진'),
     ];
 
-    return RoutexStack(
-      gap: RoutexStackGap.content,
-      children: [
-        if (hero.isNotEmpty) RoutexMediaCarousel(items: hero),
-        RoutexPlaceHeader(
-          name: detail.name,
-          metadata: '${detail.floorLabel} · ${detail.category}',
-          saved: _saved,
-          onShare: () => RoutexToast.show(context, '장소 공유 링크를 준비했습니다'),
-          onSaved: (value) {
-            setState(() => _saved = value);
-            RoutexToast.show(context, value ? '장소에 저장했습니다' : '저장을 취소했습니다');
-          },
-        ),
-        RoutexPlaceActions(onOrigin: () {}, onDestination: () {}),
-        Text(detail.summary, style: RoutexTypography.body),
-      ],
+    return RoutexPlaceOverview(
+      mediaItems: hero,
+      name: detail.name,
+      metadata: '${detail.floorLabel} · ${detail.category}',
+      saved: _saved,
+      onShare: () => RoutexToast.show(context, '장소 공유 링크를 준비했습니다'),
+      onSaved: (value) {
+        setState(() => _saved = value);
+        RoutexToast.show(context, value ? '장소에 저장했습니다' : '저장을 취소했습니다');
+      },
+      onOrigin: () {},
+      onDestination: () {},
+      description: detail.summary,
     );
   }
 }

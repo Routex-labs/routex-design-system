@@ -5,7 +5,6 @@ import '../foundations/routex_metrics.dart';
 import '../foundations/routex_radii.dart';
 import '../foundations/routex_spacing.dart';
 import '../foundations/routex_typography.dart';
-import '../layout/routex_stack.dart';
 import '../components/routex_surface.dart';
 import '../theme/routex_color_tokens.dart';
 import 'routex_travel_mode_bar.dart';
@@ -41,9 +40,14 @@ class RoutexRoutePlanner extends StatelessWidget {
     return RoutexSurface(
       role: RoutexSurfaceRole.chrome,
       child: Padding(
-        padding: const EdgeInsetsDirectional.all(RoutexSpacing.controlGap),
-        child: RoutexStack(
-          gap: RoutexStackGap.inline,
+        // 각 위치 행이 이미 48dp 터치 영역을 보장한다. 상하에도 controlGap을
+        // 더하면 입력 중 카드가 필요 이상으로 두꺼워지므로 inlineGap만 둔다.
+        padding: const EdgeInsetsDirectional.symmetric(
+          horizontal: RoutexSpacing.controlGap,
+          vertical: RoutexSpacing.inlineGap,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             _RouteLocationField(
               label: originLabel,
@@ -62,11 +66,14 @@ class RoutexRoutePlanner extends StatelessWidget {
               actionIcon: RoutexIcons.more,
               onAction: onDestinationMore,
             ),
-            RoutexTravelModeBar(
-              options: travelModes,
-              selectedId: selectedTravelModeId,
-              onSelected: onTravelModeSelected,
-            ),
+            if (travelModes.isNotEmpty) ...[
+              const SizedBox(height: RoutexSpacing.controlGap),
+              RoutexTravelModeBar(
+                options: travelModes,
+                selectedId: selectedTravelModeId,
+                onSelected: onTravelModeSelected,
+              ),
+            ],
           ],
         ),
       ),

@@ -40,9 +40,14 @@ class RoutexPlaceActions extends StatelessWidget {
         RoutexButton(
           label: '출발',
           variant: RoutexButtonVariant.secondary,
+          size: RoutexButtonSize.compact,
           onPressed: onOrigin,
         ),
-        RoutexButton(label: '도착', onPressed: onDestination),
+        RoutexButton(
+          label: '도착',
+          size: RoutexButtonSize.compact,
+          onPressed: onDestination,
+        ),
       ],
     );
   }

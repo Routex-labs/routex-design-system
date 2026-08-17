@@ -109,7 +109,13 @@ class RoutexSearchBar extends StatelessWidget {
                       cursorColor: colors.actionPrimary,
                       decoration: InputDecoration(
                         isDense: true,
+                        // 소비 앱의 전역 InputDecorationTheme가 filled라 해도 지도
+                        // 검색 표면 안에 입력 배경이 한 겹 더 생기면 안 된다.
+                        filled: false,
                         border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
                         contentPadding: EdgeInsets.zero,
                         hintText: placeholder,
                         hintStyle: RoutexTypography.body.copyWith(
