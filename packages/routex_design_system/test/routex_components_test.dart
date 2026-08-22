@@ -818,6 +818,29 @@ void main() {
       await tester.pump(RoutexToast.visibleDuration);
     });
 
+    // 버튼은 누를 자리를 48로 지키느라 상자가 값보다 두 배 높다. 상자 위끝을
+    // 맞추면 그 안에서 가운데 놓인 글자가 값보다 한 뼘 아래로 처져 보인다.
+    testWidgets('복사 글자는 값과 같은 기준선에 선다', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: RoutexTheme.light,
+          home: const Scaffold(
+            body: RoutexInfoRow(
+              label: '전화번호',
+              value: '02-3277-0132',
+              icon: Icons.call_outlined,
+              keepLabel: true,
+              copyText: '02-3277-0132',
+            ),
+          ),
+        ),
+      );
+
+      final value = tester.getRect(find.text('02-3277-0132').first);
+      final copy = tester.getRect(find.text('복사'));
+      expect((value.center.dy - copy.center.dy).abs(), lessThan(2));
+    });
+
     testWidgets('onCopied를 주면 성공 알림을 소비 앱이 가져간다', (tester) async {
       tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
         SystemChannels.platform,
