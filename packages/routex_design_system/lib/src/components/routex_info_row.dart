@@ -112,7 +112,13 @@ class RoutexInfoRow extends StatelessWidget {
                     ),
                   ),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  // **글자 기준선을 맞춘다.** `start`로 두면 복사 버튼이 값보다
+                  // 한 뼘 아래로 처져 보인다 — 버튼은 누를 자리를 48로 지키느라
+                  // 상자가 값보다 두 배 높고, 그 안에서 글자가 가운데 놓이기
+                  // 때문이다. 값이 여러 줄이어도 기준선은 첫 줄의 것이라 버튼은
+                  // 늘 첫 줄 옆에 선다.
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
                   children: [
                     Flexible(
                       child: Text(
